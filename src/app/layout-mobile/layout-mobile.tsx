@@ -178,60 +178,7 @@ export const MobileLayout: React.FC = () => {
           </div>
         </NeumorphicCard>
 
-        {/* Quick Menu Grids */}
-        <div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
-            
-            {/* Quick Button 1: Open POS */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-              <NeumorphicButton 
-                onClick={() => setActiveTab('transaksi')}
-                style={{ width: '56px', height: '56px', borderRadius: '50%', padding: 0 }}
-              >
-                <ShoppingCart size={22} color="var(--accent-blue)" />
-              </NeumorphicButton>
-              <span style={{ fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>Mulai POS</span>
-            </div>
 
-            {/* Quick Button 2: Stock view */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-              <NeumorphicButton 
-                onClick={() => setActiveTab('produk')}
-                style={{ width: '56px', height: '56px', borderRadius: '50%', padding: 0 }}
-              >
-                <Coffee size={22} color="var(--accent-green)" />
-              </NeumorphicButton>
-              <span style={{ fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>Cek Stok</span>
-            </div>
-
-            {/* Quick Button 3: Laporan */}
-            {user?.role !== 'Kasir' && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                <NeumorphicButton 
-                  onClick={() => setActiveTab('laporan')}
-                  style={{ width: '56px', height: '56px', borderRadius: '50%', padding: 0 }}
-                >
-                  <BarChart2 size={22} color="var(--accent-orange)" />
-                </NeumorphicButton>
-                <span style={{ fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>Laporan</span>
-              </div>
-            )}
-
-            {/* Quick Button 4: Pengaturan */}
-            {user?.role !== 'Kasir' && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                <NeumorphicButton 
-                  onClick={() => setActiveTab('pengaturan')}
-                  style={{ width: '56px', height: '56px', borderRadius: '50%', padding: 0 }}
-                >
-                  <Settings size={22} color="var(--text-primary)" />
-                </NeumorphicButton>
-                <span style={{ fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>Profil Toko</span>
-              </div>
-            )}
-
-          </div>
-        </div>
 
         {/* Dashboard low stock info */}
         <div style={{ flex: 1 }}>

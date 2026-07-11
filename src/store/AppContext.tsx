@@ -55,7 +55,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [store, setStore] = useState<Store | null>(null);
   const [currentShift, setCurrentShift] = useState<Shift | null>(null);
   const [activeTab, setActiveTabState] = useState<string>('dashboard');
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(true); // Default dark
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false); // Default light
   const [isHighContrast, setIsHighContrast] = useState<boolean>(false);
   
   const [cart, setCart] = useState<CartItem[]>([]);
