@@ -178,15 +178,15 @@ export const DashboardView: React.FC = () => {
             display: 'flex', 
             flexDirection: 'row',
             alignItems: 'center', 
-            gap: isMobile ? '8px' : '16px',
-            padding: isMobile ? '10px 8px' : '16px'
+            gap: isMobile ? '12px' : '16px',
+            padding: isMobile ? '14px 12px' : '16px'
           }}
         >
           <div
             className="nm-inset"
             style={{
-              width: isMobile ? '36px' : '48px',
-              height: isMobile ? '36px' : '48px',
+              width: isMobile ? '40px' : '48px',
+              height: isMobile ? '40px' : '48px',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
@@ -195,13 +195,13 @@ export const DashboardView: React.FC = () => {
               flexShrink: 0
             }}
           >
-            <TrendingUp size={isMobile ? 18 : 24} />
+            <TrendingUp size={isMobile ? 20 : 24} />
           </div>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: isMobile ? '9px' : '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               Omset Hari Ini
             </div>
-            <div style={{ fontSize: isMobile ? '13px' : '18px', fontWeight: 800, marginTop: '2px', color: 'var(--accent-blue)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ fontSize: isMobile ? '15px' : '18px', fontWeight: 800, marginTop: '2px', color: 'var(--accent-blue)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {formatRupiah(stats.omsetHariIni)}
             </div>
           </div>
@@ -213,15 +213,15 @@ export const DashboardView: React.FC = () => {
             display: 'flex', 
             flexDirection: 'row',
             alignItems: 'center', 
-            gap: isMobile ? '8px' : '16px',
-            padding: isMobile ? '10px 8px' : '16px'
+            gap: isMobile ? '12px' : '16px',
+            padding: isMobile ? '14px 12px' : '16px'
           }}
         >
           <div
             className="nm-inset"
             style={{
-              width: isMobile ? '36px' : '48px',
-              height: isMobile ? '36px' : '48px',
+              width: isMobile ? '40px' : '48px',
+              height: isMobile ? '40px' : '48px',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
@@ -230,13 +230,13 @@ export const DashboardView: React.FC = () => {
               flexShrink: 0
             }}
           >
-            <TrendingUp size={isMobile ? 18 : 24} />
+            <TrendingUp size={isMobile ? 20 : 24} />
           </div>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: isMobile ? '9px' : '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               Profit Hari Ini
             </div>
-            <div style={{ fontSize: isMobile ? '13px' : '18px', fontWeight: 800, marginTop: '2px', color: 'var(--accent-green)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ fontSize: isMobile ? '15px' : '18px', fontWeight: 800, marginTop: '2px', color: 'var(--accent-green)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {formatRupiah(stats.profitHariIni)}
             </div>
           </div>
@@ -248,15 +248,15 @@ export const DashboardView: React.FC = () => {
             display: 'flex', 
             flexDirection: 'row',
             alignItems: 'center', 
-            gap: isMobile ? '8px' : '16px',
-            padding: isMobile ? '10px 8px' : '16px'
+            gap: isMobile ? '12px' : '16px',
+            padding: isMobile ? '14px 12px' : '16px'
           }}
         >
           <div
             className="nm-inset"
             style={{
-              width: isMobile ? '36px' : '48px',
-              height: isMobile ? '36px' : '48px',
+              width: isMobile ? '40px' : '48px',
+              height: isMobile ? '40px' : '48px',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
@@ -265,14 +265,14 @@ export const DashboardView: React.FC = () => {
               flexShrink: 0
             }}
           >
-            <ShoppingBag size={isMobile ? 18 : 24} />
+            <ShoppingBag size={isMobile ? 20 : 24} />
           </div>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: isMobile ? '9px' : '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               Transaksi Hari Ini
             </div>
-            <div style={{ fontSize: isMobile ? '13px' : '20px', fontWeight: 800, marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {stats.transaksiHariIni} <span style={{ fontSize: isMobile ? '9px' : '11px', fontWeight: 500, color: 'var(--text-secondary)' }}>order</span>
+            <div style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: 800, marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {stats.transaksiHariIni} <span style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 500, color: 'var(--text-secondary)' }}>order</span>
             </div>
           </div>
         </NeumorphicCard>
@@ -283,16 +283,16 @@ export const DashboardView: React.FC = () => {
             display: 'flex', 
             flexDirection: 'row',
             alignItems: 'center', 
-            gap: isMobile ? '8px' : '16px',
-            padding: isMobile ? '10px 8px' : '16px',
+            gap: isMobile ? '12px' : '16px',
+            padding: isMobile ? '14px 12px' : '16px',
             border: stats.stokMenipis > 0 ? '1px solid var(--accent-red)' : 'none'
           }}
         >
           <div
             className="nm-inset"
             style={{
-              width: isMobile ? '36px' : '48px',
-              height: isMobile ? '36px' : '48px',
+              width: isMobile ? '40px' : '48px',
+              height: isMobile ? '40px' : '48px',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
@@ -301,14 +301,14 @@ export const DashboardView: React.FC = () => {
               flexShrink: 0
             }}
           >
-            {stats.stokMenipis > 0 ? <AlertTriangle size={isMobile ? 18 : 24} /> : <Box size={isMobile ? 18 : 24} />}
+            {stats.stokMenipis > 0 ? <AlertTriangle size={isMobile ? 20 : 24} /> : <Box size={isMobile ? 20 : 24} />}
           </div>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: isMobile ? '9px' : '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               Stok Menipis
             </div>
-            <div style={{ fontSize: isMobile ? '13px' : '20px', fontWeight: 800, marginTop: '2px', color: stats.stokMenipis > 0 ? 'var(--accent-red)' : 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {stats.stokMenipis} <span style={{ fontSize: isMobile ? '9px' : '11px', fontWeight: 500, color: 'var(--text-secondary)' }}>produk</span>
+            <div style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: 800, marginTop: '2px', color: stats.stokMenipis > 0 ? 'var(--accent-red)' : 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {stats.stokMenipis} <span style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 500, color: 'var(--text-secondary)' }}>produk</span>
             </div>
           </div>
         </NeumorphicCard>
