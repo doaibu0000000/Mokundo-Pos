@@ -315,7 +315,7 @@ export const DashboardView: React.FC = () => {
       </div>
 
       {/* Recharts Chart Panel */}
-      <NeumorphicCard style={{ padding: '24px', marginBottom: '20px' }}>
+      <NeumorphicCard style={{ padding: isMobile ? '16px 12px' : '24px', marginBottom: '20px' }}>
         <div
           style={{
             display: 'flex',
@@ -345,7 +345,7 @@ export const DashboardView: React.FC = () => {
           </div>
         </div>
 
-        <div style={{ width: '100%', height: '280px', marginTop: '10px' }}>
+        <div style={{ width: '100%', height: isMobile ? '180px' : '280px', marginTop: '10px' }}>
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartData} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--shadow-dark)" opacity={0.3} />
