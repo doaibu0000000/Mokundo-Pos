@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Home, ShoppingCart, Coffee, BarChart2, Settings, 
-  Sun, Moon, User
+  Sun, Moon, User, LogOut
 } from 'lucide-react';
 import { useApp } from '../../store/AppContext';
 import { db } from '../../shared/services/db';
@@ -31,7 +31,8 @@ export const MobileLayout: React.FC = () => {
     toggleDarkMode, 
     currentShift,
     canInstall,
-    installApp
+    installApp,
+    logoutUser
   } = useApp();
 
   const [omsetToday, setOmsetToday] = useState(0);
@@ -70,7 +71,8 @@ export const MobileLayout: React.FC = () => {
     { id: 'transaksi', label: 'POS', icon: <ShoppingCart size={20} />, roles: ['Admin', 'Kasir', 'Manajer'] },
     { id: 'produk', label: 'Produk', icon: <Coffee size={20} />, roles: ['Admin', 'Kasir', 'Manajer'] },
     { id: 'laporan', label: 'Laporan', icon: <BarChart2 size={20} />, roles: ['Admin', 'Manajer'] },
-    { id: 'pengaturan', label: 'Profil', icon: <Settings size={20} />, roles: ['Admin', 'Kasir', 'Manajer'] }
+    { id: 'pengaturan', label: 'Profil', icon: <Settings size={20} />, roles: ['Admin', 'Manajer'] },
+    { id: 'logout', label: 'Keluar', icon: <LogOut size={20} />, roles: ['Kasir'] }
   ];
 
   const filteredNavItems = navItems.filter(item => item.roles.includes(user?.role || ''));
@@ -221,7 +223,15 @@ export const MobileLayout: React.FC = () => {
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                if (item.id === 'logout') {
+                  if (confirm('Apakah Anda yakin ingin keluar?')) {
+                    logoutUser();
+                  }
+                } else {
+                  setActiveTab(item.id);
+                }
+              }}
               className={isActive ? 'nm-inset' : ''}
               style={{
                 display: 'flex',
@@ -233,7 +243,7 @@ export const MobileLayout: React.FC = () => {
                 borderRadius: '50%',
                 border: 'none',
                 background: 'none',
-                color: isActive ? 'var(--accent-blue)' : 'var(--text-secondary)',
+                color: item.id === 'logout' ? 'var(--accent-red)' : (isActive ? 'var(--accent-blue)' : 'var(--text-secondary)'),
                 gap: '2px',
                 transition: 'all 0.15s ease'
               }}
