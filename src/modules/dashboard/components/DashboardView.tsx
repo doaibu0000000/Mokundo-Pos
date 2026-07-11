@@ -167,85 +167,112 @@ export const DashboardView: React.FC = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '20px',
+          gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: isMobile ? '12px' : '20px',
           marginBottom: '30px',
         }}
       >
         {/* Card 1: Omset */}
-        <NeumorphicCard style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <NeumorphicCard 
+          style={{ 
+            display: 'flex', 
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'flex-start' : 'center', 
+            gap: isMobile ? '10px' : '16px',
+            padding: isMobile ? '12px' : '16px'
+          }}
+        >
           <div
             className="nm-inset"
             style={{
-              width: '48px',
-              height: '48px',
+              width: isMobile ? '36px' : '48px',
+              height: isMobile ? '36px' : '48px',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'var(--accent-blue)',
+              flexShrink: 0
             }}
           >
-            <TrendingUp size={24} />
+            <TrendingUp size={isMobile ? 18 : 24} />
           </div>
           <div>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
               Omset Hari Ini
             </div>
-            <div style={{ fontSize: '18px', fontWeight: 800, marginTop: '2px', color: 'var(--accent-blue)' }}>
+            <div style={{ fontSize: isMobile ? '14px' : '18px', fontWeight: 800, marginTop: '2px', color: 'var(--accent-blue)' }}>
               {formatRupiah(stats.omsetHariIni)}
             </div>
           </div>
         </NeumorphicCard>
 
         {/* Card 2: Profit */}
-        <NeumorphicCard style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <NeumorphicCard 
+          style={{ 
+            display: 'flex', 
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'flex-start' : 'center', 
+            gap: isMobile ? '10px' : '16px',
+            padding: isMobile ? '12px' : '16px'
+          }}
+        >
           <div
             className="nm-inset"
             style={{
-              width: '48px',
-              height: '48px',
+              width: isMobile ? '36px' : '48px',
+              height: isMobile ? '36px' : '48px',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'var(--accent-green)',
+              flexShrink: 0
             }}
           >
-            <TrendingUp size={24} />
+            <TrendingUp size={isMobile ? 18 : 24} />
           </div>
           <div>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
               Profit Hari Ini
             </div>
-            <div style={{ fontSize: '18px', fontWeight: 800, marginTop: '2px', color: 'var(--accent-green)' }}>
+            <div style={{ fontSize: isMobile ? '14px' : '18px', fontWeight: 800, marginTop: '2px', color: 'var(--accent-green)' }}>
               {formatRupiah(stats.profitHariIni)}
             </div>
           </div>
         </NeumorphicCard>
 
         {/* Card 3: Transaksi */}
-        <NeumorphicCard style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <NeumorphicCard 
+          style={{ 
+            display: 'flex', 
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'flex-start' : 'center', 
+            gap: isMobile ? '10px' : '16px',
+            padding: isMobile ? '12px' : '16px'
+          }}
+        >
           <div
             className="nm-inset"
             style={{
-              width: '48px',
-              height: '48px',
+              width: isMobile ? '36px' : '48px',
+              height: isMobile ? '36px' : '48px',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'var(--text-primary)',
+              flexShrink: 0
             }}
           >
-            <ShoppingBag size={24} />
+            <ShoppingBag size={isMobile ? 18 : 24} />
           </div>
           <div>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
               Transaksi Hari Ini
             </div>
-            <div style={{ fontSize: '20px', fontWeight: 800, marginTop: '2px' }}>
-              {stats.transaksiHariIni} <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)' }}>order</span>
+            <div style={{ fontSize: isMobile ? '15px' : '20px', fontWeight: 800, marginTop: '2px' }}>
+              {stats.transaksiHariIni} <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-secondary)' }}>order</span>
             </div>
           </div>
         </NeumorphicCard>
@@ -254,31 +281,34 @@ export const DashboardView: React.FC = () => {
         <NeumorphicCard 
           style={{ 
             display: 'flex', 
-            alignItems: 'center', 
-            gap: '16px',
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'flex-start' : 'center', 
+            gap: isMobile ? '10px' : '16px',
+            padding: isMobile ? '12px' : '16px',
             border: stats.stokMenipis > 0 ? '1px solid var(--accent-red)' : 'none'
           }}
         >
           <div
             className="nm-inset"
             style={{
-              width: '48px',
-              height: '48px',
+              width: isMobile ? '36px' : '48px',
+              height: isMobile ? '36px' : '48px',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: stats.stokMenipis > 0 ? 'var(--accent-red)' : 'var(--text-secondary)',
+              flexShrink: 0
             }}
           >
-            {stats.stokMenipis > 0 ? <AlertTriangle size={24} /> : <Box size={24} />}
+            {stats.stokMenipis > 0 ? <AlertTriangle size={isMobile ? 18 : 24} /> : <Box size={isMobile ? 18 : 24} />}
           </div>
           <div>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
               Stok Menipis
             </div>
-            <div style={{ fontSize: '20px', fontWeight: 800, marginTop: '2px', color: stats.stokMenipis > 0 ? 'var(--accent-red)' : 'var(--text-primary)' }}>
-              {stats.stokMenipis} <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)' }}>produk</span>
+            <div style={{ fontSize: isMobile ? '15px' : '20px', fontWeight: 800, marginTop: '2px', color: stats.stokMenipis > 0 ? 'var(--accent-red)' : 'var(--text-primary)' }}>
+              {stats.stokMenipis} <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-secondary)' }}>produk</span>
             </div>
           </div>
         </NeumorphicCard>
