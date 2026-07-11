@@ -117,7 +117,7 @@ export const MobileLayout: React.FC = () => {
             </div>
             <div>
               <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Selamat datang,</div>
-              <div style={{ fontSize: '14px', fontWeight: 800 }}>{user?.nama_lengkap} ({user?.role})</div>
+              <div style={{ fontSize: '14px', fontWeight: 800 }}>{user?.nama_lengkap?.replace(' Utama', '')} ({user?.role})</div>
             </div>
           </div>
 
@@ -180,7 +180,6 @@ export const MobileLayout: React.FC = () => {
 
         {/* Quick Menu Grids */}
         <div>
-          <h3 style={{ fontSize: '14px', fontWeight: 800, marginBottom: '12px' }}>Menu Cepat</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
             
             {/* Quick Button 1: Open POS */}

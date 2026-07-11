@@ -157,7 +157,7 @@ export async function seedDatabase() {
         username: 'admin',
         password_hash: adminHash,
         role: 'Admin',
-        nama_lengkap: 'Administrator Utama',
+        nama_lengkap: 'Administrator',
       },
       {
         username: 'kasir',
