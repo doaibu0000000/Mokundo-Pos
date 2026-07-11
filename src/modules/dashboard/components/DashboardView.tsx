@@ -347,10 +347,10 @@ export const DashboardView: React.FC = () => {
 
         <div style={{ width: '100%', height: isMobile ? '180px' : '280px', marginTop: '10px' }}>
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ left: isMobile ? -25 : -10, right: 10, top: 10, bottom: 0 }}>
+            <ComposedChart data={chartData} margin={{ left: isMobile ? -12 : -10, right: 10, top: 10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--shadow-dark)" opacity={0.3} />
               <XAxis dataKey="date" stroke="var(--text-secondary)" fontSize={10} tickLine={false} />
-              <YAxis stroke="var(--text-secondary)" fontSize={10} tickLine={false} width={isMobile ? 20 : 40} />
+              <YAxis stroke="var(--text-secondary)" fontSize={10} tickLine={false} width={isMobile ? 22 : 40} />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'var(--bg-surface)',
