@@ -10,7 +10,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      injectRegister: 'inline',
+      injectRegister: 'auto',
+      includeAssets: ['favicon.svg', 'pwa-192x192.png', 'pwa-512x512.png', 'pwa-512x512-maskable.png'],
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         cleanupOutdatedCaches: true,
@@ -33,25 +34,33 @@ export default defineConfig({
           }
         ]
       },
+      devOptions: {
+        enabled: true
+      },
       manifest: {
-        name: 'Mokundo POS',
-        short_name: 'MokundoPOS',
-        description: 'Sistem Kasir (POS) Offline-First',
+        name: 'Mokundo POS — Sistem Kasir',
+        short_name: 'Mokundo POS',
+        description: 'Sistem Kasir (POS) Offline-First untuk UMKM',
         theme_color: '#2B2F3A',
         background_color: '#2B2F3A',
         display: 'standalone',
+        orientation: 'portrait',
         start_url: '/Mokundo-Pos/',
         scope: '/Mokundo-Pos/',
+        id: '/Mokundo-Pos/',
+        categories: ['business', 'finance', 'productivity'],
         icons: [
           {
             src: 'pwa-192x192.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any'
           },
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any'
           },
           {
             src: 'pwa-512x512-maskable.png',

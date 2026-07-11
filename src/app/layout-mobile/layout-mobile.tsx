@@ -29,7 +29,9 @@ export const MobileLayout: React.FC = () => {
     setActiveTab, 
     isDarkMode, 
     toggleDarkMode, 
-    currentShift 
+    currentShift,
+    canInstall,
+    installApp
   } = useApp();
 
   const [omsetToday, setOmsetToday] = useState(0);
@@ -126,6 +128,30 @@ export const MobileLayout: React.FC = () => {
             {isDarkMode ? <Sun size={18} color="var(--accent-orange)" /> : <Moon size={18} />}
           </NeumorphicButton>
         </div>
+
+        {/* PWA Install Banner */}
+        {canInstall && (
+          <NeumorphicCard
+            style={{
+              padding: '16px',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--accent-blue)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}
+          >
+            <div>
+              <h4 style={{ fontWeight: 800, fontSize: '14px', color: 'var(--text-primary)' }}>Pasang Aplikasi Mokundo POS</h4>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px', lineHeight: '1.4' }}>
+                Instal di HP/tablet Anda agar berjalan mandiri di layar penuh tanpa browser dan tetap stabil saat offline.
+              </p>
+            </div>
+            <NeumorphicButton variant="primary" size="sm" onClick={installApp} style={{ width: '100%' }}>
+              Instal Aplikasi POS
+            </NeumorphicButton>
+          </NeumorphicCard>
+        )}
 
         {/* Large Summary Card (GoPay balance-card look) */}
         <NeumorphicCard 

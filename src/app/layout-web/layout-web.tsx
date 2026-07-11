@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   Home, ShoppingCart, Coffee, BarChart2, Settings, 
-  Sun, Moon, LogOut, Coffee as ShopIcon
+  Sun, Moon, LogOut, Coffee as ShopIcon, Download
 } from 'lucide-react';
 import { useApp } from '../../store/AppContext';
 import { NeumorphicButton } from '../../shared/components';
@@ -20,7 +20,9 @@ export const WebLayout: React.FC = () => {
     toggleDarkMode,
     isHighContrast,
     toggleHighContrast,
-    logoutUser
+    logoutUser,
+    canInstall,
+    installApp
   } = useApp();
 
   const menuItems = [
@@ -142,6 +144,18 @@ export const WebLayout: React.FC = () => {
             );
           })}
         </div>
+
+        {/* PWA Install Button for Desktop */}
+        {canInstall && (
+          <NeumorphicButton
+            variant="primary"
+            onClick={installApp}
+            style={{ width: '100%', marginBottom: '16px', padding: '10px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+          >
+            <Download size={16} />
+            <span style={{ fontSize: '12px', fontWeight: 800 }}>Pasang POS App</span>
+          </NeumorphicButton>
+        )}
 
         {/* Sidebar Footer theme configurations */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px dashed var(--text-muted)', paddingTop: '16px' }}>

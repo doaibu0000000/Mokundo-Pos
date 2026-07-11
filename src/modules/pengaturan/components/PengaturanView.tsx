@@ -24,7 +24,9 @@ export const PengaturanView: React.FC = () => {
     refreshShift,
     isHighContrast,
     toggleHighContrast,
-    logoutUser
+    logoutUser,
+    canInstall,
+    installApp
   } = useApp();
 
   const [activeSubTab, setActiveSubTab] = useState<'profil' | 'keamanan' | 'sync' | 'shift'>('profil');
@@ -257,85 +259,99 @@ export const PengaturanView: React.FC = () => {
 
       {/* 1. SHOP PROFILE & TAX TABS */}
       {activeSubTab === 'profil' && (
-        <NeumorphicCard style={{ maxWidth: '600px' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '20px' }}>Pengaturan Toko & Struk</h3>
-          
-          <form onSubmit={handleSaveStore} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <NeumorphicInput
-              label="Nama Toko"
-              value={storeNama}
-              onChange={(e) => setStoreNama(e.target.value)}
-              required
-            />
-            <NeumorphicInput
-              label="Alamat Toko"
-              value={storeAlamat}
-              onChange={(e) => setStoreAlamat(e.target.value)}
-              required
-            />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '600px' }}>
+          {canInstall && (
+            <NeumorphicCard>
+              <h3 style={{ fontSize: '15px', fontWeight: 800, marginBottom: '8px' }}>Instal Aplikasi Mokundo POS</h3>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px', lineHeight: '1.4' }}>
+                Pasang aplikasi ini langsung di layar utama HP/tablet Anda untuk berjalan mandiri di layar penuh (full-screen) dan lebih stabil.
+              </p>
+              <NeumorphicButton variant="primary" onClick={installApp} style={{ width: '100%' }}>
+                Instal Sekarang
+              </NeumorphicButton>
+            </NeumorphicCard>
+          )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <NeumorphicCard style={{ width: '100%' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '20px' }}>Pengaturan Toko & Struk</h3>
+            
+            <form onSubmit={handleSaveStore} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <NeumorphicInput
-                label="Pajak PPN (%)"
-                type="number"
-                value={storePPN}
-                onChange={(e) => setStorePPN(e.target.value)}
+                label="Nama Toko"
+                value={storeNama}
+                onChange={(e) => setStoreNama(e.target.value)}
                 required
               />
               <NeumorphicInput
-                label="Service Charge (%)"
-                type="number"
-                value={storeService}
-                onChange={(e) => setStoreService(e.target.value)}
+                label="Alamat Toko"
+                value={storeAlamat}
+                onChange={(e) => setStoreAlamat(e.target.value)}
                 required
               />
-            </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Header Struk</label>
-              <textarea
-                value={receiptHeader}
-                onChange={(e) => setReceiptHeader(e.target.value)}
-                rows={3}
-                className="nm-input"
-                style={{
-                  padding: '12px',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '13px',
-                  fontFamily: 'monospace',
-                  border: 'var(--border-width-hc) solid var(--border-high-contrast)'
-                }}
-              />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Footer Struk</label>
-              <textarea
-                value={receiptFooter}
-                onChange={(e) => setReceiptFooter(e.target.value)}
-                rows={3}
-                className="nm-input"
-                style={{
-                  padding: '12px',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '13px',
-                  fontFamily: 'monospace',
-                  border: 'var(--border-width-hc) solid var(--border-high-contrast)'
-                }}
-              />
-            </div>
-
-            {storeSuccess && (
-              <div style={{ color: 'var(--accent-green)', fontSize: '12px', fontWeight: 600 }}>
-                ✓ {storeSuccess}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <NeumorphicInput
+                  label="Pajak PPN (%)"
+                  type="number"
+                  value={storePPN}
+                  onChange={(e) => setStorePPN(e.target.value)}
+                  required
+                />
+                <NeumorphicInput
+                  label="Service Charge (%)"
+                  type="number"
+                  value={storeService}
+                  onChange={(e) => setStoreService(e.target.value)}
+                  required
+                />
               </div>
-            )}
 
-            <NeumorphicButton type="submit" variant="primary" style={{ marginTop: '8px' }}>
-              Simpan Profil Toko
-            </NeumorphicButton>
-          </form>
-        </NeumorphicCard>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Header Struk</label>
+                <textarea
+                  value={receiptHeader}
+                  onChange={(e) => setReceiptHeader(e.target.value)}
+                  rows={3}
+                  className="nm-input"
+                  style={{
+                    padding: '12px',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '13px',
+                    fontFamily: 'monospace',
+                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Footer Struk</label>
+                <textarea
+                  value={receiptFooter}
+                  onChange={(e) => setReceiptFooter(e.target.value)}
+                  rows={3}
+                  className="nm-input"
+                  style={{
+                    padding: '12px',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '13px',
+                    fontFamily: 'monospace',
+                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
+                  }}
+                />
+              </div>
+
+              {storeSuccess && (
+                <div style={{ color: 'var(--accent-green)', fontSize: '12px', fontWeight: 600 }}>
+                  ✓ {storeSuccess}
+                </div>
+              )}
+
+              <NeumorphicButton type="submit" variant="primary" style={{ marginTop: '8px' }}>
+                Simpan Profil Toko
+              </NeumorphicButton>
+            </form>
+          </NeumorphicCard>
+        </div>
       )}
 
       {/* 2. CHANGE PASSWORD SECURITY TABS */}

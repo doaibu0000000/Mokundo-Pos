@@ -44,6 +44,8 @@ interface AppContextType {
   setDiscountAmount: (val: number) => void;
   platform: 'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood';
   setPlatform: (val: 'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood') => void;
+  canInstall: boolean;
+  installApp: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -59,6 +61,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [platform, setPlatform] = useState<'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood'>('Dine-in');
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  // Listen to PWA installation events
+  useEffect(() => {
+    const handleBeforePrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    const handleAppInstalled = () => {
+      console.log('PWA app was successfully installed');
+      setDeferredPrompt(null);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforePrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforePrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
+  const installApp = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log('PWA installation status:', outcome);
+    setDeferredPrompt(null);
+  };
 
   // Load Session and System configs on startup
   useEffect(() => {
@@ -222,7 +251,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         discountAmount,
         setDiscountAmount,
         platform,
-        setPlatform
+        setPlatform,
+        canInstall: !!deferredPrompt,
+        installApp
       }}
     >
       {children}
