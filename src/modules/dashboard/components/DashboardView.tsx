@@ -139,7 +139,7 @@ export const DashboardView: React.FC = () => {
   }, [filterDays]);
 
   return (
-    <div style={{ padding: isMobile ? '0' : '20px', height: isMobile ? 'auto' : '100%', overflowY: isMobile ? 'visible' : 'auto', overflowX: 'hidden' }}>
+    <div style={{ padding: isMobile ? '0' : '20px', height: isMobile ? 'auto' : '100%', overflowY: isMobile ? 'visible' : 'auto', overflowX: 'hidden', width: '100%' }}>
       {/* Header Title */}
       {!isMobile && (
         <div
@@ -170,6 +170,7 @@ export const DashboardView: React.FC = () => {
           gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fit, minmax(220px, 1fr))',
           gap: isMobile ? '12px' : '20px',
           marginBottom: '30px',
+          width: '100%'
         }}
       >
         {/* Card 1: Omset */}

@@ -182,8 +182,7 @@ export const MobileLayout: React.FC = () => {
 
 
 
-        {/* Dashboard low stock info */}
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, width: '100%' }}>
           <DashboardView />
         </div>
       </div>
