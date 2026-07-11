@@ -70,7 +70,7 @@ export const MobileLayout: React.FC = () => {
     { id: 'transaksi', label: 'POS', icon: <ShoppingCart size={20} />, roles: ['Admin', 'Kasir', 'Manajer'] },
     { id: 'produk', label: 'Produk', icon: <Coffee size={20} />, roles: ['Admin', 'Kasir', 'Manajer'] },
     { id: 'laporan', label: 'Laporan', icon: <BarChart2 size={20} />, roles: ['Admin', 'Manajer'] },
-    { id: 'pengaturan', label: 'Profil', icon: <Settings size={20} />, roles: ['Admin', 'Manajer'] }
+    { id: 'pengaturan', label: 'Profil', icon: <Settings size={20} />, roles: ['Admin', 'Kasir', 'Manajer'] }
   ];
 
   const filteredNavItems = navItems.filter(item => item.roles.includes(user?.role || ''));
