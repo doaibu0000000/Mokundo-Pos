@@ -34,6 +34,13 @@ export const DashboardView: React.FC = () => {
   const [chartData, setChartData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [filterDays, setFilterDays] = useState<7 | 30>(7);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const loadDashboardData = async () => {
     setLoading(true);
@@ -134,25 +141,27 @@ export const DashboardView: React.FC = () => {
   return (
     <div style={{ padding: '20px', height: '100%', overflowY: 'auto' }}>
       {/* Header Title */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '24px',
-        }}
-      >
-        <div>
-          <h1 style={{ fontSize: '24px', fontWeight: 800 }}>Ringkasan Bisnis</h1>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-            Pantau performa penjualan Anda secara real-time
-          </p>
+      {!isMobile && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '24px',
+          }}
+        >
+          <div>
+            <h1 style={{ fontSize: '24px', fontWeight: 800 }}>Ringkasan Bisnis</h1>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+              Pantau performa penjualan Anda secara real-time
+            </p>
+          </div>
+          <NeumorphicButton onClick={loadDashboardData} size="sm">
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            Refresh
+          </NeumorphicButton>
         </div>
-        <NeumorphicButton onClick={loadDashboardData} size="sm">
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-          Refresh
-        </NeumorphicButton>
-      </div>
+      )}
 
       {/* Stats Cards Grid */}
       <div
