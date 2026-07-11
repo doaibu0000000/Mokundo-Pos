@@ -139,7 +139,7 @@ export const DashboardView: React.FC = () => {
   }, [filterDays]);
 
   return (
-    <div style={{ padding: isMobile ? '0' : '20px', height: '100%', overflowY: 'auto' }}>
+    <div style={{ padding: isMobile ? '0' : '20px', height: isMobile ? 'auto' : '100%', overflowY: isMobile ? 'visible' : 'auto', overflowX: 'hidden' }}>
       {/* Header Title */}
       {!isMobile && (
         <div
@@ -345,7 +345,7 @@ export const DashboardView: React.FC = () => {
           </div>
         </div>
 
-        <div style={{ width: '100%', height: isMobile ? '180px' : '280px', marginTop: '10px' }}>
+        <div style={{ width: '100%', height: isMobile ? '180px' : '280px', marginTop: '10px', overflow: 'hidden' }}>
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartData} margin={{ left: isMobile ? -5 : -10, right: 10, top: 10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--shadow-dark)" opacity={0.3} />
