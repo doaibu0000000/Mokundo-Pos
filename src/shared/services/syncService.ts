@@ -1,0 +1,111 @@
+import { db } from './db';
+
+export class SyncService {
+  private static isSyncing = false;
+
+  // Listen to network changes and sync
+  public static init() {
+    window.addEventListener('online', () => {
+      console.log('Device is online, triggering sync...');
+      this.syncAll().catch(err => console.error('Sync error on network return:', err));
+    });
+  }
+
+  // General check and sync trigger
+  public static async syncAll(): Promise<{ success: boolean; syncedCount: number }> {
+    if (this.isSyncing) return { success: false, syncedCount: 0 };
+    
+    // Check if network is available
+    if (!navigator.onLine) {
+      return { success: false, syncedCount: 0 };
+    }
+
+    const storeConfig = await db.stores.toCollection().first();
+    if (!storeConfig || !storeConfig.sync_enabled || !storeConfig.supabase_url || !storeConfig.supabase_anon_key) {
+      // Sync is not enabled or credentials are not filled
+      return { success: false, syncedCount: 0 };
+    }
+
+    this.isSyncing = true;
+    let totalSynced = 0;
+
+    try {
+      const url = storeConfig.supabase_url.replace(/\/$/, '');
+      const key = storeConfig.supabase_anon_key;
+
+      // 1. Sync Shifts
+      const pendingShifts = await db.shifts.where('sync_status').equals('PENDING').toArray();
+      for (const shift of pendingShifts) {
+        const success = await this.syncRecord(url, key, 'shifts', shift);
+        if (success) {
+          await db.shifts.update(shift.id!, { sync_status: 'SYNCED' });
+          totalSynced++;
+        }
+      }
+
+      // 2. Sync Transactions
+      const pendingTx = await db.transactions.where('sync_status').equals('PENDING').toArray();
+      for (const tx of pendingTx) {
+        // Also fetch items for this transaction
+        const items = await db.transaction_items.where('transaksi_id').equals(tx.id!).toArray();
+        
+        // Payload combines transaction + its items
+        const payload = {
+          ...tx,
+          items: items.map(item => ({
+            produk_id: item.produk_id,
+            nama_produk: item.nama_produk,
+            qty: item.qty,
+            harga_satuan: item.harga_satuan,
+            varian: item.varian,
+            catatan: item.catatan
+          }))
+        };
+
+        const success = await this.syncRecord(url, key, 'transactions', payload);
+        if (success) {
+          await db.transactions.update(tx.id!, { sync_status: 'SYNCED' });
+          totalSynced++;
+        }
+      }
+
+      // 3. Sync Stock Logs
+      const pendingLogs = await db.stock_logs.where('sync_status').equals('PENDING').toArray();
+      for (const log of pendingLogs) {
+        const success = await this.syncRecord(url, key, 'stock_logs', log);
+        if (success) {
+          await db.stock_logs.update(log.id!, { sync_status: 'SYNCED' });
+          totalSynced++;
+        }
+      }
+
+      return { success: true, syncedCount: totalSynced };
+    } catch (error) {
+      console.error('Data synchronization failed:', error);
+      return { success: false, syncedCount: totalSynced };
+    } finally {
+      this.isSyncing = false;
+    }
+  }
+
+  // Push single record to Supabase via REST API
+  private static async syncRecord(url: string, anonKey: string, tableName: string, payload: any): Promise<boolean> {
+    try {
+      const response = await fetch(`${url}/rest/v1/${tableName}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': anonKey,
+          'Authorization': `Bearer ${anonKey}`,
+          'Prefer': 'resolution=merge-duplicates' // UPSERT behavior if primary keys match
+        },
+        body: JSON.stringify(payload)
+      });
+
+      return response.ok || response.status === 201;
+    } catch (e) {
+      console.error(`Network error syncing ${tableName}:`, e);
+      return false;
+    }
+  }
+}

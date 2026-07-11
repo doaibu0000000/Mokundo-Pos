@@ -1,0 +1,63 @@
+/* src/index.css */
+@import './shared/design-system/tokens.css';
+
+/* Neumorphic UI Utility classes */
+.nm-flat {
+  background-color: var(--bg-surface);
+  box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+  border: var(--border-width-hc) solid var(--border-high-contrast);
+  transition: all 0.2s ease;
+}
+
+.nm-inset {
+  background-color: var(--bg-inset);
+  box-shadow: inset 4px 4px 8px var(--shadow-dark-inset), inset -4px -4px 8px var(--shadow-light-inset);
+  border: var(--border-width-hc) solid var(--border-high-contrast);
+  transition: all 0.2s ease;
+}
+
+/* Elevated hover/active behaviors */
+.nm-button {
+  background-color: var(--bg-surface);
+  box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+  border: var(--border-width-hc) solid var(--border-high-contrast);
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.nm-button:hover {
+  box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+}
+
+.nm-button:active, .nm-button.active {
+  box-shadow: inset 3px 3px 6px var(--shadow-dark-inset), inset -3px -3px 6px var(--shadow-light-inset);
+  transform: scale(0.98);
+}
+
+.nm-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  border: 1px dashed var(--text-muted);
+}
+
+.nm-input {
+  background-color: var(--bg-inset);
+  color: var(--text-primary);
+  box-shadow: inset 3px 3px 6px var(--shadow-dark-inset), inset -3px -3px 6px var(--shadow-light-inset);
+  border: 1px solid transparent;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.nm-input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: inset 3px 3px 6px var(--shadow-dark-inset), inset -3px -3px 6px var(--shadow-light-inset), 0 0 8px var(--border-focus);
+}
+
+/* Standard animation utility */
+.transition-all-custom {
+  transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}

@@ -1,0 +1,118 @@
+/* src/shared/design-system/tokens.css */
+
+:root {
+  /* Light Mode Tokens */
+  --bg-base: #E6E9EF;
+  --bg-surface: #E6E9EF;
+  --bg-inset: #DCDEE4;
+  
+  --shadow-light: #ffffff;
+  --shadow-dark: #b8bbc2;
+  
+  --shadow-light-inset: #ffffff;
+  --shadow-dark-inset: #a3a6ad;
+  
+  --text-primary: #2B2F3A;
+  --text-secondary: #5C6270;
+  --text-muted: #8E95A5;
+  
+  --accent-blue: #3B82F6;
+  --accent-blue-gradient: linear-gradient(135deg, #4F46E5, #3B82F6);
+  --accent-green: #10B981;
+  --accent-green-gradient: linear-gradient(135deg, #059669, #10B981);
+  --accent-red: #EF4444;
+  --accent-red-gradient: linear-gradient(135deg, #DC2626, #EF4444);
+  --accent-orange: #F59E0B;
+  
+  --text-on-accent: #ffffff;
+  
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 9999px;
+  
+  --border-focus: rgba(59, 130, 246, 0.6);
+  --border-high-contrast: transparent;
+  --border-width-hc: 0px;
+}
+
+:root.dark {
+  /* Dark Mode Tokens */
+  --bg-base: #2B2F3A;
+  --bg-surface: #2B2F3A;
+  --bg-inset: #20232b;
+  
+  --shadow-light: #363b4a;
+  --shadow-dark: #1c1f27;
+  
+  --shadow-light-inset: #323744;
+  --shadow-dark-inset: #15171d;
+  
+  --text-primary: #E6E9EF;
+  --text-secondary: #9CA3AF;
+  --text-muted: #6B7280;
+  
+  --accent-blue: #60A5FA;
+  --accent-blue-gradient: linear-gradient(135deg, #6366F1, #60A5FA);
+  --accent-green: #34D399;
+  --accent-green-gradient: linear-gradient(135deg, #10B981, #34D399);
+  --accent-red: #F87171;
+  --accent-red-gradient: linear-gradient(135deg, #EF4444, #F87171);
+  --accent-orange: #FBBF24;
+  
+  --border-focus: rgba(96, 165, 250, 0.6);
+}
+
+:root.high-contrast {
+  /* High Contrast Mode Tokens */
+  --border-high-contrast: #000000;
+  --border-width-hc: 2px;
+  --shadow-light: transparent;
+  --shadow-dark: transparent;
+  --shadow-light-inset: transparent;
+  --shadow-dark-inset: transparent;
+}
+
+:root.dark.high-contrast {
+  --border-high-contrast: #ffffff;
+  --border-width-hc: 2px;
+  --shadow-light: transparent;
+  --shadow-dark: transparent;
+  --shadow-light-inset: transparent;
+  --shadow-dark-inset: transparent;
+}
+
+/* Global resets and standard layouts */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--shadow-dark);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}

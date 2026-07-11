@@ -1,0 +1,239 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { db, type User, type Store, type Shift, type Product } from '../shared/services/db';
+import { calculateTotals } from '../shared/lib/math';
+
+export interface CartItem {
+  product: Product;
+  qty: number;
+  selectedVarian: string;
+  notes: string;
+}
+
+interface AppContextType {
+  user: User | null;
+  loginUser: (user: User) => void;
+  logoutUser: () => void;
+  
+  store: Store | null;
+  refreshStore: () => Promise<void>;
+  
+  currentShift: Shift | null;
+  refreshShift: () => Promise<void>;
+  
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+  isHighContrast: boolean;
+  toggleHighContrast: () => void;
+  
+  cart: CartItem[];
+  addToCart: (product: Product, varian: string, notes: string) => void;
+  updateCartQty: (productId: number, varian: string, change: number) => void;
+  removeFromCart: (productId: number, varian: string) => void;
+  clearCart: () => void;
+  cartTotals: {
+    subtotal: number;
+    discount: number;
+    tax: number;
+    serviceCharge: number;
+    total: number;
+  };
+  discountAmount: number; // custom transactions discount
+  setDiscountAmount: (val: number) => void;
+  platform: 'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood';
+  setPlatform: (val: 'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood') => void;
+}
+
+const AppContext = createContext<AppContextType | undefined>(undefined);
+
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [store, setStore] = useState<Store | null>(null);
+  const [currentShift, setCurrentShift] = useState<Shift | null>(null);
+  const [activeTab, setActiveTabState] = useState<string>('dashboard');
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true); // Default dark
+  const [isHighContrast, setIsHighContrast] = useState<boolean>(false);
+  
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
+  const [platform, setPlatform] = useState<'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood'>('Dine-in');
+
+  // Load Session and System configs on startup
+  useEffect(() => {
+    // 1. Theme configuration
+    const html = document.documentElement;
+    if (isDarkMode) html.classList.add('dark');
+    else html.classList.remove('dark');
+    
+    if (isHighContrast) html.classList.add('high-contrast');
+    else html.classList.remove('high-contrast');
+
+    // 2. Load cached user session
+    const cachedUser = localStorage.getItem('mokundo_user');
+    if (cachedUser) {
+      setUser(JSON.parse(cachedUser));
+    }
+
+    // 3. Load database configs
+    refreshStore();
+    refreshShift();
+  }, []);
+
+  // Update theme classes on change
+  useEffect(() => {
+    const html = document.documentElement;
+    if (isDarkMode) html.classList.add('dark');
+    else html.classList.remove('dark');
+  }, [isDarkMode]);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    if (isHighContrast) html.classList.add('high-contrast');
+    else html.classList.remove('high-contrast');
+  }, [isHighContrast]);
+
+  const refreshStore = async () => {
+    const storeInfo = await db.stores.toCollection().first();
+    if (storeInfo) {
+      setStore(storeInfo);
+    }
+  };
+
+  const refreshShift = async () => {
+    const openShift = await db.shifts.where('status').equals('OPEN').first();
+    if (openShift) {
+      setCurrentShift(openShift);
+    } else {
+      setCurrentShift(null);
+    }
+  };
+
+  const loginUser = (loggedInUser: User) => {
+    setUser(loggedInUser);
+    localStorage.setItem('mokundo_user', JSON.stringify(loggedInUser));
+    
+    // Redirect Kasir strictly to POS screen
+    if (loggedInUser.role === 'Kasir') {
+      setActiveTabState('transaksi');
+    } else {
+      setActiveTabState('dashboard');
+    }
+  };
+
+  const logoutUser = () => {
+    setUser(null);
+    localStorage.removeItem('mokundo_user');
+  };
+
+  const setActiveTab = (tab: string) => {
+    // Restrict Kasir role from accessing Admin tabs
+    if (user?.role === 'Kasir' && tab !== 'transaksi' && tab !== 'produk') {
+      return;
+    }
+    setActiveTabState(tab);
+  };
+
+  const toggleDarkMode = () => setIsDarkMode(prev => !prev);
+  const toggleHighContrast = () => setIsHighContrast(prev => !prev);
+
+  // Cart operations
+  const addToCart = (product: Product, varian: string, notes: string) => {
+    setCart(prevCart => {
+      const existingIdx = prevCart.findIndex(
+        item => item.product.id === product.id && item.selectedVarian === varian
+      );
+
+      if (existingIdx > -1) {
+        const updated = [...prevCart];
+        updated[existingIdx].qty += 1;
+        // Merge notes if needed or append
+        if (notes && !updated[existingIdx].notes.includes(notes)) {
+          updated[existingIdx].notes = updated[existingIdx].notes 
+            ? `${updated[existingIdx].notes}, ${notes}` 
+            : notes;
+        }
+        return updated;
+      }
+
+      return [...prevCart, { product, qty: 1, selectedVarian: varian, notes }];
+    });
+  };
+
+  const updateCartQty = (productId: number, varian: string, change: number) => {
+    setCart(prevCart => {
+      const idx = prevCart.findIndex(
+        item => item.product.id === productId && item.selectedVarian === varian
+      );
+      if (idx === -1) return prevCart;
+
+      const updated = [...prevCart];
+      updated[idx].qty += change;
+
+      if (updated[idx].qty <= 0) {
+        updated.splice(idx, 1);
+      }
+      return updated;
+    });
+  };
+
+  const removeFromCart = (productId: number, varian: string) => {
+    setCart(prevCart => 
+      prevCart.filter(item => !(item.product.id === productId && item.selectedVarian === varian))
+    );
+  };
+
+  const clearCart = () => {
+    setCart([]);
+    setDiscountAmount(0);
+  };
+
+  // Cart financial calculations using shared pure utility
+  const cartTotals = calculateTotals(
+    cart.map(item => ({ price: item.product.harga, qty: item.qty })),
+    discountAmount,
+    store?.PPN ?? 11,
+    store?.service_charge ?? 0
+  );
+
+  return (
+    <AppContext.Provider
+      value={{
+        user,
+        loginUser,
+        logoutUser,
+        store,
+        refreshStore,
+        currentShift,
+        refreshShift,
+        activeTab,
+        setActiveTab,
+        isDarkMode,
+        toggleDarkMode,
+        isHighContrast,
+        toggleHighContrast,
+        cart,
+        addToCart,
+        updateCartQty,
+        removeFromCart,
+        clearCart,
+        cartTotals,
+        discountAmount,
+        setDiscountAmount,
+        platform,
+        setPlatform
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
+};
+
+export const useApp = () => {
+  const context = useContext(AppContext);
+  if (context === undefined) {
+    throw new Error('useApp must be used within an AppProvider');
+  }
+  return context;
+};

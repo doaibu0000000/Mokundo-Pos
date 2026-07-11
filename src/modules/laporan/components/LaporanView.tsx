@@ -1,0 +1,532 @@
+import React, { useEffect, useState } from 'react';
+import { Download, AlertTriangle, Eye } from 'lucide-react';
+import { db, type Transaction, type TransactionItem } from '../../../shared/services/db';
+import { NeumorphicCard, NeumorphicButton, NeumorphicModal } from '../../../shared/components';
+
+// Format currency helper
+const formatRupiah = (number: number) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(number);
+};
+
+export const LaporanView: React.FC = () => {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [filterRange, setFilterRange] = useState<'today' | '7days' | '30days'>('today');
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
+
+  useEffect(() => {
+    const handleResize = () => setIsLargeScreen(window.innerWidth >= 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Stats
+  const [summary, setSummary] = useState({
+    omset: 0,
+    HPP: 0,
+    profit: 0,
+    count: 0
+  });
+  
+  // Best sellers
+  const [bestSellers, setBestSellers] = useState<Array<{ name: string, qty: number, revenue: number }>>([]);
+  
+  // Detail Modal States
+  const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
+  const [selectedItems, setSelectedItems] = useState<TransactionItem[]>([]);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+  useEffect(() => {
+    loadReportData();
+  }, [filterRange]);
+
+  const loadReportData = async () => {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    if (filterRange === '7days') {
+      start.setDate(start.getDate() - 6);
+    } else if (filterRange === '30days') {
+      start.setDate(start.getDate() - 29);
+    }
+    const startStr = start.toISOString();
+
+    // Query active transactions
+    const txList = await db.transactions
+      .where('tanggal')
+      .aboveOrEqual(startStr)
+      .reverse()
+      .toArray();
+
+    setTransactions(txList);
+
+    // Compute stats
+    let totalOmset = 0;
+    let totalHPP = 0;
+    let completedCount = 0;
+
+    const itemsMap = new Map<string, { qty: number, revenue: number }>();
+    const productHppMap = new Map<number, number>();
+    
+    // Pre-cache product cost prices
+    const products = await db.products.toArray();
+    products.forEach(p => productHppMap.set(p.id!, p.HPP));
+
+    for (const tx of txList) {
+      if (tx.status === 'COMPLETED') {
+        totalOmset += tx.total;
+        completedCount++;
+
+        const items = await db.transaction_items.where('transaksi_id').equals(tx.id!).toArray();
+        for (const item of items) {
+          const hpp = productHppMap.get(item.produk_id) || 0;
+          totalHPP += hpp * item.qty;
+
+          // Group by name for best seller computation
+          const existing = itemsMap.get(item.nama_produk) || { qty: 0, revenue: 0 };
+          itemsMap.set(item.nama_produk, {
+            qty: existing.qty + item.qty,
+            revenue: existing.revenue + (item.qty * item.harga_satuan)
+          });
+        }
+      }
+    }
+
+    setSummary({
+      omset: totalOmset,
+      HPP: totalHPP,
+      profit: Math.max(0, totalOmset - totalHPP),
+      count: completedCount
+    });
+
+    // Best sellers sorting
+    const sortedBest = Array.from(itemsMap.entries())
+      .map(([name, val]) => ({ name, qty: val.qty, revenue: val.revenue }))
+      .sort((a, b) => b.qty - a.qty)
+      .slice(0, 5);
+
+    setBestSellers(sortedBest);
+  };
+
+  const viewTransactionDetails = async (tx: Transaction) => {
+    const items = await db.transaction_items.where('transaksi_id').equals(tx.id!).toArray();
+    setSelectedTx(tx);
+    setSelectedItems(items);
+    setIsDetailOpen(true);
+  };
+
+  // Void transaction control
+  const handleVoidTransaction = async (txId: number) => {
+    const reason = prompt('Masukkan alasan pembatalan (Void) transaksi ini:');
+    if (reason === null) return; // cancelled prompt
+    if (!reason.trim()) {
+      alert('Alasan pembatalan wajib diisi!');
+      return;
+    }
+
+    try {
+      await db.transaction('rw', [db.products, db.transactions, db.stock_logs, db.shifts], async () => {
+        const tx = await db.transactions.get(txId);
+        if (!tx || tx.status === 'VOIDED') return;
+
+        // Restore stocks
+        const items = await db.transaction_items.where('transaksi_id').equals(txId).toArray();
+        for (const item of items) {
+          const prod = await db.products.get(item.produk_id);
+          if (prod) {
+            await db.products.update(item.produk_id, { stok: prod.stok + item.qty });
+            
+            await db.stock_logs.add({
+              produk_id: item.produk_id,
+              jenis: 'IN',
+              qty: item.qty,
+              keterangan: `Pembatalan (Void) TRX-${txId}`,
+              tanggal: new Date().toISOString(),
+              sync_status: 'PENDING'
+            });
+          }
+        }
+
+        // Update transaction status
+        await db.transactions.update(txId, {
+          status: 'VOIDED',
+          void_reason: reason,
+          sync_status: 'PENDING'
+        });
+
+        // Decrement shift values
+        const shift = await db.shifts.get(tx.shift_id);
+        if (shift) {
+          if (tx.metode_bayar === 'Tunai') {
+            await db.shifts.update(tx.shift_id, {
+              total_penjualan_tunai: Math.max(0, shift.total_penjualan_tunai - tx.total)
+            });
+          } else {
+            await db.shifts.update(tx.shift_id, {
+              total_penjualan_non_tunai: Math.max(0, shift.total_penjualan_non_tunai - tx.total)
+            });
+          }
+        }
+      });
+
+      alert('Transaksi berhasil dibatalkan (Void) dan stok dikembalikan.');
+      setIsDetailOpen(false);
+      loadReportData();
+    } catch (e) {
+      alert('Gagal membatalkan transaksi');
+    }
+  };
+
+  const handleExportCSV = () => {
+    let csv = 'ID,Tanggal,Kasir,Subtotal,Diskon,Pajak,Total,MetodeBayar,Status,KeteranganVoid\n';
+    transactions.forEach(t => {
+      csv += `${t.id},"${new Date(t.tanggal).toLocaleString('id-ID')}","${t.kasir_nama}",${t.subtotal},${t.diskon},${t.pajak},${t.total},"${t.metode_bayar}","${t.status}","${t.void_reason || ''}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', `Laporan_Transaksi_Mokundo_${filterRange}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <div style={{ padding: '20px', height: '100%', overflowY: 'auto' }}>
+      
+      {/* Header Panel */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '24px',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}
+      >
+        <div>
+          <h1 style={{ fontSize: '24px', fontWeight: 800 }}>Laporan Penjualan</h1>
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Analisis detail keuangan toko Anda</p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <NeumorphicButton size="sm" onClick={handleExportCSV}>
+            <Download size={14} /> Export CSV
+          </NeumorphicButton>
+
+          <NeumorphicButton active={filterRange === 'today'} onClick={() => setFilterRange('today')} size="sm">
+            Hari Ini
+          </NeumorphicButton>
+          <NeumorphicButton active={filterRange === '7days'} onClick={() => setFilterRange('7days')} size="sm">
+            7 Hari
+          </NeumorphicButton>
+          <NeumorphicButton active={filterRange === '30days'} onClick={() => setFilterRange('30days')} size="sm">
+            30 Hari
+          </NeumorphicButton>
+        </div>
+      </div>
+
+      {/* Laba Rugi overview stats */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '20px',
+          marginBottom: '30px'
+        }}
+      >
+        <NeumorphicCard>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            Omset Penjualan
+          </div>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--accent-blue)', marginTop: '4px' }}>
+            {formatRupiah(summary.omset)}
+          </div>
+          <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Total pendapatan kotor</span>
+        </NeumorphicCard>
+
+        <NeumorphicCard>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            Harga Pokok (HPP)
+          </div>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
+            {formatRupiah(summary.HPP)}
+          </div>
+          <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Modal modal bahan pokok</span>
+        </NeumorphicCard>
+
+        <NeumorphicCard>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            Laba Bersih (Profit)
+          </div>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--accent-green)', marginTop: '4px' }}>
+            {formatRupiah(summary.profit)}
+          </div>
+          <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Selisih omset dikurang HPP</span>
+        </NeumorphicCard>
+
+        <NeumorphicCard>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            Jumlah Penjualan
+          </div>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
+            {summary.count}
+          </div>
+          <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Total transaksi terselesaikan</span>
+        </NeumorphicCard>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: isLargeScreen ? '3fr 2fr' : '1fr', gap: '20px', marginBottom: '20px' }}>
+        
+        {/* Left Card: Transaction History list */}
+        <NeumorphicCard style={{ padding: '20px', overflowX: 'auto' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '16px' }}>Riwayat Transaksi</h3>
+          
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px dashed var(--text-muted)', textAlign: 'left' }}>
+                <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>TRX ID</th>
+                <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Tanggal</th>
+                <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Kasir</th>
+                <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Bayar</th>
+                <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Total</th>
+                <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Status</th>
+                <th style={{ padding: '10px 8px', textAlign: 'center' }}>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.length === 0 ? (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)' }}>
+                    Tidak ada riwayat transaksi ditemukan
+                  </td>
+                </tr>
+              ) : (
+                transactions.map(t => (
+                  <tr 
+                    key={t.id} 
+                    style={{ 
+                      borderBottom: '1px solid rgba(0,0,0,0.05)',
+                      opacity: t.status === 'VOIDED' ? 0.5 : 1
+                    }}
+                  >
+                    <td style={{ padding: '12px 8px', fontWeight: 700 }}>TRX-{t.id}</td>
+                    <td style={{ padding: '12px 8px' }}>{new Date(t.tanggal).toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: 'numeric', month: 'short' })}</td>
+                    <td style={{ padding: '12px 8px' }}>{t.kasir_nama}</td>
+                    <td style={{ padding: '12px 8px' }}>{t.metode_bayar}</td>
+                    <td style={{ padding: '12px 8px', fontWeight: 700, color: t.status === 'VOIDED' ? 'var(--text-muted)' : 'var(--accent-blue)' }}>
+                      {formatRupiah(t.total)}
+                    </td>
+                    <td style={{ padding: '12px 8px' }}>
+                      <span 
+                        style={{
+                          fontSize: '10px',
+                          fontWeight: 800,
+                          padding: '2px 6px',
+                          borderRadius: 'var(--radius-pill)',
+                          backgroundColor: t.status === 'COMPLETED' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                          color: t.status === 'COMPLETED' ? 'var(--accent-green)' : 'var(--accent-red)'
+                        }}
+                      >
+                        {t.status}
+                      </span>
+                    </td>
+                    <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                      <NeumorphicButton size="sm" onClick={() => viewTransactionDetails(t)} style={{ width: '28px', height: '28px', padding: 0 }}>
+                        <Eye size={12} />
+                      </NeumorphicButton>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </NeumorphicCard>
+
+        {/* Right Card: Best Sellers list */}
+        <NeumorphicCard style={{ padding: '20px' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '16px' }}>Menu Terlaris</h3>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {bestSellers.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)', fontSize: '13px' }}>
+                Data tidak tersedia
+              </div>
+            ) : (
+              bestSellers.map((item, idx) => (
+                <div 
+                  key={item.name}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '8px 0',
+                    borderBottom: idx < bestSellers.length - 1 ? '1px dashed var(--text-muted)' : 'none'
+                  }}
+                >
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '13px' }}>
+                      {idx + 1}. {item.name}
+                    </div>
+                    <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                      Total Omset: {formatRupiah(item.revenue)}
+                    </span>
+                  </div>
+                  <span 
+                    className="nm-inset"
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: 'var(--radius-pill)',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      color: 'var(--accent-blue)'
+                    }}
+                  >
+                    Terjual: {item.qty}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </NeumorphicCard>
+      </div>
+
+      {/* TRANSACTION DETAIL MODAL */}
+      <NeumorphicModal
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+        title="Detail Transaksi"
+      >
+        {selectedTx && (
+          <div>
+            {/* Header info */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '12px' }}>
+              <div>
+                <div>No. Invoice: <b>TRX-{selectedTx.id}</b></div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                  {new Date(selectedTx.tanggal).toLocaleString('id-ID')}
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div>Kasir: <b>{selectedTx.kasir_nama}</b></div>
+                <span 
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    padding: '2px 6px',
+                    borderRadius: 'var(--radius-pill)',
+                    backgroundColor: selectedTx.status === 'COMPLETED' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    color: selectedTx.status === 'COMPLETED' ? 'var(--accent-green)' : 'var(--accent-red)'
+                  }}
+                >
+                  {selectedTx.status}
+                </span>
+              </div>
+            </div>
+
+            {selectedTx.status === 'VOIDED' && (
+              <div 
+                className="nm-inset"
+                style={{
+                  padding: '10px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                  border: '1px solid var(--accent-red)',
+                  color: 'var(--accent-red)',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  marginBottom: '16px'
+                }}
+              >
+                ⚠️ Batal (Void) Alasan: "{selectedTx.void_reason}"
+              </div>
+            )}
+
+            {/* Items table */}
+            <div style={{ margin: '16px 0', borderBottom: '1px dashed var(--text-muted)', paddingBottom: '12px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Item Pembelian</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                {selectedItems.map(item => (
+                  <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <div>
+                      <div><b>{item.nama_produk}</b>{item.varian !== 'Normal' ? ` (${item.varian})` : ''}</div>
+                      {item.catatan && <span style={{ fontSize: '11px', fontStyle: 'italic', color: 'var(--text-muted)' }}>* {item.catatan}</span>}
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div>{item.qty} x {formatRupiah(item.harga_satuan)}</div>
+                      <div style={{ fontWeight: 700 }}>{formatRupiah(item.qty * item.harga_satuan)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Finance totals */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', borderBottom: '1px dashed var(--text-muted)', paddingBottom: '12px', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Subtotal:</span>
+                <span>{formatRupiah(selectedTx.subtotal)}</span>
+              </div>
+              {selectedTx.diskon > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Diskon:</span>
+                  <span>-{formatRupiah(selectedTx.diskon)}</span>
+                </div>
+              )}
+              {selectedTx.pajak > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Pajak PPN:</span>
+                  <span>{formatRupiah(selectedTx.pajak)}</span>
+                </div>
+              )}
+              {selectedTx.service_charge > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Svc Charge:</span>
+                  <span>{formatRupiah(selectedTx.service_charge)}</span>
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', fontWeight: 800, color: 'var(--accent-blue)' }}>
+                <span>TOTAL:</span>
+                <span>{formatRupiah(selectedTx.total)}</span>
+              </div>
+            </div>
+
+            {/* Cash payments */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Metode Pembayaran:</span>
+                <span style={{ fontWeight: 700 }}>{selectedTx.metode_bayar}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Jumlah Dibayar:</span>
+                <span>{formatRupiah(selectedTx.cash_paid)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Kembalian:</span>
+                <span>{formatRupiah(selectedTx.cash_change)}</span>
+              </div>
+            </div>
+
+            {/* Void trigger button (Admin/Manager role ONLY) */}
+            {selectedTx.status === 'COMPLETED' && (
+              <NeumorphicButton 
+                variant="danger" 
+                onClick={() => handleVoidTransaction(selectedTx.id!)}
+                style={{ width: '100%' }}
+              >
+                <AlertTriangle size={16} /> Batalkan Transaksi (Void)
+              </NeumorphicButton>
+            )}
+          </div>
+        )}
+      </NeumorphicModal>
+
+    </div>
+  );
+};

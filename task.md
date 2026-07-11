@@ -1,0 +1,41 @@
+# Task Checklist: Mokundo POS Implementation
+
+- `[x]` Project Initialization & Configurations
+  - `[x]` Initialize Vite + React + TypeScript project
+  - `[x]` Install dependencies (`dexie`, `recharts`, `lucide-react`, `jspdf`)
+  - `[x]` Configure `vite.config.ts` with alias resolutions and `vite-plugin-pwa` settings
+  - `[x]` Set up GitHub Actions CI/CD pipeline (`.github/workflows/deploy.yml`)
+  - `[x]` Add `tsconfig.json` configurations
+- `[x]` Design System & Shared Primitives
+  - `[x]` Build `tokens.css` defining Neumorphic variables (light, dark, high-contrast)
+  - `[x]` Create `NeumorphicCard` component
+  - `[x]` Create `NeumorphicButton` (with normal, hover, pressed states and colors)
+  - `[x]` Create `NeumorphicInput` (with focus border glows and options)
+  - `[x]` Create `NeumorphicBottomSheet` for mobile cart overlay
+  - `[x]` Create `NeumorphicModal` for dialogs
+- `[x]` Core Local Services
+  - `[x]` Build Dexie database configuration (`db.ts`)
+  - `[x]` Create database seeding logic for default products and user roles (`admin` & `kasir`)
+  - `[x]` Implement local user password hashing using SHA-256 (Web Crypto API)
+  - `[x]` Create browser fallback printing system (`printService.ts`)
+  - `[x]` Setup local sync queue manager (`syncService.ts`)
+- `[x]` Layout Shell & Viewport Manager
+  - `[x]` Build `App.tsx` routing with HashRouter
+  - `[x]` Implement `<MobileLayout />` (Gopay navigation, bottom sheet cart integration)
+  - `[x]` Implement `<WebLayout />` (Left sidebar navigation)
+- `[x]` Modules Implementation
+  - `[x]` Auth Module (`modules/auth/`): Login view, session management, logout
+  - `[x]` Dashboard Module (`modules/dashboard/`): KPI summaries, Recharts, low stock alerts
+  - `[x]` Transaksi Module (`modules/transaksi/`): Search catalog, barcode scanner, cart options, cash calculator, Wake Lock integration
+  - `[x]` Produk & Kategori Modules (`modules/produk/`, `modules/kategori/`): Inventory/category forms, CSV helper
+  - `[x]` Laporan Module (`modules/laporan/`): Transaction grids, PDF export
+  - `[x]` Kas-Shift Module (`modules/kas-shift/`): Drawer opening/closing register
+  - `[x]` Pengaturan Module (`modules/pengaturan/`): Store parameters, PPN/Service configs, Supabase credentials setup
+- `[x]` Supabase Migrations
+  - `[x]` Write `supabase/migrations/001_initial_setup.sql` tables schema
+  - `[x]` Write `supabase/migrations/002_rls_policies.sql` RLS access control rules
+- `[x]` Testing & Verification
+  - `[x]` Install Vitest & configure test environment
+  - `[x]` Write unit tests for cart calculations (`useCart`) and cash returns
+  - `[x]` Run build (`npm run build`) and test suite (`npm run test`)
+  - `[x]` Verify responsiveness, PWA install status, and Wake Lock API

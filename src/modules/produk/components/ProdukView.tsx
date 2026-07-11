@@ -1,0 +1,659 @@
+import React, { useEffect, useState } from 'react';
+import { Plus, Edit2, Trash2, Download, Upload, AlertCircle } from 'lucide-react';
+import { db, type Product, type Category } from '../../../shared/services/db';
+import { NeumorphicCard, NeumorphicButton, NeumorphicInput, NeumorphicModal } from '../../../shared/components';
+
+const formatRupiah = (number: number) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(number);
+};
+
+export const ProdukView: React.FC = () => {
+  const [activeSubTab, setActiveSubTab] = useState<'produk' | 'kategori'>('produk');
+  
+  // Products states
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [productSearch, setProductSearch] = useState('');
+  
+  // Product Form Modal States
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [prodNama, setProdNama] = useState('');
+  const [prodHarga, setProdHarga] = useState('');
+  const [prodHPP, setProdHPP] = useState('');
+  const [prodStok, setProdStok] = useState('');
+  const [prodSku, setProdSku] = useState('');
+  const [prodVarianInput, setProdVarianInput] = useState('');
+  const [prodGambarUrl, setProdGambarUrl] = useState('');
+  const [prodThreshold, setProdThreshold] = useState('');
+  const [prodKategoriId, setProdKategoriId] = useState<number>(0);
+  const [prodError, setProdError] = useState('');
+
+  // Category Form Modal States
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [catNama, setCatNama] = useState('');
+  const [catUrutan, setCatUrutan] = useState('');
+  const [catError, setCatError] = useState('');
+
+  useEffect(() => {
+    loadData();
+  }, [productSearch]);
+
+  const loadData = async () => {
+    // Load categories
+    const cats = await db.categories.orderBy('urutan').toArray();
+    setCategories(cats);
+    if (cats.length > 0 && prodKategoriId === 0) {
+      setProdKategoriId(cats[0].id!);
+    }
+
+    // Load products
+    const prods = await db.products.toArray();
+    let filteredProds = prods;
+    if (productSearch) {
+      const lower = productSearch.toLowerCase();
+      filteredProds = prods.filter(p => 
+        p.nama.toLowerCase().includes(lower) || 
+        p.sku.toLowerCase().includes(lower)
+      );
+    }
+    setProducts(filteredProds);
+  };
+
+  // Open product form for edit/new
+  const openProductForm = (p: Product | null = null) => {
+    setEditingProduct(p);
+    setProdError('');
+    if (p) {
+      setProdNama(p.nama);
+      setProdHarga(p.harga.toString());
+      setProdHPP(p.HPP.toString());
+      setProdStok(p.stok.toString());
+      setProdSku(p.sku);
+      setProdVarianInput(p.varian.join(', '));
+      setProdGambarUrl(p.gambar_url);
+      setProdThreshold(p.threshold_stok.toString());
+      setProdKategoriId(p.kategori_id);
+    } else {
+      setProdNama('');
+      setProdHarga('');
+      setProdHPP('');
+      setProdStok('');
+      setProdSku(new Date().getTime().toString().slice(-6)); // Generate mock sku
+      setProdVarianInput('Normal');
+      setProdGambarUrl('');
+      setProdThreshold('5');
+      if (categories.length > 0) setProdKategoriId(categories[0].id!);
+    }
+    setIsProductModalOpen(true);
+  };
+
+  const handleProductSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProdError('');
+
+    const harga = parseFloat(prodHarga);
+    const HPP = parseFloat(prodHPP);
+    const stok = parseInt(prodStok);
+    const threshold = parseInt(prodThreshold);
+
+    if (!prodNama || isNaN(harga) || isNaN(HPP) || isNaN(stok) || isNaN(threshold) || !prodSku) {
+      setProdError('Harap lengkapi semua field numerik dengan benar');
+      return;
+    }
+
+    const varian = prodVarianInput
+      ? prodVarianInput.split(',').map(v => v.trim()).filter(v => v.length > 0)
+      : ['Normal'];
+
+    const payload: Product = {
+      nama: prodNama,
+      kategori_id: prodKategoriId,
+      harga,
+      HPP,
+      stok,
+      sku: prodSku,
+      varian,
+      gambar_url: prodGambarUrl || 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=150',
+      threshold_stok: threshold,
+    };
+
+    try {
+      if (editingProduct) {
+        // Log changes if stock changes
+        const oldProd = await db.products.get(editingProduct.id!);
+        if (oldProd && oldProd.stok !== stok) {
+          const type = stok > oldProd.stok ? 'IN' : 'OUT';
+          const diff = Math.abs(stok - oldProd.stok);
+          await db.stock_logs.add({
+            produk_id: editingProduct.id!,
+            jenis: type,
+            qty: diff,
+            keterangan: 'Penyesuaian stok manual',
+            tanggal: new Date().toISOString(),
+            sync_status: 'PENDING'
+          });
+        }
+        await db.products.update(editingProduct.id!, payload as any);
+      } else {
+        const newId = await db.products.add(payload);
+        // Write initial stock log
+        await db.stock_logs.add({
+          produk_id: newId as number,
+          jenis: 'IN',
+          qty: stok,
+          keterangan: 'Inisialisasi produk baru',
+          tanggal: new Date().toISOString(),
+          sync_status: 'PENDING'
+        });
+      }
+      setIsProductModalOpen(false);
+      loadData();
+    } catch (err: any) {
+      setProdError(err.message || 'Gagal menyimpan produk. Periksa duplikasi SKU.');
+    }
+  };
+
+  const deleteProduct = async (id: number) => {
+    if (confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
+      await db.products.delete(id);
+      loadData();
+    }
+  };
+
+  // Open category form for edit/new
+  const openCategoryForm = (c: Category | null = null) => {
+    setEditingCategory(c);
+    setCatError('');
+    if (c) {
+      setCatNama(c.nama);
+      setCatUrutan(c.urutan.toString());
+    } else {
+      setCatNama('');
+      setCatUrutan((categories.length + 1).toString());
+    }
+    setIsCategoryModalOpen(true);
+  };
+
+  const handleCategorySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCatError('');
+
+    const urutan = parseInt(catUrutan);
+    if (!catNama || isNaN(urutan)) {
+      setCatError('Harap isi nama dan urutan dengan benar');
+      return;
+    }
+
+    const payload: Category = {
+      nama: catNama,
+      urutan
+    };
+
+    try {
+      if (editingCategory) {
+        await db.categories.update(editingCategory.id!, payload);
+      } else {
+        await db.categories.add(payload);
+      }
+      setIsCategoryModalOpen(false);
+      loadData();
+    } catch (err: any) {
+      setCatError('Gagal menyimpan kategori');
+    }
+  };
+
+  const deleteCategory = async (id: number) => {
+    if (confirm('Apakah Anda yakin ingin menghapus kategori ini? Semua produk di dalamnya tidak akan terhapus namun kehilangan kategori.')) {
+      await db.categories.delete(id);
+      loadData();
+    }
+  };
+
+  // CSV Import/Export
+  const handleExportCSV = () => {
+    let csv = 'SKU,Nama,Harga,HPP,Stok,ThresholdStok,Varian,GambarUrl\n';
+    products.forEach(p => {
+      csv += `"${p.sku}","${p.nama}",${p.harga},${p.HPP},${p.stok},${p.threshold_stok},"${p.varian.join('|')}","${p.gambar_url}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', `Daftar_Produk_Mokundo_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleImportCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const text = event.target?.result as string;
+        const lines = text.split('\n');
+        // skip header (lines[0])
+        let addedCount = 0;
+        let defaultCatId = categories.length > 0 ? categories[0].id! : 1;
+
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+
+          // Simple csv splitter
+          const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+          if (cols.length < 5) continue;
+
+          const sku = cols[0].replace(/"/g, '').trim();
+          const nama = cols[1].replace(/"/g, '').trim();
+          const harga = parseFloat(cols[2]);
+          const HPP = parseFloat(cols[3]);
+          const stok = parseInt(cols[4]);
+          const threshold = parseInt(cols[5]) || 5;
+          const varianStr = cols[6] ? cols[6].replace(/"/g, '').trim() : 'Normal';
+          const gambarUrl = cols[7] ? cols[7].replace(/"/g, '').trim() : '';
+
+          const varian = varianStr.split('|').map(v => v.trim());
+
+          const existing = await db.products.where('sku').equals(sku).first();
+          const payload = {
+            nama,
+            kategori_id: defaultCatId,
+            harga,
+            HPP,
+            stok,
+            sku,
+            varian,
+            gambar_url: gambarUrl,
+            threshold_stok: threshold
+          };
+
+          if (existing) {
+            await db.products.update(existing.id!, payload);
+          } else {
+            await db.products.add(payload);
+          }
+          addedCount++;
+        }
+
+        alert(`Berhasil mengimpor/memperbarui ${addedCount} produk.`);
+        loadData();
+      } catch (err) {
+        alert('Gagal memproses file CSV. Pastikan format kolom sesuai.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  return (
+    <div style={{ padding: '20px', height: '100%', overflowY: 'auto' }}>
+      
+      {/* Seeding Warning Alert */}
+      <div 
+        className="nm-inset"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          padding: '12px 16px',
+          borderRadius: 'var(--radius-md)',
+          backgroundColor: 'rgba(245, 158, 11, 0.1)',
+          border: '1px solid var(--accent-orange)',
+          color: 'var(--accent-orange)',
+          marginBottom: '20px',
+          fontSize: '13px',
+          fontWeight: 600
+        }}
+      >
+        <AlertCircle size={20} />
+        <div>
+          <span>Pemberitahuan Keamanan:</span> Akun default <code>admin</code> dan <code>kasir</code> aktif. Silakan ubah password bawaan Anda di menu <b>Pengaturan</b>.
+        </div>
+      </div>
+
+      {/* Navigation tabs */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '20px',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}
+      >
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <NeumorphicButton active={activeSubTab === 'produk'} onClick={() => setActiveSubTab('produk')}>
+            Kelola Produk
+          </NeumorphicButton>
+          <NeumorphicButton active={activeSubTab === 'kategori'} onClick={() => setActiveSubTab('kategori')}>
+            Kelola Kategori
+          </NeumorphicButton>
+        </div>
+
+        {/* Action Button Row */}
+        {activeSubTab === 'produk' && (
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <NeumorphicButton size="sm" onClick={handleExportCSV}>
+              <Download size={14} /> Export CSV
+            </NeumorphicButton>
+            
+            <label className="nm-button" style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              fontSize: '12px',
+              fontWeight: 600,
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-md)',
+              cursor: 'pointer'
+            }}>
+              <Upload size={14} /> Import CSV
+              <input type="file" accept=".csv" onChange={handleImportCSV} style={{ display: 'none' }} />
+            </label>
+
+            <NeumorphicButton variant="success" size="sm" onClick={() => openProductForm(null)}>
+              <Plus size={14} /> Tambah Produk
+            </NeumorphicButton>
+          </div>
+        )}
+
+        {activeSubTab === 'kategori' && (
+          <NeumorphicButton variant="success" size="sm" onClick={() => openCategoryForm(null)}>
+            <Plus size={14} /> Tambah Kategori
+          </NeumorphicButton>
+        )}
+      </div>
+
+      {/* PRODUCTS TAB VIEW */}
+      {activeSubTab === 'produk' && (
+        <div>
+          <div style={{ marginBottom: '16px' }}>
+            <NeumorphicInput
+              placeholder="Cari SKU atau nama produk..."
+              value={productSearch}
+              onChange={(e) => setProductSearch(e.target.value)}
+            />
+          </div>
+
+          {/* Products List Grid */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {products.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+                Belum ada produk terdaftar. Tambahkan produk atau gunakan import CSV.
+              </div>
+            ) : (
+              products.map(p => {
+                const category = categories.find(c => c.id === p.kategori_id);
+                const isLowStock = p.stok <= p.threshold_stok;
+                return (
+                  <NeumorphicCard
+                    key={p.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '12px 16px',
+                      flexWrap: 'wrap',
+                      gap: '12px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1 }}>
+                      <div
+                        style={{
+                          width: '44px',
+                          height: '44px',
+                          borderRadius: '8px',
+                          backgroundImage: `url(${p.gambar_url})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          backgroundColor: 'var(--bg-inset)'
+                        }}
+                      />
+                      <div>
+                        <h4 style={{ fontWeight: 800, fontSize: '14px' }}>
+                          {p.nama} <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 500 }}>({p.sku})</span>
+                        </h4>
+                        <div style={{ display: 'flex', gap: '8px', fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px', flexWrap: 'wrap' }}>
+                          <span>Kategori: <b>{category?.nama || 'Uncategorized'}</b></span>
+                          <span>HPP: <b>{formatRupiah(p.HPP)}</b></span>
+                          <span>Jual: <b>{formatRupiah(p.harga)}</b></span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      {/* Stock Level Warning indicators */}
+                      <span 
+                        className="nm-inset"
+                        style={{
+                          padding: '4px 10px',
+                          borderRadius: 'var(--radius-pill)',
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          backgroundColor: isLowStock ? 'rgba(239, 68, 68, 0.1)' : 'var(--bg-inset)',
+                          border: isLowStock ? '1px solid var(--accent-red)' : 'none',
+                          color: isLowStock ? 'var(--accent-red)' : 'var(--text-primary)'
+                        }}
+                      >
+                        Stok: {p.stok}
+                      </span>
+
+                      {/* Edit Delete tools */}
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        <NeumorphicButton size="sm" onClick={() => openProductForm(p)} style={{ width: '32px', height: '32px', padding: 0 }}>
+                          <Edit2 size={12} />
+                        </NeumorphicButton>
+                        <NeumorphicButton size="sm" onClick={() => deleteProduct(p.id!)} style={{ width: '32px', height: '32px', padding: 0, color: 'var(--accent-red)' }}>
+                          <Trash2 size={12} />
+                        </NeumorphicButton>
+                      </div>
+                    </div>
+                  </NeumorphicCard>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* CATEGORIES TAB VIEW */}
+      {activeSubTab === 'kategori' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {categories.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+              Belum ada kategori terdaftar. Klik "+ Tambah Kategori".
+            </div>
+          ) : (
+            categories.map(c => (
+              <NeumorphicCard
+                key={c.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '14px 20px'
+                }}
+              >
+                <div>
+                  <h4 style={{ fontWeight: 800, fontSize: '15px' }}>{c.nama}</h4>
+                  <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Urutan Tampil: #{c.urutan}</span>
+                </div>
+
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <NeumorphicButton size="sm" onClick={() => openCategoryForm(c)} style={{ width: '32px', height: '32px', padding: 0 }}>
+                    <Edit2 size={12} />
+                  </NeumorphicButton>
+                  <NeumorphicButton size="sm" onClick={() => deleteCategory(c.id!)} style={{ width: '32px', height: '32px', padding: 0, color: 'var(--accent-red)' }}>
+                    <Trash2 size={12} />
+                  </NeumorphicButton>
+                </div>
+              </NeumorphicCard>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* PRODUCT FORM MODAL */}
+      <NeumorphicModal
+        isOpen={isProductModalOpen}
+        onClose={() => setIsProductModalOpen(false)}
+        title={editingProduct ? 'Ubah Produk' : 'Tambah Produk Baru'}
+      >
+        <form onSubmit={handleProductSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <NeumorphicInput
+            label="Nama Produk"
+            placeholder="Misal: Rice Bowl Beef Blackpepper"
+            value={prodNama}
+            onChange={(e) => setProdNama(e.target.value)}
+            required
+          />
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <NeumorphicInput
+              label="Harga Jual (Rp)"
+              type="number"
+              placeholder="0"
+              value={prodHarga}
+              onChange={(e) => setProdHarga(e.target.value)}
+              required
+            />
+            <NeumorphicInput
+              label="Harga Pokok (HPP) (Rp)"
+              type="number"
+              placeholder="0"
+              value={prodHPP}
+              onChange={(e) => setProdHPP(e.target.value)}
+              required
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <NeumorphicInput
+              label="Stok Awal"
+              type="number"
+              placeholder="0"
+              value={prodStok}
+              onChange={(e) => setProdStok(e.target.value)}
+              required
+            />
+            <NeumorphicInput
+              label="Batas Stok Rendah"
+              type="number"
+              placeholder="5"
+              value={prodThreshold}
+              onChange={(e) => setProdThreshold(e.target.value)}
+              required
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <NeumorphicInput
+              label="SKU / Barcode"
+              placeholder="Misal: 888001"
+              value={prodSku}
+              onChange={(e) => setProdSku(e.target.value)}
+              required
+            />
+
+            {/* Category Select element */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
+                Kategori
+              </label>
+              <select
+                value={prodKategoriId}
+                onChange={(e) => setProdKategoriId(parseInt(e.target.value))}
+                className="nm-input"
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '14px',
+                  height: '45px',
+                  border: 'var(--border-width-hc) solid var(--border-high-contrast)'
+                }}
+              >
+                {categories.map(c => (
+                  <option key={c.id} value={c.id} style={{ background: 'var(--bg-surface)' }}>
+                    {c.nama}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <NeumorphicInput
+            label="Daftar Varian (pisahkan koma)"
+            placeholder="Misal: Normal, Less Sugar, Large"
+            value={prodVarianInput}
+            onChange={(e) => setProdVarianInput(e.target.value)}
+          />
+
+          <NeumorphicInput
+            label="URL Gambar Produk"
+            placeholder="https://example.com/photo.jpg"
+            value={prodGambarUrl}
+            onChange={(e) => setProdGambarUrl(e.target.value)}
+          />
+
+          {prodError && (
+            <div style={{ color: 'var(--accent-red)', fontSize: '12px', fontWeight: 600 }}>
+              ⚠️ {prodError}
+            </div>
+          )}
+
+          <NeumorphicButton type="submit" variant="primary" style={{ marginTop: '10px' }}>
+            Simpan Produk
+          </NeumorphicButton>
+        </form>
+      </NeumorphicModal>
+
+      {/* CATEGORY FORM MODAL */}
+      <NeumorphicModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        title={editingCategory ? 'Ubah Kategori' : 'Tambah Kategori Baru'}
+      >
+        <form onSubmit={handleCategorySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <NeumorphicInput
+            label="Nama Kategori"
+            placeholder="Misal: Pasta, Dessert"
+            value={catNama}
+            onChange={(e) => setCatNama(e.target.value)}
+            required
+          />
+
+          <NeumorphicInput
+            label="Nomor Urutan Tampil"
+            type="number"
+            placeholder="1"
+            value={catUrutan}
+            onChange={(e) => setCatUrutan(e.target.value)}
+            required
+          />
+
+          {catError && (
+            <div style={{ color: 'var(--accent-red)', fontSize: '12px', fontWeight: 600 }}>
+              ⚠️ {catError}
+            </div>
+          )}
+
+          <NeumorphicButton type="submit" variant="primary" style={{ marginTop: '10px' }}>
+            Simpan Kategori
+          </NeumorphicButton>
+        </form>
+      </NeumorphicModal>
+
+    </div>
+  );
+};
