@@ -167,20 +167,20 @@ export const DashboardView: React.FC = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fit, minmax(220px, 1fr))',
+          gridTemplateColumns: isMobile ? 'minmax(0, 1fr) minmax(0, 1fr)' : 'repeat(auto-fit, minmax(220px, 1fr))',
           gap: isMobile ? '12px' : '20px',
           marginBottom: '30px',
           width: '100%'
         }}
       >
-        {/* Card 1: Omset */}
         <NeumorphicCard 
           style={{ 
             display: 'flex', 
             flexDirection: 'row',
             alignItems: 'center', 
             gap: isMobile ? '12px' : '16px',
-            padding: isMobile ? '14px 12px' : '16px'
+            padding: isMobile ? '14px 12px' : '16px',
+            minWidth: 0
           }}
         >
           <div
@@ -208,14 +208,14 @@ export const DashboardView: React.FC = () => {
           </div>
         </NeumorphicCard>
 
-        {/* Card 2: Profit */}
         <NeumorphicCard 
           style={{ 
             display: 'flex', 
             flexDirection: 'row',
             alignItems: 'center', 
             gap: isMobile ? '12px' : '16px',
-            padding: isMobile ? '14px 12px' : '16px'
+            padding: isMobile ? '14px 12px' : '16px',
+            minWidth: 0
           }}
         >
           <div
@@ -243,14 +243,14 @@ export const DashboardView: React.FC = () => {
           </div>
         </NeumorphicCard>
 
-        {/* Card 3: Transaksi */}
         <NeumorphicCard 
           style={{ 
             display: 'flex', 
             flexDirection: 'row',
             alignItems: 'center', 
             gap: isMobile ? '12px' : '16px',
-            padding: isMobile ? '14px 12px' : '16px'
+            padding: isMobile ? '14px 12px' : '16px',
+            minWidth: 0
           }}
         >
           <div
@@ -278,7 +278,6 @@ export const DashboardView: React.FC = () => {
           </div>
         </NeumorphicCard>
 
-        {/* Card 4: Low Stock Alert */}
         <NeumorphicCard 
           style={{ 
             display: 'flex', 
@@ -286,7 +285,8 @@ export const DashboardView: React.FC = () => {
             alignItems: 'center', 
             gap: isMobile ? '12px' : '16px',
             padding: isMobile ? '14px 12px' : '16px',
-            border: stats.stokMenipis > 0 ? '1px solid var(--accent-red)' : 'none'
+            border: stats.stokMenipis > 0 ? '1px solid var(--accent-red)' : 'none',
+            minWidth: 0
           }}
         >
           <div
