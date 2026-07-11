@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/Mokundo-Pos/sw.js', { scope: '/Mokundo-Pos/' })})}
