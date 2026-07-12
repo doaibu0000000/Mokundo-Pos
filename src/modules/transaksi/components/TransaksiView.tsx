@@ -1033,11 +1033,6 @@ export const TransaksiView: React.FC = () => {
             </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-            <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>PPN (${store?.PPN || 11}%)</span>
-            <span style={{ fontWeight: 700 }}>{formatRupiah(cartTotals.tax)}</span>
-          </div>
-
           {store?.service_charge ? (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
               <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Svc Charge (${store.service_charge}%)</span>

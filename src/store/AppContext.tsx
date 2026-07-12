@@ -253,7 +253,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const cartTotals = calculateTotals(
     cart.map(item => ({ price: item.product.harga, qty: item.qty })),
     discountAmount,
-    store?.PPN ?? 11,
+    0, // PPN removed
     store?.service_charge ?? 0
   );
 

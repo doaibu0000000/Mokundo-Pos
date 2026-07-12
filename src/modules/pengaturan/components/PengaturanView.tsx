@@ -34,7 +34,6 @@ export const PengaturanView: React.FC = () => {
   // Profil & Pajak States
   const [storeNama, setStoreNama] = useState('');
   const [storeAlamat, setStoreAlamat] = useState('');
-  const [storePPN, setStorePPN] = useState('');
   const [storeService, setStoreService] = useState('');
   const [receiptHeader, setReceiptHeader] = useState('');
   const [receiptFooter, setReceiptFooter] = useState('');
@@ -157,7 +156,6 @@ export const PengaturanView: React.FC = () => {
     if (store) {
       setStoreNama(store.nama);
       setStoreAlamat(store.alamat);
-      setStorePPN(store.PPN.toString());
       setStoreService(store.service_charge.toString());
       setReceiptHeader(store.receipt_header);
       setReceiptFooter(store.receipt_footer);
@@ -172,10 +170,9 @@ export const PengaturanView: React.FC = () => {
     e.preventDefault();
     setStoreSuccess('');
 
-    const PPN = parseFloat(storePPN);
     const serviceCharge = parseFloat(storeService);
 
-    if (!storeNama || isNaN(PPN) || isNaN(serviceCharge)) {
+    if (!storeNama || isNaN(serviceCharge)) {
       alert('Harap isi form pajak dan nama dengan benar');
       return;
     }
@@ -184,7 +181,7 @@ export const PengaturanView: React.FC = () => {
       await db.stores.update(store!.id!, {
         nama: storeNama,
         alamat: storeAlamat,
-        PPN,
+        PPN: 0,
         service_charge: serviceCharge,
         receipt_header: receiptHeader,
         receipt_footer: receiptFooter
@@ -452,14 +449,7 @@ export const PengaturanView: React.FC = () => {
                 required
               />
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <NeumorphicInput
-                  label="Pajak PPN (%)"
-                  type="number"
-                  value={storePPN}
-                  onChange={(e) => setStorePPN(e.target.value)}
-                  required
-                />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <NeumorphicInput
                   label="Service Charge (%)"
                   type="number"
