@@ -405,7 +405,7 @@ export const ProdukView: React.FC = () => {
                     onClick={() => setIsDropdownOpen(false)}
                   />
                   <div 
-                    className="nm-button"
+                    className="nm-button anim-dropdown"
                     style={{
                       position: 'absolute',
                       top: '100%',
@@ -424,22 +424,24 @@ export const ProdukView: React.FC = () => {
                     }}
                   >
                     <NeumorphicButton 
+                      className="anim-dropdown-item"
                       active={activeSubTab === 'produk'} 
                       onClick={() => {
                         setActiveSubTab('produk');
                         setIsDropdownOpen(false);
                       }}
-                      style={{ padding: '10px 16px', justifyContent: 'center' }}
+                      style={{ padding: '10px 16px', justifyContent: 'center', animationDelay: '0ms' }}
                     >
                       Produk
                     </NeumorphicButton>
                     <NeumorphicButton 
+                      className="anim-dropdown-item"
                       active={activeSubTab === 'kategori'} 
                       onClick={() => {
                         setActiveSubTab('kategori');
                         setIsDropdownOpen(false);
                       }}
-                      style={{ padding: '10px 16px', justifyContent: 'center' }}
+                      style={{ padding: '10px 16px', justifyContent: 'center', animationDelay: '50ms' }}
                     >
                       Kategori
                     </NeumorphicButton>
@@ -719,7 +721,7 @@ export const ProdukView: React.FC = () => {
                       onClick={() => setIsCategoryDropdownOpen(false)} 
                     />
                     <div 
-                      className="nm-button"
+                      className="nm-button anim-dropdown"
                       style={{ 
                         position: 'absolute', 
                         top: '100%', 
@@ -739,8 +741,9 @@ export const ProdukView: React.FC = () => {
                         gap: '8px'
                       }}
                     >
-                      {categories.map(c => (
+                      {categories.map((c, index) => (
                         <NeumorphicButton
+                          className="anim-dropdown-item"
                           key={c.id}
                           active={prodKategoriId === c.id}
                           onClick={() => {
@@ -750,7 +753,8 @@ export const ProdukView: React.FC = () => {
                           style={{
                             padding: '10px 12px',
                             justifyContent: 'space-between',
-                            width: '100%'
+                            width: '100%',
+                            animationDelay: `${index * 50}ms`
                           }}
                         >
                           <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
