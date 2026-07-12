@@ -648,7 +648,9 @@ export const TransaksiView: React.FC = () => {
             <CartInnerContent />
           </div>
         </NeumorphicBottomSheet>
-        {/* CHOOSE VARIAN OVERLAY MODAL */}
+      ))}
+
+      {/* CHOOSE VARIAN OVERLAY MODAL */}
       <NeumorphicModal
         isOpen={!!variantProduct}
         onClose={() => {
