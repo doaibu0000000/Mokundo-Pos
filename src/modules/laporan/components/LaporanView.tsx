@@ -285,20 +285,20 @@ export const LaporanView: React.FC = () => {
       <div style={{ display: 'grid', gridTemplateColumns: isLargeScreen ? '3fr 2fr' : '1fr', gap: '20px', marginBottom: '20px' }}>
         
         {/* Left Card: Transaction History list */}
-        <NeumorphicCard style={{ padding: '20px', overflowX: 'auto' }}>
+        <NeumorphicCard style={{ padding: '20px', minWidth: 0 }}>
           <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '16px' }}>Riwayat Transaksi</h3>
-          
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px dashed var(--text-muted)', textAlign: 'left' }}>
-                <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>TRX ID</th>
-                <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Tanggal</th>
-                <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Kasir</th>
-                <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Bayar</th>
-                <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Total</th>
-                <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Status</th>
-                <th style={{ padding: '10px 8px', textAlign: 'center' }}>Aksi</th>
-              </tr>
+          <div style={{ width: '100%', overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '500px' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px dashed var(--text-muted)', textAlign: 'left' }}>
+                  <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>TRX ID</th>
+                  <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Tanggal</th>
+                  <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Kasir</th>
+                  <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Bayar</th>
+                  <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Total</th>
+                  <th style={{ padding: '10px 8px', color: 'var(--text-secondary)' }}>Status</th>
+                  <th style={{ padding: '10px 8px', textAlign: 'center' }}>Aksi</th>
+                </tr>
             </thead>
             <tbody>
               {transactions.length === 0 ? (
@@ -347,6 +347,7 @@ export const LaporanView: React.FC = () => {
               )}
             </tbody>
           </table>
+          </div>
         </NeumorphicCard>
 
         {/* Right Card: Best Sellers list */}
