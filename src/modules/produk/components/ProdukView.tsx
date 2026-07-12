@@ -711,7 +711,7 @@ export const ProdukView: React.FC = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', alignItems: 'flex-end' }}>
             <NeumorphicInput
               label="Harga Jual (Rp)"
               type="number"
@@ -721,7 +721,7 @@ export const ProdukView: React.FC = () => {
               required
             />
             <NeumorphicInput
-              label="Harga Pokok (HPP) (Rp)"
+              label="Harga Pokok (Rp)"
               type="number"
               placeholder="0"
               value={prodHPP}
@@ -730,7 +730,7 @@ export const ProdukView: React.FC = () => {
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', alignItems: 'flex-end' }}>
             <NeumorphicInput
               label="Stok Awal"
               type="number"
