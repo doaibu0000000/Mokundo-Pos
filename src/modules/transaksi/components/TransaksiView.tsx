@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  Search, Barcode, Trash2, Plus, Minus, Tag, CreditCard, 
+  Search, Scan, Trash2, Plus, Minus, Tag, CreditCard, 
   Smartphone, Share2, Printer, CheckCircle, FileText, Sun, ShoppingBag, ShoppingCart 
 } from 'lucide-react';
 import { useApp } from '../../../store/AppContext';
