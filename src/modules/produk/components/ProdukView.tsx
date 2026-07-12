@@ -14,6 +14,13 @@ const formatRupiah = (number: number) => {
 
 export const ProdukView: React.FC = () => {
   const [activeSubTab, setActiveSubTab] = useState<'produk' | 'kategori'>('produk');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   // Products states
   const [products, setProducts] = useState<Product[]>([]);
@@ -298,27 +305,29 @@ export const ProdukView: React.FC = () => {
     <div style={{ padding: '20px', height: '100%', overflowY: 'auto' }}>
       
       {/* Seeding Warning Alert */}
-      <div 
-        className="nm-inset"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          padding: '12px 16px',
-          borderRadius: 'var(--radius-md)',
-          backgroundColor: 'rgba(245, 158, 11, 0.1)',
-          border: '1px solid var(--accent-orange)',
-          color: 'var(--accent-orange)',
-          marginBottom: '20px',
-          fontSize: '13px',
-          fontWeight: 600
-        }}
-      >
-        <AlertCircle size={20} />
-        <div>
-          <span>Pemberitahuan Keamanan:</span> Akun default <code>admin</code> dan <code>kasir</code> aktif. Silakan ubah password bawaan Anda di menu <b>Pengaturan</b>.
+      {!isMobile && (
+        <div 
+          className="nm-inset"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '12px 16px',
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+            border: '1px solid var(--accent-orange)',
+            color: 'var(--accent-orange)',
+            marginBottom: '20px',
+            fontSize: '13px',
+            fontWeight: 600
+          }}
+        >
+          <AlertCircle size={20} />
+          <div>
+            <span>Pemberitahuan Keamanan:</span> Akun default <code>admin</code> dan <code>kasir</code> aktif. Silakan ubah password bawaan Anda di menu <b>Pengaturan</b>.
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Navigation tabs */}
       <div
