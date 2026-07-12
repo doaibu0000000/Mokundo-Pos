@@ -375,7 +375,7 @@ export const ProdukView: React.FC = () => {
                       top: '100%',
                       left: 0,
                       marginTop: '12px',
-                      padding: '12px',
+                      padding: '8px',
                       borderRadius: 'var(--radius-lg)',
                       zIndex: 50,
                       display: 'flex',
@@ -393,7 +393,7 @@ export const ProdukView: React.FC = () => {
                         setActiveSubTab('produk');
                         setIsDropdownOpen(false);
                       }}
-                      style={{ padding: '8px 12px', justifyContent: 'flex-start' }}
+                      style={{ padding: '10px 16px', justifyContent: 'center' }}
                     >
                       Produk
                     </NeumorphicButton>
@@ -403,7 +403,7 @@ export const ProdukView: React.FC = () => {
                         setActiveSubTab('kategori');
                         setIsDropdownOpen(false);
                       }}
-                      style={{ padding: '8px 12px', justifyContent: 'flex-start' }}
+                      style={{ padding: '10px 16px', justifyContent: 'center' }}
                     >
                       Kategori
                     </NeumorphicButton>
