@@ -80,6 +80,7 @@ export const NeumorphicBottomSheet: React.FC<BottomSheetProps> = ({
           display: 'flex',
           flexDirection: 'column',
           zIndex: 1001,
+          boxShadow: 'none',
           transform: `translateY(${animateShow ? '0%' : '100%'})`,
           transition: 'transform 0.25s ease-out',
         }}
