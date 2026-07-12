@@ -98,7 +98,7 @@ export const MobileLayout: React.FC = () => {
   // GoPay Style Home layout
   const renderGoPayHome = () => {
     return (
-      <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px', height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
+      <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
         
         {/* Profile and Theme Toggle header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
