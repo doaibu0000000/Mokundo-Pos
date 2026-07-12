@@ -561,9 +561,18 @@ export const ProdukView: React.FC = () => {
           </div>
 
           {/* Products List Grid */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', flex: 1, paddingBottom: '20px', paddingRight: '4px', margin: '0 -4px' }}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', 
+            gap: '16px', 
+            overflowY: 'auto', 
+            flex: 1, 
+            paddingBottom: '20px', 
+            paddingRight: '6px', 
+            alignContent: 'start' 
+          }}>
             {products.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
                 Belum ada produk terdaftar. Tambahkan produk atau gunakan import CSV.
               </div>
             ) : (
@@ -575,63 +584,65 @@ export const ProdukView: React.FC = () => {
                     key={p.id}
                     style={{
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '12px 16px',
-                      flexWrap: 'wrap',
-                      gap: '12px'
+                      flexDirection: 'column',
+                      padding: '12px',
+                      position: 'relative'
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1 }}>
-                      <div
-                        style={{
-                          width: '44px',
-                          height: '44px',
-                          borderRadius: '8px',
-                          backgroundImage: `url(${p.gambar_url})`,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                          backgroundColor: 'var(--bg-inset)'
-                        }}
-                      />
-                      <div>
-                        <h4 style={{ fontWeight: 800, fontSize: '14px' }}>
-                          {p.nama} <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 500 }}>({p.sku})</span>
-                        </h4>
-                        <div style={{ display: 'flex', gap: '8px', fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px', flexWrap: 'wrap' }}>
-                          <span>Kategori: <b>{category?.nama || 'Uncategorized'}</b></span>
-                          <span>HPP: <b>{formatRupiah(p.HPP)}</b></span>
-                          <span>Jual: <b>{formatRupiah(p.harga)}</b></span>
-                        </div>
+                    {/* Product Photo */}
+                    <div
+                      style={{
+                        width: '100%',
+                        paddingTop: '75%', // 4:3 aspect ratio
+                        backgroundImage: `url(${p.gambar_url || 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=150'})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        borderRadius: 'var(--radius-sm)',
+                        marginBottom: '10px'
+                      }}
+                    />
+
+                    {/* Stock Indicator */}
+                    <div 
+                      style={{ 
+                        position: 'absolute', 
+                        top: '18px', 
+                        right: '18px',
+                        fontSize: '9px',
+                        fontWeight: 800,
+                        padding: '2px 6px',
+                        borderRadius: 'var(--radius-pill)',
+                        backgroundColor: isLowStock ? 'var(--accent-red)' : 'var(--bg-inset)',
+                        color: isLowStock ? '#fff' : 'var(--text-secondary)'
+                      }}
+                    >
+                      Stok: {p.stok}
+                    </div>
+
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      <h4 style={{ fontSize: '13px', fontWeight: 700, lineHeight: 1.2, height: '32px', overflow: 'hidden' }}>
+                        {p.nama}
+                      </h4>
+                      <div style={{ fontSize: '10px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                        ({p.sku})
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                        <span>Kat: {category?.nama || '-'}</span>
+                        <span>M: {formatRupiah(p.HPP)}</span>
+                      </div>
+                      <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--accent-blue)', marginTop: '4px' }}>
+                        J: {formatRupiah(p.harga)}
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      {/* Stock Level Warning indicators */}
-                      <span 
-                        className="nm-inset"
-                        style={{
-                          padding: '4px 10px',
-                          borderRadius: 'var(--radius-pill)',
-                          fontSize: '11px',
-                          fontWeight: 800,
-                          backgroundColor: isLowStock ? 'rgba(239, 68, 68, 0.1)' : 'var(--bg-inset)',
-                          border: isLowStock ? '1px solid var(--accent-red)' : 'none',
-                          color: isLowStock ? 'var(--accent-red)' : 'var(--text-primary)'
-                        }}
-                      >
-                        Stok: {p.stok}
-                      </span>
-
-                      {/* Edit Delete tools */}
-                      <div style={{ display: 'flex', gap: '6px' }}>
-                        <NeumorphicButton size="sm" onClick={() => openProductForm(p)} style={{ width: '32px', height: '32px', padding: 0 }}>
-                          <Edit2 size={12} />
-                        </NeumorphicButton>
-                        <NeumorphicButton size="sm" onClick={() => deleteProduct(p.id!)} style={{ width: '32px', height: '32px', padding: 0, color: 'var(--accent-red)' }}>
-                          <Trash2 size={12} />
-                        </NeumorphicButton>
-                      </div>
+                    {/* Action buttons at bottom */}
+                    <div style={{ display: 'flex', gap: '6px', marginTop: '12px', justifyContent: 'flex-end' }}>
+                      <NeumorphicButton size="sm" onClick={() => openProductForm(p)} style={{ width: '32px', height: '32px', padding: 0 }}>
+                        <Edit2 size={12} />
+                      </NeumorphicButton>
+                      <NeumorphicButton size="sm" onClick={() => deleteProduct(p.id!)} style={{ width: '32px', height: '32px', padding: 0, color: 'var(--accent-red)' }}>
+                        <Trash2 size={12} />
+                      </NeumorphicButton>
                     </div>
                   </NeumorphicCard>
                 );
