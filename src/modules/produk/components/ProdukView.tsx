@@ -340,51 +340,60 @@ export const ProdukView: React.FC = () => {
           gap: '16px'
         }}
       >
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <NeumorphicButton active={activeSubTab === 'produk'} onClick={() => setActiveSubTab('produk')}>
+        <div 
+          className="overflow-x-auto"
+          style={{ 
+            display: 'flex', 
+            gap: '8px',
+            paddingBottom: '4px',
+            maxWidth: '100%',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none'
+          }}
+        >
+          <style>{`.overflow-x-auto::-webkit-scrollbar { display: none; }`}</style>
+          <NeumorphicButton active={activeSubTab === 'produk'} onClick={() => setActiveSubTab('produk')} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
             Kelola Produk
           </NeumorphicButton>
-          <NeumorphicButton active={activeSubTab === 'kategori'} onClick={() => setActiveSubTab('kategori')}>
+          <NeumorphicButton active={activeSubTab === 'kategori'} onClick={() => setActiveSubTab('kategori')} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
             Kelola Kategori
           </NeumorphicButton>
+
+          {activeSubTab === 'produk' && (
+            <NeumorphicButton variant="success" onClick={() => openProductForm(null)} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+              <Plus size={16} /> Tambah Produk
+            </NeumorphicButton>
+          )}
+
+          {activeSubTab === 'kategori' && (
+            <NeumorphicButton variant="success" onClick={() => openCategoryForm(null)} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+              <Plus size={16} /> Tambah Kategori
+            </NeumorphicButton>
+          )}
         </div>
 
-        {/* Action Button Row */}
-        {activeSubTab === 'produk' && (
+        {/* Action Button Row (Desktop Exports) */}
+        {!isMobile && activeSubTab === 'produk' && (
           <div style={{ display: 'flex', gap: '8px' }}>
-            {!isMobile && (
-              <>
-                <NeumorphicButton size="sm" onClick={handleExportCSV}>
-                  <Download size={14} /> Export CSV
-                </NeumorphicButton>
-                
-                <label className="nm-button" style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  padding: '6px 12px',
-                  borderRadius: 'var(--radius-md)',
-                  cursor: 'pointer'
-                }}>
-                  <Upload size={14} /> Import CSV
-                  <input type="file" accept=".csv" onChange={handleImportCSV} style={{ display: 'none' }} />
-                </label>
-              </>
-            )}
-
-            <NeumorphicButton variant="success" size="sm" onClick={() => openProductForm(null)}>
-              <Plus size={14} /> Tambah Produk
+            <NeumorphicButton size="sm" onClick={handleExportCSV}>
+              <Download size={14} /> Export CSV
             </NeumorphicButton>
+            
+            <label className="nm-button" style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              fontSize: '12px',
+              fontWeight: 600,
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-md)',
+              cursor: 'pointer'
+            }}>
+              <Upload size={14} /> Import CSV
+              <input type="file" accept=".csv" onChange={handleImportCSV} style={{ display: 'none' }} />
+            </label>
           </div>
-        )}
-
-        {activeSubTab === 'kategori' && (
-          <NeumorphicButton variant="success" size="sm" onClick={() => openCategoryForm(null)}>
-            <Plus size={14} /> Tambah Kategori
-          </NeumorphicButton>
         )}
       </div>
 
