@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Plus, Edit2, Trash2, Download, Upload, AlertCircle, Search, ChevronDown, Check } from 'lucide-react';
 import { db, type Product, type Category } from '../../../shared/services/db';
 import { NeumorphicCard, NeumorphicButton, NeumorphicInput, NeumorphicModal } from '../../../shared/components';
-import Cropper from 'react-easy-crop';
+import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 import { getCroppedImg } from '../../../utils/cropImage';
 
 const formatRupiah = (number: number) => {
@@ -47,9 +48,9 @@ export const ProdukView: React.FC = () => {
   // Crop states
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const [imageSrcToCrop, setImageSrcToCrop] = useState('');
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [crop, setCrop] = useState<Crop>({ unit: '%', width: 90, height: 90, x: 5, y: 5 });
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   // Category Form Modal States
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -206,13 +207,14 @@ export const ProdukView: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
-  const onCropComplete = (_: any, croppedAreaPixels: any) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  };
-
   const handleSaveCrop = async () => {
+    if (!imgRef.current || !completedCrop) {
+      setProdError('Pilih area gambar yang ingin dipotong.');
+      return;
+    }
+
     try {
-      const croppedImage = await getCroppedImg(imageSrcToCrop, croppedAreaPixels);
+      const croppedImage = await getCroppedImg(imgRef.current, completedCrop);
       setProdGambarUrl(croppedImage);
       setIsCropModalOpen(false);
     } catch (e) {
@@ -892,16 +894,22 @@ export const ProdukView: React.FC = () => {
 
       {/* Crop Modal */}
       <NeumorphicModal isOpen={isCropModalOpen} onClose={() => setIsCropModalOpen(false)} title="Potong Gambar">
-        <div style={{ position: 'relative', width: '100%', height: '300px', background: '#333', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
-          <Cropper
-            image={imageSrcToCrop}
+        <div style={{ width: '100%', maxHeight: '400px', display: 'flex', justifyContent: 'center', background: '#333', borderRadius: 'var(--radius-md)', overflow: 'auto', padding: '10px' }}>
+          <ReactCrop
             crop={crop}
-            zoom={zoom}
+            onChange={(_, percentCrop) => setCrop(percentCrop)}
+            onComplete={(c) => setCompletedCrop(c)}
             aspect={1}
-            onCropChange={setCrop}
-            onCropComplete={onCropComplete}
-            onZoomChange={setZoom}
-          />
+            circularCrop={false}
+          >
+            <img 
+              ref={imgRef} 
+              src={imageSrcToCrop} 
+              alt="Crop" 
+              style={{ maxHeight: '350px', objectFit: 'contain' }} 
+              crossOrigin="anonymous" 
+            />
+          </ReactCrop>
         </div>
         <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
           <NeumorphicButton style={{ flex: 1, justifyContent: 'center' }} onClick={() => setIsCropModalOpen(false)}>

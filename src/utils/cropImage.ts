@@ -1,18 +1,8 @@
-export const createImage = (url: string): Promise<HTMLImageElement> =>
-  new Promise((resolve, reject) => {
-    const image = new Image()
-    image.addEventListener('load', () => resolve(image))
-    image.addEventListener('error', (error) => reject(error))
-    image.setAttribute('crossOrigin', 'anonymous')
-    image.src = url
-  })
-
 export async function getCroppedImg(
-  imageSrc: string,
+  image: HTMLImageElement,
   pixelCrop: { x: number; y: number; width: number; height: number },
   rotation = 0
 ): Promise<string> {
-  const image = await createImage(imageSrc)
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
 
@@ -21,13 +11,13 @@ export async function getCroppedImg(
   }
 
   // Set canvas size to match the bounding box
-  canvas.width = image.width
-  canvas.height = image.height
+  canvas.width = image.naturalWidth
+  canvas.height = image.naturalHeight
 
   // Translate canvas context to a central location to allow rotating and flipping around the center
-  ctx.translate(image.width / 2, image.height / 2)
+  ctx.translate(image.naturalWidth / 2, image.naturalHeight / 2)
   ctx.rotate((rotation * Math.PI) / 180)
-  ctx.translate(-image.width / 2, -image.height / 2)
+  ctx.translate(-image.naturalWidth / 2, -image.naturalHeight / 2)
 
   // Draw rotated image
   ctx.drawImage(image, 0, 0)
@@ -44,12 +34,18 @@ export async function getCroppedImg(
   croppedCanvas.height = pixelCrop.height
 
   // Draw the cropped image onto the new canvas
+  // We need to scale the pixelCrop (which is based on the rendered image)
+  // to the natural size of the image.
+  
+  const scaleX = image.naturalWidth / image.width;
+  const scaleY = image.naturalHeight / image.height;
+
   croppedCtx.drawImage(
     canvas,
-    pixelCrop.x,
-    pixelCrop.y,
-    pixelCrop.width,
-    pixelCrop.height,
+    pixelCrop.x * scaleX,
+    pixelCrop.y * scaleY,
+    pixelCrop.width * scaleX,
+    pixelCrop.height * scaleY,
     0,
     0,
     pixelCrop.width,
