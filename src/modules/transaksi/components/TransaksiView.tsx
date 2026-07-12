@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Search, Barcode, Trash2, Plus, Minus, Tag, CreditCard, 
-  Smartphone, Share2, Printer, CheckCircle, FileText, Sun, ShoppingBag 
+  Smartphone, Share2, Printer, CheckCircle, FileText, Sun, ShoppingBag, ShoppingCart 
 } from 'lucide-react';
 import { useApp } from '../../../store/AppContext';
 import { db, type Product, type Category, type Transaction, type TransactionItem } from '../../../shared/services/db';
@@ -594,7 +594,7 @@ export const TransaksiView: React.FC = () => {
                 boxShadow: '4px 4px 8px rgba(0,0,0,0.3)',
               }}
             >
-              <Plus size={24} />
+              <ShoppingCart size={24} />
               <span 
                 style={{
                   position: 'absolute',
