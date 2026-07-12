@@ -772,36 +772,24 @@ export const ProdukView: React.FC = () => {
           {confirmConfig.message}
         </p>
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-          <button
-            className="nm-button"
+          <NeumorphicButton
             onClick={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
-            style={{
-              padding: '10px 20px',
-              borderRadius: 'var(--radius-md)',
-              border: 'none',
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-            }}
+            borderRadius="pill"
+            style={{ minWidth: '100px' }}
           >
             Batal
-          </button>
-          <button
-            className="nm-button"
+          </NeumorphicButton>
+          <NeumorphicButton
+            variant="danger"
+            borderRadius="pill"
             onClick={() => {
               confirmConfig.onConfirm();
               setConfirmConfig({ ...confirmConfig, isOpen: false });
             }}
-            style={{
-              padding: '10px 20px',
-              borderRadius: 'var(--radius-md)',
-              border: 'none',
-              fontWeight: 600,
-              color: 'white',
-              backgroundColor: 'var(--accent-red)',
-            }}
+            style={{ minWidth: '120px' }}
           >
             Ya, Hapus
-          </button>
+          </NeumorphicButton>
         </div>
       </NeumorphicModal>
 
