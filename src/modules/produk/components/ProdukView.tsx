@@ -171,7 +171,7 @@ export const ProdukView: React.FC = () => {
       setIsProductModalOpen(false);
       loadData();
     } catch (err: any) {
-      setProdError(err.message || 'Gagal menyimpan produk. Periksa duplikasi SKU.');
+      setProdError(err.message || 'Gagal menyimpan produk. Periksa duplikasi Barcode.');
     }
   };
 
@@ -486,7 +486,7 @@ export const ProdukView: React.FC = () => {
         <div>
           <div style={{ marginBottom: '16px' }}>
             <NeumorphicInput
-              placeholder="Cari SKU atau nama produk..."
+              placeholder="Cari Barcode atau nama produk..."
               value={productSearch}
               onChange={(e) => setProductSearch(e.target.value)}
             />
@@ -665,7 +665,7 @@ export const ProdukView: React.FC = () => {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <NeumorphicInput
-              label="SKU / Barcode"
+              label="Barcode"
               placeholder="Misal: 888001"
               value={prodSku}
               onChange={(e) => setProdSku(e.target.value)}

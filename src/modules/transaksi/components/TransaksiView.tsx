@@ -212,7 +212,7 @@ export const TransaksiView: React.FC = () => {
       setScanMessage(`✅ Scanned: ${product.nama}`);
       setBarcodeInput('');
     } else {
-      setScanMessage('❌ SKU tidak ditemukan');
+      setScanMessage('❌ Barcode tidak ditemukan');
     }
   };
 
@@ -427,8 +427,8 @@ export const TransaksiView: React.FC = () => {
           {!isMobile && (
             <div style={{ display: 'flex', gap: '8px' }}>
               <NeumorphicButton onClick={() => setShowScannerMock(!showScannerMock)}>
-                <Barcode size={18} />
-                <span className="hidden sm:inline">Scan SKU</span>
+                <Scan size={18} />
+                <span className="hidden sm:inline">Scan Barcode</span>
               </NeumorphicButton>
               
               {/* Wake Lock Status Badge */}
@@ -461,7 +461,7 @@ export const TransaksiView: React.FC = () => {
             <form onSubmit={handleBarcodeSubmit} style={{ display: 'flex', gap: '12px' }}>
               <div style={{ flex: 1 }}>
                 <NeumorphicInput
-                  placeholder="Simulasikan Scan SKU (Misal: 888001)"
+                  placeholder="Simulasikan Scan Barcode (Misal: 888001)"
                   value={barcodeInput}
                   onChange={(e) => setBarcodeInput(e.target.value)}
                   autoFocus
