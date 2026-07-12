@@ -33,7 +33,6 @@ export const TransaksiView: React.FC = () => {
     removeFromCart,
     clearCart,
     cartTotals,
-    discountAmount,
     setDiscountAmount,
     platform,
     setPlatform,
