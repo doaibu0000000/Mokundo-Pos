@@ -639,48 +639,85 @@ export const ProdukView: React.FC = () => {
       >
         <form onSubmit={handleProductSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           
-          {/* Image Uploader */}
-          <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '8px' }}>
-            <label 
-              className="nm-inset"
-              style={{
-                width: '120px',
-                height: '120px',
-                borderRadius: 'var(--radius-lg)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                overflow: 'hidden',
-                position: 'relative',
-                border: 'var(--border-width-hc) solid var(--border-high-contrast)',
-              }}
-            >
-              {prodGambarUrl ? (
-                <img src={prodGambarUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
-                  <Upload size={24} />
-                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase' }}>Foto Produk</span>
-                </div>
-              )}
-              <input 
-                type="file" 
-                accept="image/*" 
-                onChange={handleImageUpload} 
-                style={{ display: 'none' }} 
-              />
-            </label>
-          </div>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+            {/* Image Uploader - Left Side */}
+            <div style={{ flexShrink: 0 }}>
+              <label 
+                className="nm-inset"
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  borderRadius: 'var(--radius-lg)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  border: 'var(--border-width-hc) solid var(--border-high-contrast)',
+                }}
+              >
+                {prodGambarUrl ? (
+                  <img src={prodGambarUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
+                    <Upload size={24} />
+                    <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', textAlign: 'center', padding: '0 4px' }}>Foto Produk</span>
+                  </div>
+                )}
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleImageUpload} 
+                  style={{ display: 'none' }} 
+                />
+              </label>
+            </div>
 
-          <NeumorphicInput
-            label="Nama Produk"
-            placeholder="Misal: Rice Bowl Beef Blackpepper"
-            value={prodNama}
-            onChange={(e) => setProdNama(e.target.value)}
-            required
-          />
+            {/* Right Side - Nama, Kategori, Barcode */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', minWidth: 0 }}>
+              <NeumorphicInput
+                label="Nama Produk"
+                placeholder="Misal: Rice Bowl..."
+                value={prodNama}
+                onChange={(e) => setProdNama(e.target.value)}
+                required
+              />
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
+                  Kategori
+                </label>
+                <select
+                  value={prodKategoriId}
+                  onChange={(e) => setProdKategoriId(parseInt(e.target.value))}
+                  className="nm-input"
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '14px',
+                    height: '42px',
+                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
+                  }}
+                >
+                  {categories.map(c => (
+                    <option key={c.id} value={c.id} style={{ background: 'var(--bg-surface)' }}>
+                      {c.nama}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <NeumorphicInput
+                label="Barcode"
+                placeholder="Misal: 888001"
+                value={prodSku}
+                onChange={(e) => setProdSku(e.target.value)}
+                required
+              />
+            </div>
+          </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <NeumorphicInput
@@ -720,40 +757,7 @@ export const ProdukView: React.FC = () => {
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <NeumorphicInput
-              label="Barcode"
-              placeholder="Misal: 888001"
-              value={prodSku}
-              onChange={(e) => setProdSku(e.target.value)}
-              required
-            />
 
-            {/* Category Select element */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
-                Kategori
-              </label>
-              <select
-                value={prodKategoriId}
-                onChange={(e) => setProdKategoriId(parseInt(e.target.value))}
-                className="nm-input"
-                style={{
-                  padding: '12px 14px',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '14px',
-                  height: '45px',
-                  border: 'var(--border-width-hc) solid var(--border-high-contrast)'
-                }}
-              >
-                {categories.map(c => (
-                  <option key={c.id} value={c.id} style={{ background: 'var(--bg-surface)' }}>
-                    {c.nama}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
 
           <NeumorphicInput
             label="Daftar Varian (pisahkan koma)"
