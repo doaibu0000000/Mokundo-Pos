@@ -21,7 +21,6 @@ export const NeumorphicInput: React.FC<InputProps> = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === 'password';
-  const actualType = isPassword ? (showPassword ? 'text' : 'password') : type;
   
   const radiusClass = `var(--radius-${borderRadius})`;
 
@@ -44,6 +43,7 @@ export const NeumorphicInput: React.FC<InputProps> = ({
     width: '100%',
     fontSize: '14px',
     border: 'var(--border-width-hc) solid var(--border-high-contrast)',
+    ...({ WebkitTextSecurity: (isPassword && !showPassword) ? 'disc' : 'none' } as any),
     ...style,
   };
 
@@ -76,6 +76,7 @@ export const NeumorphicInput: React.FC<InputProps> = ({
         <label 
           htmlFor={id} 
           style={{
+            display: 'block',
             fontSize: '11px',
             fontWeight: 700,
             letterSpacing: '0.05em',
@@ -92,9 +93,11 @@ export const NeumorphicInput: React.FC<InputProps> = ({
         
         <input
           id={id}
-          type={actualType}
+          type={isPassword ? 'text' : type}
           className={`nm-input transition-all-custom ${className}`}
           style={inputStyle}
+          autoComplete="off"
+          spellCheck="false"
           {...props}
         />
         
