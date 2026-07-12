@@ -53,7 +53,7 @@ export const WebLayout: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100dvh', width: '100vw', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
       
       {/* Left fixed Sidebar panel */}
       <div
