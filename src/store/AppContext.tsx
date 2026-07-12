@@ -54,7 +54,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [user, setUser] = useState<User | null>(null);
   const [store, setStore] = useState<Store | null>(null);
   const [currentShift, setCurrentShift] = useState<Shift | null>(null);
-  const [activeTab, setActiveTabState] = useState<string>('dashboard');
+  const [activeTab, setActiveTabState] = useState<string>(() => {
+    return localStorage.getItem('mokundo_activeTab') || 'dashboard';
+  });
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false); // Default light
   const [isHighContrast, setIsHighContrast] = useState<boolean>(false);
   
@@ -146,8 +148,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // Redirect Kasir strictly to POS screen
     if (loggedInUser.role === 'Kasir') {
       setActiveTabState('transaksi');
+      localStorage.setItem('mokundo_activeTab', 'transaksi');
     } else {
       setActiveTabState('dashboard');
+      localStorage.setItem('mokundo_activeTab', 'dashboard');
     }
   };
 
@@ -162,6 +166,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return;
     }
     setActiveTabState(tab);
+    localStorage.setItem('mokundo_activeTab', tab);
   };
 
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
