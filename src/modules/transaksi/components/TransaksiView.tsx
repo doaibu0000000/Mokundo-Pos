@@ -75,6 +75,20 @@ export const TransaksiView: React.FC = () => {
   const [completedItems, setCompletedItems] = useState<TransactionItem[]>([]);
   const [bluetoothName, setBluetoothName] = useState('');
   
+  // Discount State
+  const [discountType, setDiscountType] = useState<'Rp' | '%'>('Rp');
+  const [rawDiscountInput, setRawDiscountInput] = useState('');
+
+  // Sync discount
+  useEffect(() => {
+    const raw = parseFloat(rawDiscountInput) || 0;
+    if (discountType === 'Rp') {
+      setDiscountAmount(raw);
+    } else {
+      setDiscountAmount((raw / 100) * cartTotals.subtotal);
+    }
+  }, [rawDiscountInput, discountType, cartTotals.subtotal, setDiscountAmount]);
+  
   // Wake Lock State
   const [wakeLock, setWakeLock] = useState<any>(null);
   const [wakeLockStatus, setWakeLockStatus] = useState<'Active' | 'Inactive' | 'Unsupported'>('Inactive');
@@ -781,25 +795,79 @@ export const TransaksiView: React.FC = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: 'var(--text-secondary)' }}>
               <Tag size={16} />
-              <span style={{ fontWeight: 700 }}>Diskon (Rp)</span>
+              <span style={{ fontWeight: 700 }}>Diskon</span>
             </div>
-            <div style={{ width: '150px' }}>
-              <input
-                type="number"
-                placeholder="0"
-                value={discountAmount || ''}
-                onChange={(e) => setDiscountAmount(Math.max(0, parseFloat(e.target.value) || 0))}
-                className="nm-input"
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              {/* Type Switcher */}
+              <div 
+                style={{ 
+                  display: 'flex', 
+                  backgroundColor: 'var(--bg-inset)',
                   borderRadius: 'var(--radius-sm)',
-                  fontSize: '14px',
-                  fontWeight: 800,
-                  textAlign: 'right',
-                  border: '1px solid transparent'
+                  padding: '2px'
                 }}
-              />
+                className="nm-inset"
+              >
+                <button
+                  type="button"
+                  onClick={() => { setDiscountType('Rp'); setRawDiscountInput(''); }}
+                  style={{
+                    padding: '4px 8px',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    borderRadius: 'var(--radius-sm)',
+                    border: 'none',
+                    backgroundColor: discountType === 'Rp' ? 'var(--bg-surface)' : 'transparent',
+                    color: discountType === 'Rp' ? 'var(--accent-blue)' : 'var(--text-secondary)',
+                    boxShadow: discountType === 'Rp' ? 'var(--shadow-sm)' : 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Rp
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setDiscountType('%'); setRawDiscountInput(''); }}
+                  style={{
+                    padding: '4px 8px',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    borderRadius: 'var(--radius-sm)',
+                    border: 'none',
+                    backgroundColor: discountType === '%' ? 'var(--bg-surface)' : 'transparent',
+                    color: discountType === '%' ? 'var(--accent-blue)' : 'var(--text-secondary)',
+                    boxShadow: discountType === '%' ? 'var(--shadow-sm)' : 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  %
+                </button>
+              </div>
+              <div style={{ width: '100px' }}>
+                <input
+                  type="number"
+                  placeholder="0"
+                  value={rawDiscountInput}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === '') {
+                      setRawDiscountInput('');
+                    } else {
+                      setRawDiscountInput(Math.max(0, parseFloat(val)).toString());
+                    }
+                  }}
+                  className="nm-input"
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '14px',
+                    fontWeight: 800,
+                    textAlign: 'right',
+                    border: '1px solid transparent'
+                  }}
+                />
+              </div>
             </div>
           </div>
 
