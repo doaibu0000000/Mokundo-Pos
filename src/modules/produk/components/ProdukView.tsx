@@ -893,7 +893,7 @@ export const ProdukView: React.FC = () => {
       </NeumorphicModal>
 
       {/* Crop Modal */}
-      <NeumorphicModal isOpen={isCropModalOpen} onClose={() => setIsCropModalOpen(false)} title="Potong Gambar">
+      <NeumorphicModal isOpen={isCropModalOpen} onClose={() => setIsCropModalOpen(false)} title="Potong Gambar" hideCloseButton>
         <div style={{ width: '100%', maxHeight: '400px', display: 'flex', justifyContent: 'center', background: '#333', borderRadius: 'var(--radius-md)', overflow: 'auto', padding: '10px' }}>
           <ReactCrop
             crop={crop}
@@ -915,7 +915,7 @@ export const ProdukView: React.FC = () => {
           <NeumorphicButton style={{ flex: 1, justifyContent: 'center' }} onClick={() => setIsCropModalOpen(false)}>
             Batal
           </NeumorphicButton>
-          <NeumorphicButton style={{ flex: 1, justifyContent: 'center' }} onClick={handleSaveCrop}>
+          <NeumorphicButton variant="primary" style={{ flex: 1, justifyContent: 'center' }} onClick={handleSaveCrop}>
             Simpan
           </NeumorphicButton>
         </div>
