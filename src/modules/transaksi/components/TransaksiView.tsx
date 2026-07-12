@@ -66,7 +66,7 @@ export const TransaksiView: React.FC = () => {
 
   // Payment State
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'Tunai' | 'QRIS' | 'DANA' | 'GoPay' | 'OVO' | 'ShopeePay'>('Tunai');
+  const [paymentMethod, setPaymentMethod] = useState<'Tunai' | 'QRIS' | 'DANA' | 'GoPay' | 'OVO' | 'Bank'>('Tunai');
   const [cashPaid, setCashPaid] = useState('');
   const [checkoutError, setCheckoutError] = useState('');
   
@@ -735,7 +735,7 @@ export const TransaksiView: React.FC = () => {
                 marginTop: '8px' 
               }}
             >
-              {(['Tunai', 'QRIS', 'DANA', 'GoPay', 'OVO', 'ShopeePay'] as const).map(m => (
+              {(['Tunai', 'QRIS', 'DANA', 'GoPay', 'OVO', 'Bank'] as const).map(m => (
                 <NeumorphicButton
                   key={m}
                   size="sm"
