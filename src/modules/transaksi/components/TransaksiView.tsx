@@ -905,7 +905,7 @@ export const TransaksiView: React.FC = () => {
             onClick={handleCheckoutSubmit} 
             style={{ width: '100%', padding: '12px' }}
           >
-            Bayar & Simpan Transaksi
+            Bayar & Cetak Struk
           </NeumorphicButton>
         </div>
       </NeumorphicModal>
