@@ -28,7 +28,6 @@ export const NeumorphicInput: React.FC<InputProps> = ({
   const wrapperStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
-    gap: '6px',
     width: '100%',
   };
 
@@ -81,7 +80,8 @@ export const NeumorphicInput: React.FC<InputProps> = ({
             fontWeight: 700,
             letterSpacing: '0.05em',
             color: 'var(--text-secondary)',
-            textTransform: 'uppercase'
+            textTransform: 'uppercase',
+            marginBottom: '6px'
           }}
         >
           {label}

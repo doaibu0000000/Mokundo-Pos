@@ -60,7 +60,14 @@ export const LoginView: React.FC = () => {
         padding: '20px',
       }}
     >
-      <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '420px' }}>
+      <div 
+        style={{ width: '100%', maxWidth: '420px' }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleSubmit(e);
+          }
+        }}
+      >
         <NeumorphicCard
           style={{
             padding: '36px 30px',
@@ -110,18 +117,21 @@ export const LoginView: React.FC = () => {
 
           {/* Fields */}
           <NeumorphicInput
-            id="username-input"
+            id="field_u"
+            name="field_u"
             label="Username"
             placeholder="admin / kasir"
             icon={<UserIcon size={18} />}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             containerClassName="w-full mb-5"
-            autoComplete="off"
+            autoComplete="new-password"
+            data-lpignore="true"
           />
 
           <NeumorphicInput
-            id="password-input"
+            id="field_p"
+            name="field_p"
             label="Password"
             type="password"
             placeholder="••••••••"
@@ -129,7 +139,8 @@ export const LoginView: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             containerClassName="w-full mb-6"
-            autoComplete="off"
+            autoComplete="new-password"
+            data-lpignore="true"
           />
 
           {/* Error Message */}
@@ -151,7 +162,8 @@ export const LoginView: React.FC = () => {
 
           {/* Submit Button */}
           <NeumorphicButton
-            type="submit"
+            type="button"
+            onClick={handleSubmit}
             variant="primary"
             borderRadius="pill"
             disabled={loading}
@@ -164,7 +176,7 @@ export const LoginView: React.FC = () => {
             {loading ? 'Memvalidasi...' : 'Masuk'}
           </NeumorphicButton>
         </NeumorphicCard>
-      </form>
+      </div>
     </div>
   );
 };
