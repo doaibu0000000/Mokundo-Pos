@@ -53,7 +53,10 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const cachedUser = localStorage.getItem('mokundo_user');
+    return cachedUser ? JSON.parse(cachedUser) : null;
+  });
   const [store, setStore] = useState<Store | null>(null);
   const [currentShift, setCurrentShift] = useState<Shift | null>(null);
   const [activeTab, setActiveTabState] = useState<string>(() => {
@@ -102,12 +105,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     
     if (isHighContrast) html.classList.add('high-contrast');
     else html.classList.remove('high-contrast');
-
-    // 2. Load cached user session
-    const cachedUser = localStorage.getItem('mokundo_user');
-    if (cachedUser) {
-      setUser(JSON.parse(cachedUser));
-    }
 
     // 3. Load database configs and finish initializing
     const initApp = async () => {

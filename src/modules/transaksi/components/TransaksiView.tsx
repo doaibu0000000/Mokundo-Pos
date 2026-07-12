@@ -36,7 +36,8 @@ export const TransaksiView: React.FC = () => {
     discountAmount,
     setDiscountAmount,
     platform,
-    setPlatform
+    setPlatform,
+    isInitializing
   } = useApp();
 
   // State Management
@@ -348,7 +349,7 @@ export const TransaksiView: React.FC = () => {
     <div style={{ display: 'flex', height: '100%', width: '100%', overflow: 'hidden' }}>
       
       {/* SHIFT GATEWAY BLOCK (Force Modal) */}
-      {!currentShift && (
+      {!isInitializing && !currentShift && (
         <div
           style={{
             position: 'absolute',
