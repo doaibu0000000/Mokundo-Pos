@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db, type User, type Store, type Shift, type Product } from '../shared/services/db';
+import { seedDatabase } from '../shared/services/db';
+import { SyncService } from '../shared/services/syncService';
 import { calculateTotals } from '../shared/lib/math';
 
 export interface CartItem {
@@ -108,18 +110,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // 3. Load database configs and finish initializing
     const initApp = async () => {
-      // Validate session: if IndexedDB was wiped but localStorage survived,
-      // the user will be in state but not in the DB. We must force logout.
-      if (user) {
-        const dbUser = await db.users.where('username').equalsIgnoreCase(user.username).first();
-        if (!dbUser) {
+      try {
+        // A. Check if the database is currently empty (wiped) BEFORE seeding
+        const isDatabaseWiped = (await db.users.count()) === 0;
+
+        // B. If user exists in localStorage, but DB is wiped, it's a ghost session
+        if (user && isDatabaseWiped) {
           logoutUser();
         }
-      }
 
-      await refreshStore();
-      await refreshShift();
-      setIsInitializing(false);
+        // C. Now safely seed the database
+        await seedDatabase();
+
+        // D. Initialize sync services
+        SyncService.init();
+        SyncService.syncAll().catch(err => console.error('Auto sync check error:', err));
+
+        // E. Refresh local state
+        await refreshStore();
+        await refreshShift();
+      } catch (err) {
+        console.error('Initialization error:', err);
+      } finally {
+        setIsInitializing(false);
+      }
     };
     initApp();
   }, []);
