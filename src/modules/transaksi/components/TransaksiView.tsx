@@ -803,7 +803,7 @@ export const TransaksiView: React.FC = () => {
                   display: 'flex', 
                   backgroundColor: 'var(--bg-inset)',
                   borderRadius: 'var(--radius-sm)',
-                  padding: '2px'
+                  padding: '4px'
                 }}
                 className="nm-inset"
               >
@@ -811,8 +811,8 @@ export const TransaksiView: React.FC = () => {
                   type="button"
                   onClick={() => { setDiscountType('Rp'); setRawDiscountInput(''); }}
                   style={{
-                    padding: '4px 8px',
-                    fontSize: '11px',
+                    padding: '6px 12px',
+                    fontSize: '13px',
                     fontWeight: 800,
                     borderRadius: 'var(--radius-sm)',
                     border: 'none',
@@ -828,8 +828,8 @@ export const TransaksiView: React.FC = () => {
                   type="button"
                   onClick={() => { setDiscountType('%'); setRawDiscountInput(''); }}
                   style={{
-                    padding: '4px 8px',
-                    fontSize: '11px',
+                    padding: '6px 12px',
+                    fontSize: '13px',
                     fontWeight: 800,
                     borderRadius: 'var(--radius-sm)',
                     border: 'none',
