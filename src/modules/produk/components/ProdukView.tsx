@@ -739,7 +739,7 @@ export const ProdukView: React.FC = () => {
               required
             />
             <NeumorphicInput
-              label="Stok Awal"
+              label="Jumlah Stok"
               type="number"
               placeholder="0"
               value={prodStok}
