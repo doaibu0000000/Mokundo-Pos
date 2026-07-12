@@ -1015,8 +1015,8 @@ export const TransaksiView: React.FC = () => {
         )}
 
         {/* Platform choices */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px', marginBottom: '14px' }}>
-          {(['Take Away', 'GrabFood', 'GoFood', 'ShopeeFood'] as const).map(p => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '4px', marginBottom: '14px' }}>
+          {(['Dine-in', 'Take Away', 'GrabFood', 'GoFood', 'ShopeeFood'] as const).map(p => (
             <NeumorphicButton
               key={p}
               size="sm"
