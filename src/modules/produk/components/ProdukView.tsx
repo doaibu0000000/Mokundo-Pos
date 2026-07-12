@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Edit2, Trash2, Download, Upload, AlertCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2, Download, Upload, AlertCircle, Search } from 'lucide-react';
 import { db, type Product, type Category } from '../../../shared/services/db';
 import { NeumorphicCard, NeumorphicButton, NeumorphicInput, NeumorphicModal } from '../../../shared/components';
 
@@ -486,7 +486,8 @@ export const ProdukView: React.FC = () => {
         <div>
           <div style={{ marginBottom: '16px' }}>
             <NeumorphicInput
-              placeholder="Cari Barcode atau nama produk..."
+              icon={<Search size={18} color="var(--text-secondary)" />}
+              placeholder="Cari Barcode/Produk..."
               value={productSearch}
               onChange={(e) => setProductSearch(e.target.value)}
             />
