@@ -724,31 +724,7 @@ export const TransaksiView: React.FC = () => {
             </h2>
           </div>
 
-          {/* Discount input row */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-              <Tag size={16} />
-              <span style={{ fontWeight: 700 }}>Diskon (Rp)</span>
-            </div>
-            <div style={{ width: '150px' }}>
-              <input
-                type="number"
-                placeholder="0"
-                value={discountAmount || ''}
-                onChange={(e) => setDiscountAmount(Math.max(0, parseFloat(e.target.value) || 0))}
-                className="nm-input"
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: '14px',
-                  fontWeight: 800,
-                  textAlign: 'right',
-                  border: '1px solid transparent'
-                }}
-              />
-            </div>
-          </div>
+
 
           {/* Payment Method chips */}
           <div style={{ marginBottom: '18px' }}>
@@ -798,11 +774,41 @@ export const TransaksiView: React.FC = () => {
                 <NeumorphicButton size="sm" onClick={() => handleFastCash(100000)}>100k</NeumorphicButton>
               </div>
 
-              {/* Cash Return Info */}
+            </div>
+          )}
+
+          {/* Discount input row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+              <Tag size={16} />
+              <span style={{ fontWeight: 700 }}>Diskon (Rp)</span>
+            </div>
+            <div style={{ width: '150px' }}>
+              <input
+                type="number"
+                placeholder="0"
+                value={discountAmount || ''}
+                onChange={(e) => setDiscountAmount(Math.max(0, parseFloat(e.target.value) || 0))}
+                className="nm-input"
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  textAlign: 'right',
+                  border: '1px solid transparent'
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Cash Return Info */}
+          {paymentMethod === 'Tunai' && (
+            <div style={{ marginBottom: '18px' }}>
               <div 
                 className="nm-inset"
                 style={{ 
-                  marginTop: '14px', 
                   padding: '12px', 
                   borderRadius: 'var(--radius-md)',
                   display: 'flex',
