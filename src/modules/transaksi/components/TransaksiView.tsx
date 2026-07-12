@@ -1116,10 +1116,8 @@ export const TransaksiView: React.FC = () => {
               );
             })
           )}
-        </div>
-
-        {/* Pricing Math calculations */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px dashed var(--text-muted)', paddingTop: '14px' }}>
+          {/* Pricing Math calculations */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px dashed var(--text-muted)', paddingTop: '14px', marginTop: 'auto' }}>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
             <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Subtotal</span>
@@ -1149,6 +1147,7 @@ export const TransaksiView: React.FC = () => {
             <CreditCard size={18} />
             Bayar - {formatRupiah(cartTotals.total)}
           </NeumorphicButton>
+        </div>
         </div>
       </div>
     );
