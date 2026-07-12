@@ -318,7 +318,7 @@ export const ProdukView: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '20px', height: '100%', overflowY: 'auto' }}>
+    <div style={{ padding: '20px', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       
       {/* Seeding Warning Alert */}
       {!isMobile && (
@@ -353,7 +353,8 @@ export const ProdukView: React.FC = () => {
           justifyContent: 'space-between',
           marginBottom: '20px',
           flexWrap: 'wrap',
-          gap: '16px'
+          gap: '16px',
+          flexShrink: 0
         }}
       >
         <div 
@@ -483,8 +484,8 @@ export const ProdukView: React.FC = () => {
 
       {/* PRODUCTS TAB VIEW */}
       {activeSubTab === 'produk' && (
-        <div>
-          <div style={{ marginBottom: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+          <div style={{ marginBottom: '16px', flexShrink: 0 }}>
             <NeumorphicInput
               icon={<Search size={18} color="var(--text-secondary)" />}
               placeholder="Cari Barcode/Produk..."
@@ -494,7 +495,7 @@ export const ProdukView: React.FC = () => {
           </div>
 
           {/* Products List Grid */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', flex: 1, paddingBottom: '20px', paddingRight: '4px', margin: '0 -4px' }}>
             {products.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
                 Belum ada produk terdaftar. Tambahkan produk atau gunakan import CSV.
@@ -576,7 +577,7 @@ export const ProdukView: React.FC = () => {
 
       {/* CATEGORIES TAB VIEW */}
       {activeSubTab === 'kategori' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', flex: 1, paddingBottom: '20px', paddingRight: '4px', margin: '0 -4px' }}>
           {categories.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
               Belum ada kategori terdaftar. Klik "+ Tambah Kategori".
