@@ -1045,7 +1045,7 @@ export const TransaksiView: React.FC = () => {
         </div>
 
         {/* Cart items list */}
-        <div className="hide-scrollbar" style={{ 
+        <div style={{ 
           flex: 1, 
           overflowY: 'auto', 
           marginBottom: '16px', 
