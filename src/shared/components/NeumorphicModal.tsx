@@ -124,7 +124,7 @@ export const NeumorphicModal: React.FC<ModalProps> = ({
         </div>
 
         {/* Content body */}
-        <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+        <div style={{ maxHeight: '70vh', overflowY: 'auto', padding: '12px', margin: '-12px' }}>
           {children}
         </div>
       </div>
