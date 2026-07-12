@@ -56,21 +56,17 @@ export const LoginView: React.FC = () => {
         justifyContent: 'center',
         height: '100dvh',
         width: '100vw',
-        backgroundColor: '#202226', // Force dark background for login screen
+        backgroundColor: 'var(--bg-default)',
         padding: '20px',
       }}
     >
       <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '420px' }}>
         <NeumorphicCard
-          className="dark"
           style={{
-            backgroundColor: '#2B2F3A',
             padding: '36px 30px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            boxShadow: '10px 10px 20px #15171d, -10px -10px 20px #414757',
-            border: 'none',
           }}
         >
           {/* Logo Avatar */}
@@ -80,13 +76,10 @@ export const LoginView: React.FC = () => {
               width: '80px',
               height: '80px',
               borderRadius: '50%',
-              backgroundColor: '#2B2F3A',
-              boxShadow: 'inset 4px 4px 8px #15171d, inset -4px -4px 8px #414757',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '20px',
-              border: 'none',
             }}
           >
             <Coffee size={36} color="var(--accent-blue)" />
@@ -97,7 +90,7 @@ export const LoginView: React.FC = () => {
             style={{
               fontSize: '24px',
               fontWeight: 800,
-              color: '#ffffff',
+              color: 'var(--text-primary)',
               marginBottom: '4px',
               textAlign: 'center',
             }}
@@ -107,7 +100,7 @@ export const LoginView: React.FC = () => {
           <p
             style={{
               fontSize: '13px',
-              color: '#8E95A5',
+              color: 'var(--text-secondary)',
               marginBottom: '32px',
               textAlign: 'center',
             }}
@@ -124,11 +117,6 @@ export const LoginView: React.FC = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             containerClassName="w-full mb-5"
-            style={{
-              backgroundColor: '#20232b',
-              color: '#ffffff',
-              boxShadow: 'inset 3px 3px 6px #15171d, inset -3px -3px 6px #414757',
-            }}
           />
 
           <NeumorphicInput
@@ -140,11 +128,6 @@ export const LoginView: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             containerClassName="w-full mb-6"
-            style={{
-              backgroundColor: '#20232b',
-              color: '#ffffff',
-              boxShadow: 'inset 3px 3px 6px #15171d, inset -3px -3px 6px #414757',
-            }}
           />
 
           {/* Error Message */}
@@ -174,7 +157,6 @@ export const LoginView: React.FC = () => {
               width: '100%',
               padding: '14px',
               marginTop: '8px',
-              boxShadow: '6px 6px 12px #15171d, -6px -6px 12px #414757',
             }}
           >
             {loading ? 'Memvalidasi...' : 'Masuk'}

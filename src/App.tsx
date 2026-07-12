@@ -18,7 +18,7 @@ const LayoutSelector: React.FC = () => {
 
   // Wait for session validation silently to avoid splash screen flash
   if (isInitializing) {
-    return <div style={{ height: '100dvh', width: '100vw', backgroundColor: '#202226' }} />;
+    return <div style={{ height: '100dvh', width: '100vw', backgroundColor: 'var(--bg-default)' }} />;
   }
 
   if (!user) {
