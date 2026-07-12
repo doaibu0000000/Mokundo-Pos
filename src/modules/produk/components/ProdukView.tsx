@@ -175,6 +175,25 @@ export const ProdukView: React.FC = () => {
     }
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      setProdError("Ukuran gambar terlalu besar! Maksimal 2MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setProdGambarUrl(event.target.result as string);
+        setProdError('');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const deleteProduct = (id: number) => {
     setConfirmConfig({
       isOpen: true,
@@ -619,6 +638,42 @@ export const ProdukView: React.FC = () => {
         title={editingProduct ? 'Ubah Produk' : 'Tambah Produk Baru'}
       >
         <form onSubmit={handleProductSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          
+          {/* Image Uploader */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+            <label 
+              className="nm-inset"
+              style={{
+                width: '120px',
+                height: '120px',
+                borderRadius: 'var(--radius-lg)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                overflow: 'hidden',
+                position: 'relative',
+                border: 'var(--border-width-hc) solid var(--border-high-contrast)',
+              }}
+            >
+              {prodGambarUrl ? (
+                <img src={prodGambarUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
+                  <Upload size={24} />
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase' }}>Foto Produk</span>
+                </div>
+              )}
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleImageUpload} 
+                style={{ display: 'none' }} 
+              />
+            </label>
+          </div>
+
           <NeumorphicInput
             label="Nama Produk"
             placeholder="Misal: Rice Bowl Beef Blackpepper"
@@ -705,13 +760,6 @@ export const ProdukView: React.FC = () => {
             placeholder="Misal: Normal, Less Sugar, Large"
             value={prodVarianInput}
             onChange={(e) => setProdVarianInput(e.target.value)}
-          />
-
-          <NeumorphicInput
-            label="URL Gambar Produk"
-            placeholder="https://example.com/photo.jpg"
-            value={prodGambarUrl}
-            onChange={(e) => setProdGambarUrl(e.target.value)}
           />
 
           {prodError && (
