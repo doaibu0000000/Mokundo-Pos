@@ -648,13 +648,14 @@ export const TransaksiView: React.FC = () => {
             <CartInnerContent />
           </div>
         </NeumorphicBottomSheet>
-      ))}
-
-      {/* CHOOSE VARIAN OVERLAY MODAL */}
+        {/* CHOOSE VARIAN OVERLAY MODAL */}
       <NeumorphicModal
         isOpen={!!variantProduct}
-        onClose={() => setVariantProduct(null)}
-        title="Pilih Varian & Catatan"
+        onClose={() => {
+          setVariantProduct(null);
+          setItemNotes('');
+        }}
+        title="Pilih Varian"
       >
         {variantProduct && (
           <div>
@@ -696,16 +697,8 @@ export const TransaksiView: React.FC = () => {
               </div>
             </div>
 
-            {/* Notes input */}
-            <div style={{ marginBottom: '24px' }}>
-              <NeumorphicInput
-                label="Catatan item (opsional)"
-                placeholder="Misal: Gula dikit, Extra es"
-                value={itemNotes}
-                onChange={(e) => setItemNotes(e.target.value)}
-              />
-            </div>
-
+            {/* Add spacing for button */}
+            <div style={{ marginBottom: '24px' }}></div>
             <NeumorphicButton variant="primary" onClick={submitVarianSelection} style={{ width: '100%' }}>
               Masukkan Keranjang
             </NeumorphicButton>
