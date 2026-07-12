@@ -7,6 +7,7 @@ interface ModalProps {
   title: string;
   children: React.ReactNode;
   width?: string;
+  hideCloseButton?: boolean;
 }
 
 export const NeumorphicModal: React.FC<ModalProps> = ({
@@ -15,6 +16,7 @@ export const NeumorphicModal: React.FC<ModalProps> = ({
   title,
   children,
   width = '480px',
+  hideCloseButton = false,
 }) => {
   const [animateShow, setAnimateShow] = useState(false);
 
@@ -101,22 +103,24 @@ export const NeumorphicModal: React.FC<ModalProps> = ({
             {title}
           </h3>
           
-          <button
-            onClick={onClose}
-            className="nm-button"
-            style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: 'none',
-              color: 'var(--text-secondary)',
-            }}
-          >
-            <X size={18} />
-          </button>
+          {!hideCloseButton && (
+            <button
+              onClick={onClose}
+              className="nm-button"
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: 'none',
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <X size={18} />
+            </button>
+          )}
         </div>
 
         {/* Content body */}

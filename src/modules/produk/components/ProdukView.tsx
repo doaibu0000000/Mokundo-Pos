@@ -766,6 +766,7 @@ export const ProdukView: React.FC = () => {
         onClose={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
         title="Konfirmasi"
         width="360px"
+        hideCloseButton={true}
       >
         <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: '1.5' }}>
           {confirmConfig.message}
