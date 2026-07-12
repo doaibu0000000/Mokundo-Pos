@@ -767,29 +767,6 @@ export const TransaksiView: React.FC = () => {
             </div>
           </div>
 
-          {/* Cash Payment calculator inputs */}
-          {paymentMethod === 'Tunai' && (
-            <div style={{ marginBottom: '18px' }}>
-              <NeumorphicInput
-                label="Uang Dibayar (Rp)"
-                placeholder="0"
-                type="number"
-                value={cashPaid}
-                onChange={(e) => setCashPaid(e.target.value)}
-                autoFocus
-              />
-              
-              {/* Cash suggestion buttons */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginTop: '10px' }}>
-                <NeumorphicButton size="sm" onClick={() => handleFastCash(cartTotals.total)}>Pas</NeumorphicButton>
-                <NeumorphicButton size="sm" onClick={() => handleFastCash(20000)}>20k</NeumorphicButton>
-                <NeumorphicButton size="sm" onClick={() => handleFastCash(50000)}>50k</NeumorphicButton>
-                <NeumorphicButton size="sm" onClick={() => handleFastCash(100000)}>100k</NeumorphicButton>
-              </div>
-
-            </div>
-          )}
-
           {/* Discount input row */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: 'var(--text-secondary)' }}>
@@ -869,6 +846,30 @@ export const TransaksiView: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Cash Payment calculator inputs */}
+          {paymentMethod === 'Tunai' && (
+            <div style={{ marginBottom: '18px' }}>
+              <NeumorphicInput
+                label="Uang Dibayar (Rp)"
+                placeholder="0"
+                type="number"
+                value={cashPaid}
+                onChange={(e) => setCashPaid(e.target.value)}
+                autoFocus
+              />
+              
+              {/* Cash suggestion buttons */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginTop: '10px' }}>
+                <NeumorphicButton size="sm" onClick={() => handleFastCash(cartTotals.total)}>Pas</NeumorphicButton>
+                <NeumorphicButton size="sm" onClick={() => handleFastCash(20000)}>20k</NeumorphicButton>
+                <NeumorphicButton size="sm" onClick={() => handleFastCash(50000)}>50k</NeumorphicButton>
+                <NeumorphicButton size="sm" onClick={() => handleFastCash(100000)}>100k</NeumorphicButton>
+              </div>
+
+            </div>
+          )}
+
 
           {/* Cash Return Info */}
           {paymentMethod === 'Tunai' && (
