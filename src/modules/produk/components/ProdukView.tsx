@@ -708,14 +708,6 @@ export const ProdukView: React.FC = () => {
                   ))}
                 </select>
               </div>
-
-              <NeumorphicInput
-                label="Barcode"
-                placeholder="Misal: 888001"
-                value={prodSku}
-                onChange={(e) => setProdSku(e.target.value)}
-                required
-              />
             </div>
           </div>
 
@@ -738,14 +730,23 @@ export const ProdukView: React.FC = () => {
             />
           </div>
 
-          <NeumorphicInput
-            label="Stok Awal"
-            type="number"
-            placeholder="0"
-            value={prodStok}
-            onChange={(e) => setProdStok(e.target.value)}
-            required
-          />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <NeumorphicInput
+              label="Stok Awal"
+              type="number"
+              placeholder="0"
+              value={prodStok}
+              onChange={(e) => setProdStok(e.target.value)}
+              required
+            />
+            <NeumorphicInput
+              label="Barcode"
+              placeholder="Misal: 888001"
+              value={prodSku}
+              onChange={(e) => setProdSku(e.target.value)}
+              required
+            />
+          </div>
 
 
 
