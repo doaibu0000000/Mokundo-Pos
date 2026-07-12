@@ -369,20 +369,21 @@ export const ProdukView: React.FC = () => {
                     onClick={() => setIsDropdownOpen(false)}
                   />
                   <div 
-                    className="nm-flat"
+                    className="nm-button"
                     style={{
                       position: 'absolute',
                       top: '100%',
                       left: 0,
-                      marginTop: '8px',
-                      padding: '8px',
-                      borderRadius: 'var(--radius-md)',
+                      marginTop: '12px',
+                      padding: '12px',
+                      borderRadius: 'var(--radius-lg)',
                       zIndex: 50,
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '4px',
-                      minWidth: '150px',
-                      background: 'var(--bg-surface)'
+                      gap: '8px',
+                      minWidth: '160px',
+                      background: 'var(--bg-surface)',
+                      boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2), var(--shadow-out)'
                     }}
                   >
                     <NeumorphicButton 
