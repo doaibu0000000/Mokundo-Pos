@@ -902,14 +902,16 @@ export const TransaksiView: React.FC = () => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '16px' }}>
         {/* Cart Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h3 style={{ fontWeight: 800, fontSize: '16px' }}>Keranjang Belanja</h3>
-          {cart.length > 0 && (
-            <NeumorphicButton size="sm" onClick={clearCart} style={{ color: 'var(--accent-red)' }}>
-              <Trash2 size={14} /> Clear
-            </NeumorphicButton>
-          )}
-        </div>
+        {!isMobile && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ fontWeight: 800, fontSize: '16px' }}>Keranjang Belanja</h3>
+            {cart.length > 0 && (
+              <NeumorphicButton size="sm" onClick={clearCart} style={{ color: 'var(--accent-red)' }}>
+                <Trash2 size={14} /> Clear
+              </NeumorphicButton>
+            )}
+          </div>
+        )}
 
         {/* Platform choices */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '4px', marginBottom: '14px' }}>
