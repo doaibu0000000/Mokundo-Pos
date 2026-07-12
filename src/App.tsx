@@ -8,7 +8,7 @@ import { seedDatabase } from './shared/services/db';
 
 // Layout switcher based on viewport width
 const LayoutSelector: React.FC = () => {
-  const { user } = useApp();
+  const { user, isInitializing } = useApp();
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
 
   useEffect(() => {
@@ -27,6 +27,11 @@ const LayoutSelector: React.FC = () => {
 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Wait for session validation silently to avoid splash screen flash
+  if (isInitializing) {
+    return <div style={{ height: '100dvh', width: '100vw', backgroundColor: '#202226' }} />;
+  }
 
   if (!user) {
     return <LoginView />;

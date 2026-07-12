@@ -108,6 +108,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // 3. Load database configs and finish initializing
     const initApp = async () => {
+      // Validate session: if IndexedDB was wiped but localStorage survived,
+      // the user will be in state but not in the DB. We must force logout.
+      if (user) {
+        const dbUser = await db.users.where('username').equalsIgnoreCase(user.username).first();
+        if (!dbUser) {
+          logoutUser();
+        }
+      }
+
       await refreshStore();
       await refreshShift();
       setIsInitializing(false);
