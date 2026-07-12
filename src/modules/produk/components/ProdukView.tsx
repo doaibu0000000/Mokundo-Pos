@@ -682,7 +682,7 @@ export const ProdukView: React.FC = () => {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', minWidth: 0 }}>
               <NeumorphicInput
                 label="Nama Produk"
-                placeholder="Misal: Rice Bowl..."
+                placeholder="Masukkan nama"
                 value={prodNama}
                 onChange={(e) => setProdNama(e.target.value)}
                 required
