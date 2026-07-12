@@ -76,6 +76,7 @@ export const NeumorphicModal: React.FC<ModalProps> = ({
           display: 'flex',
           flexDirection: 'column',
           zIndex: 1001,
+          boxShadow: 'none',
           transform: `scale(${animateShow ? 1 : 0.9})`,
           opacity: animateShow ? 1 : 0,
           transition: 'transform 0.2s ease-out, opacity 0.2s ease-out',
