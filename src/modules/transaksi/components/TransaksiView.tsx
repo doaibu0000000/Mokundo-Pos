@@ -1045,7 +1045,7 @@ export const TransaksiView: React.FC = () => {
         </div>
 
         {/* Cart items list */}
-        <div style={{ flex: 1, overflowY: 'auto', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div className="hide-scrollbar" style={{ flex: 1, overflowY: 'auto', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {cart.length === 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)' }}>
               <ShoppingBag size={48} strokeWidth={1} style={{ marginBottom: '10px' }} />
