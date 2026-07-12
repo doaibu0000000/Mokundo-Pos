@@ -658,7 +658,7 @@ export const TransaksiView: React.FC = () => {
           onClose={() => setIsCartOpen(false)}
           title="Keranjang Belanja"
         >
-          <div style={{ maxHeight: '70vh' }}>
+          <div style={{ height: '75vh', display: 'flex', flexDirection: 'column' }}>
             <CartInnerContent />
           </div>
         </NeumorphicBottomSheet>
