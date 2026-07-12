@@ -8,7 +8,7 @@ import { seedDatabase } from './shared/services/db';
 
 // Layout switcher based on viewport width
 const LayoutSelector: React.FC = () => {
-  const { user, isAuthReady } = useApp();
+  const { user } = useApp();
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
 
   useEffect(() => {
@@ -27,12 +27,6 @@ const LayoutSelector: React.FC = () => {
 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  // Wait until auth state is restored from localStorage before rendering anything.
-  // This prevents a brief flash of the login screen when the user is already logged in.
-  if (!isAuthReady) {
-    return null;
-  }
 
   if (!user) {
     return <LoginView />;
