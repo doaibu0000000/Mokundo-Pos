@@ -54,7 +54,7 @@ export const LoginView: React.FC = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100vh',
+        height: '100dvh',
         width: '100vw',
         backgroundColor: '#202226', // Force dark background for login screen
         padding: '20px',

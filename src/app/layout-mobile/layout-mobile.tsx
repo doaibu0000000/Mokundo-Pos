@@ -190,7 +190,7 @@ export const MobileLayout: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', width: '100vw', overflow: 'hidden' }}>
       
       {/* Scrollable Screen Content */}
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
