@@ -587,8 +587,8 @@ export const TransaksiView: React.FC = () => {
               borderRadius="pill"
               onClick={() => setIsCartOpen(true)}
               style={{
-                width: '64px',
-                height: '64px',
+                width: '60px',
+                height: '60px',
                 borderRadius: '50%',
                 padding: 0,
                 display: 'flex',
@@ -596,7 +596,7 @@ export const TransaksiView: React.FC = () => {
                 justifyContent: 'center',
               }}
             >
-              <ShoppingCart size={36} color="var(--accent-blue)" />
+              <ShoppingCart size={28} color="var(--accent-blue)" />
               <span 
                 style={{
                   position: 'absolute',
