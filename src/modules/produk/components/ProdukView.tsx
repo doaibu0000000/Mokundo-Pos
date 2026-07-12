@@ -640,7 +640,7 @@ export const ProdukView: React.FC = () => {
         <form onSubmit={handleProductSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           
           {/* Image Uploader */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '8px' }}>
             <label 
               className="nm-inset"
               style={{
