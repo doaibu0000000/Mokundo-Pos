@@ -44,8 +44,8 @@ interface AppContextType {
   };
   discountAmount: number; // custom transactions discount
   setDiscountAmount: (val: number) => void;
-  platform: 'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood';
-  setPlatform: (val: 'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood') => void;
+  platform: 'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood' | 'TikTok';
+  setPlatform: (val: 'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood' | 'TikTok') => void;
   canInstall: boolean;
   installApp: () => Promise<void>;
   isInitializing: boolean;
@@ -69,7 +69,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   
   const [cart, setCart] = useState<CartItem[]>([]);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
-  const [platform, setPlatform] = useState<'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood'>('Dine-in');
+  const [platform, setPlatform] = useState<'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood' | 'TikTok'>('Dine-in');
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   // Listen to PWA installation events

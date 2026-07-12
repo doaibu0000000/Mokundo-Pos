@@ -64,7 +64,7 @@ export interface Transaction {
   cash_change: number;
   metode_bayar: 'Tunai' | 'QRIS' | 'Bank' | 'DANA' | 'GoPay' | 'OVO' | 'ShopeePay';
   status: 'COMPLETED' | 'VOIDED';
-  platform: 'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood';
+  platform: 'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood' | 'TikTok';
   sync_status: 'PENDING' | 'SYNCED';
   void_reason?: string;
   shift_id: number;

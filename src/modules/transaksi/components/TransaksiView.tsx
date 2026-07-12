@@ -1016,21 +1016,21 @@ export const TransaksiView: React.FC = () => {
 
         {/* Platform choices */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '14px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
-            {(['Dine-in', 'Take Away'] as const).map(p => (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px' }}>
+            {(['Dine-in', 'Take Away', 'GrabFood'] as const).map(p => (
               <NeumorphicButton
                 key={p}
                 size="sm"
                 active={platform === p}
                 onClick={() => setPlatform(p)}
-                style={{ padding: '8px 4px', fontSize: '11px', fontWeight: 800 }}
+                style={{ padding: '6px 2px', fontSize: '10px', fontWeight: 800 }}
               >
                 {p}
               </NeumorphicButton>
             ))}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px' }}>
-            {(['GrabFood', 'GoFood', 'ShopeeFood'] as const).map(p => (
+            {(['GoFood', 'ShopeeFood', 'TikTok'] as const).map(p => (
               <NeumorphicButton
                 key={p}
                 size="sm"
