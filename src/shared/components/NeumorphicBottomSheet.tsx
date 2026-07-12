@@ -145,7 +145,9 @@ export const NeumorphicBottomSheet: React.FC<BottomSheetProps> = ({
         {/* Content body */}
         <div
           style={{
-            overflowY: 'auto',
+            overflowY: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
             flex: 1,
             paddingRight: '4px',
           }}

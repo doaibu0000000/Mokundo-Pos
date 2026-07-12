@@ -658,7 +658,7 @@ export const TransaksiView: React.FC = () => {
           onClose={() => setIsCartOpen(false)}
           title="Keranjang Belanja"
         >
-          <div style={{ height: '75vh', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <CartInnerContent />
           </div>
         </NeumorphicBottomSheet>
@@ -1001,7 +1001,7 @@ export const TransaksiView: React.FC = () => {
   // inner cart content sub-component
   function CartInnerContent() {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '16px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, padding: '16px' }}>
         {/* Cart Header */}
         {!isMobile && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
