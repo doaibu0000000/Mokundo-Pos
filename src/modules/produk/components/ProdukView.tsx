@@ -719,49 +719,45 @@ export const ProdukView: React.FC = () => {
                       onClick={() => setIsCategoryDropdownOpen(false)} 
                     />
                     <div 
-                      className="nm-convex"
+                      className="nm-button"
                       style={{ 
                         position: 'absolute', 
                         top: '100%', 
                         left: 0, 
                         right: 0, 
-                        marginTop: '6px', 
+                        marginTop: '8px', 
                         zIndex: 1001,
-                        borderRadius: 'var(--radius-md)',
-                        maxHeight: '180px',
+                        borderRadius: 'var(--radius-lg)',
+                        maxHeight: '200px',
                         overflowY: 'auto',
-                        padding: '6px',
-                        border: 'var(--border-width-hc) solid var(--border-high-contrast)',
+                        padding: '8px',
+                        background: 'var(--bg-surface)',
+                        boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2), var(--shadow-out)',
+                        border: '1px solid rgba(0,0,0,0.08)',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '2px'
+                        gap: '8px'
                       }}
                     >
                       {categories.map(c => (
-                        <div
+                        <NeumorphicButton
                           key={c.id}
+                          active={prodKategoriId === c.id}
                           onClick={() => {
                             setProdKategoriId(c.id!);
                             setIsCategoryDropdownOpen(false);
                           }}
                           style={{
                             padding: '10px 12px',
-                            borderRadius: 'var(--radius-sm)',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            backgroundColor: prodKategoriId === c.id ? 'var(--bg-inset)' : 'transparent',
-                            color: prodKategoriId === c.id ? 'var(--accent-blue)' : 'var(--text-primary)',
-                            fontWeight: prodKategoriId === c.id ? 700 : 500,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between'
+                            justifyContent: 'space-between',
+                            width: '100%'
                           }}
                         >
                           <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {c.nama}
                           </span>
-                          {prodKategoriId === c.id && <Check size={16} color="var(--accent-blue)" />}
-                        </div>
+                          {prodKategoriId === c.id && <Check size={16} color="currentColor" />}
+                        </NeumorphicButton>
                       ))}
                     </div>
                   </>
