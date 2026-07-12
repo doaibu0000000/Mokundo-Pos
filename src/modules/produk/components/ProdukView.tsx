@@ -383,7 +383,8 @@ export const ProdukView: React.FC = () => {
                       gap: '8px',
                       minWidth: '160px',
                       background: 'var(--bg-surface)',
-                      boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2), var(--shadow-out)'
+                      boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2), var(--shadow-out)',
+                      border: '1px solid rgba(0,0,0,0.08)'
                     }}
                   >
                     <NeumorphicButton 
