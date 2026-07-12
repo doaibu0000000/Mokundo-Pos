@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Edit2, Trash2, Download, Upload, AlertCircle, Search } from 'lucide-react';
+import { Plus, Edit2, Trash2, Download, Upload, AlertCircle, Search, ChevronDown, Check } from 'lucide-react';
 import { db, type Product, type Category } from '../../../shared/services/db';
 import { NeumorphicCard, NeumorphicButton, NeumorphicInput, NeumorphicModal } from '../../../shared/components';
 
@@ -44,6 +44,7 @@ export const ProdukView: React.FC = () => {
 
   // Category Form Modal States
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [catNama, setCatNama] = useState('');
   const [catUrutan, setCatUrutan] = useState('');
@@ -685,28 +686,86 @@ export const ProdukView: React.FC = () => {
                 required
               />
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', position: 'relative' }}>
                 <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
                   Kategori
                 </label>
-                <select
-                  value={prodKategoriId}
-                  onChange={(e) => setProdKategoriId(parseInt(e.target.value))}
+                <div
                   className="nm-input"
+                  onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
                   style={{
                     padding: '8px 12px',
                     borderRadius: 'var(--radius-md)',
                     fontSize: '14px',
                     height: '42px',
-                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
+                    border: 'var(--border-width-hc) solid var(--border-high-contrast)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer',
+                    userSelect: 'none'
                   }}
                 >
-                  {categories.map(c => (
-                    <option key={c.id} value={c.id} style={{ background: 'var(--bg-surface)' }}>
-                      {c.nama}
-                    </option>
-                  ))}
-                </select>
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {categories.find(c => c.id === prodKategoriId)?.nama || 'Pilih Kategori'}
+                  </span>
+                  <ChevronDown size={16} color="var(--text-secondary)" />
+                </div>
+                
+                {isCategoryDropdownOpen && (
+                  <>
+                    <div 
+                      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }} 
+                      onClick={() => setIsCategoryDropdownOpen(false)} 
+                    />
+                    <div 
+                      className="nm-convex"
+                      style={{ 
+                        position: 'absolute', 
+                        top: '100%', 
+                        left: 0, 
+                        right: 0, 
+                        marginTop: '6px', 
+                        zIndex: 1001,
+                        borderRadius: 'var(--radius-md)',
+                        maxHeight: '180px',
+                        overflowY: 'auto',
+                        padding: '6px',
+                        border: 'var(--border-width-hc) solid var(--border-high-contrast)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '2px'
+                      }}
+                    >
+                      {categories.map(c => (
+                        <div
+                          key={c.id}
+                          onClick={() => {
+                            setProdKategoriId(c.id!);
+                            setIsCategoryDropdownOpen(false);
+                          }}
+                          style={{
+                            padding: '10px 12px',
+                            borderRadius: 'var(--radius-sm)',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            backgroundColor: prodKategoriId === c.id ? 'var(--bg-inset)' : 'transparent',
+                            color: prodKategoriId === c.id ? 'var(--accent-blue)' : 'var(--text-primary)',
+                            fontWeight: prodKategoriId === c.id ? 700 : 500,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                          }}
+                        >
+                          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {c.nama}
+                          </span>
+                          {prodKategoriId === c.id && <Check size={16} color="var(--accent-blue)" />}
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
