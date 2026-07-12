@@ -583,18 +583,21 @@ export const TransaksiView: React.FC = () => {
         {isMobile && cart.length > 0 && (
           <div style={{ position: 'fixed', bottom: '80px', right: '20px', zIndex: 99 }}>
             <NeumorphicButton
-              variant="primary"
               size="lg"
               borderRadius="pill"
               onClick={() => setIsCartOpen(true)}
               style={{
-                width: '60px',
-                height: '60px',
+                width: '64px',
+                height: '64px',
                 borderRadius: '50%',
-                boxShadow: '4px 4px 8px rgba(0,0,0,0.3)',
+                padding: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 10px 20px rgba(0,0,0,0.15), var(--shadow-out)',
               }}
             >
-              <ShoppingCart size={24} />
+              <ShoppingCart size={36} color="var(--accent-blue)" />
               <span 
                 style={{
                   position: 'absolute',
