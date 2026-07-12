@@ -49,6 +49,13 @@ export const ProdukView: React.FC = () => {
   const [catUrutan, setCatUrutan] = useState('');
   const [catError, setCatError] = useState('');
 
+  // Confirm Modal States
+  const [confirmConfig, setConfirmConfig] = useState<{isOpen: boolean, message: string, onConfirm: () => void}>({
+    isOpen: false, 
+    message: '', 
+    onConfirm: () => {}
+  });
+
   useEffect(() => {
     loadData();
   }, [productSearch]);
@@ -168,11 +175,15 @@ export const ProdukView: React.FC = () => {
     }
   };
 
-  const deleteProduct = async (id: number) => {
-    if (confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
-      await db.products.delete(id);
-      loadData();
-    }
+  const deleteProduct = (id: number) => {
+    setConfirmConfig({
+      isOpen: true,
+      message: 'Apakah Anda yakin ingin menghapus produk ini?',
+      onConfirm: async () => {
+        await db.products.delete(id);
+        loadData();
+      }
+    });
   };
 
   // Open category form for edit/new
@@ -217,11 +228,15 @@ export const ProdukView: React.FC = () => {
     }
   };
 
-  const deleteCategory = async (id: number) => {
-    if (confirm('Apakah Anda yakin ingin menghapus kategori ini? Semua produk di dalamnya tidak akan terhapus namun kehilangan kategori.')) {
-      await db.categories.delete(id);
-      loadData();
-    }
+  const deleteCategory = (id: number) => {
+    setConfirmConfig({
+      isOpen: true,
+      message: 'Apakah Anda yakin ingin menghapus kategori ini? Semua produk di dalamnya tidak akan terhapus namun kehilangan kategori.',
+      onConfirm: async () => {
+        await db.categories.delete(id);
+        loadData();
+      }
+    });
   };
 
   // CSV Import/Export
@@ -743,6 +758,50 @@ export const ProdukView: React.FC = () => {
             Simpan Kategori
           </NeumorphicButton>
         </form>
+      </NeumorphicModal>
+
+      {/* Confirmation Modal */}
+      <NeumorphicModal
+        isOpen={confirmConfig.isOpen}
+        onClose={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
+        title="Konfirmasi"
+        width="360px"
+      >
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: '1.5' }}>
+          {confirmConfig.message}
+        </p>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+          <button
+            className="nm-button"
+            onClick={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
+            style={{
+              padding: '10px 20px',
+              borderRadius: 'var(--radius-md)',
+              border: 'none',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+            }}
+          >
+            Batal
+          </button>
+          <button
+            className="nm-button"
+            onClick={() => {
+              confirmConfig.onConfirm();
+              setConfirmConfig({ ...confirmConfig, isOpen: false });
+            }}
+            style={{
+              padding: '10px 20px',
+              borderRadius: 'var(--radius-md)',
+              border: 'none',
+              fontWeight: 600,
+              color: 'white',
+              backgroundColor: 'var(--accent-red)',
+            }}
+          >
+            Ya, Hapus
+          </button>
+        </div>
       </NeumorphicModal>
 
     </div>
