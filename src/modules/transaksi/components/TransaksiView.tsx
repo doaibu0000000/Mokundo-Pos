@@ -724,6 +724,32 @@ export const TransaksiView: React.FC = () => {
             </h2>
           </div>
 
+          {/* Discount input row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+              <Tag size={16} />
+              <span style={{ fontWeight: 700 }}>Diskon (Rp)</span>
+            </div>
+            <div style={{ width: '150px' }}>
+              <input
+                type="number"
+                placeholder="0"
+                value={discountAmount || ''}
+                onChange={(e) => setDiscountAmount(Math.max(0, parseFloat(e.target.value) || 0))}
+                className="nm-input"
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  textAlign: 'right',
+                  border: '1px solid transparent'
+                }}
+              />
+            </div>
+          </div>
+
           {/* Payment Method chips */}
           <div style={{ marginBottom: '18px' }}>
             <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Metode Bayar</span>
@@ -1010,30 +1036,7 @@ export const TransaksiView: React.FC = () => {
             <span style={{ fontWeight: 700 }}>{formatRupiah(cartTotals.subtotal)}</span>
           </div>
 
-          {/* Discount input row */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-              <Tag size={14} />
-              <span style={{ fontWeight: 600 }}>Diskon (Rp)</span>
-            </div>
-            <div style={{ width: '100px' }}>
-              <input
-                type="number"
-                value={discountAmount || ''}
-                onChange={(e) => setDiscountAmount(Math.max(0, parseFloat(e.target.value) || 0))}
-                className="nm-input"
-                style={{
-                  width: '100%',
-                  padding: '4px 8px',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  textAlign: 'right',
-                  border: '1px solid transparent'
-                }}
-              />
-            </div>
-          </div>
+
 
           {store?.service_charge ? (
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
