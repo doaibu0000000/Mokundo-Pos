@@ -11,9 +11,15 @@ export const LoginView: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(e.target.value.trim());
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username || !password) {
+    const trimmedUser = username.trim();
+    const trimmedPass = password.trim();
+    if (!trimmedUser || !trimmedPass) {
       setError('Username dan password wajib diisi');
       return;
     }
@@ -23,7 +29,7 @@ export const LoginView: React.FC = () => {
 
     try {
       // 1. Fetch user by username
-      const user = await db.users.where('username').equalsIgnoreCase(username).first();
+      const user = await db.users.where('username').equalsIgnoreCase(trimmedUser).first();
       if (!user) {
         setError('Username atau password salah');
         setLoading(false);
@@ -31,7 +37,7 @@ export const LoginView: React.FC = () => {
       }
 
       // 2. Hash input password and match
-      const inputHash = await hashPassword(password);
+      const inputHash = await hashPassword(trimmedPass);
       if (user.password_hash !== inputHash) {
         setError('Username atau password salah');
         setLoading(false);
@@ -123,7 +129,7 @@ export const LoginView: React.FC = () => {
             placeholder="admin / kasir"
             icon={<UserIcon size={18} />}
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={handleUsernameChange}
             containerClassName="w-full"
             containerStyle={{ marginBottom: '14px' }}
             autoComplete="new-password"
