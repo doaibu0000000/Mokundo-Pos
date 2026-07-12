@@ -2,8 +2,24 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Plus, Edit2, Trash2, Download, Upload, AlertCircle, Search, ChevronDown, Check } from 'lucide-react';
 import { db, type Product, type Category } from '../../../shared/services/db';
 import { NeumorphicCard, NeumorphicButton, NeumorphicInput, NeumorphicModal } from '../../../shared/components';
-import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';
+import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+
+function centerAspectCrop(mediaWidth: number, mediaHeight: number, aspect: number) {
+  return centerCrop(
+    makeAspectCrop(
+      {
+        unit: '%',
+        width: 90,
+      },
+      aspect,
+      mediaWidth,
+      mediaHeight,
+    ),
+    mediaWidth,
+    mediaHeight,
+  )
+}
 import { getCroppedImg } from '../../../utils/cropImage';
 
 const formatRupiah = (number: number) => {
@@ -48,7 +64,7 @@ export const ProdukView: React.FC = () => {
   // Crop states
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const [imageSrcToCrop, setImageSrcToCrop] = useState('');
-  const [crop, setCrop] = useState<Crop>({ unit: '%', width: 90, height: 90, x: 5, y: 5 });
+  const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -908,6 +924,10 @@ export const ProdukView: React.FC = () => {
               alt="Crop" 
               style={{ maxHeight: '350px', objectFit: 'contain' }} 
               crossOrigin="anonymous" 
+              onLoad={(e) => {
+                const { width, height } = e.currentTarget;
+                setCrop(centerAspectCrop(width, height, 1));
+              }}
             />
           </ReactCrop>
         </div>
