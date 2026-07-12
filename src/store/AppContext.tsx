@@ -46,12 +46,14 @@ interface AppContextType {
   setPlatform: (val: 'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood') => void;
   canInstall: boolean;
   installApp: () => Promise<void>;
+  isAuthReady: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isAuthReady, setIsAuthReady] = useState<boolean>(false);
   const [store, setStore] = useState<Store | null>(null);
   const [currentShift, setCurrentShift] = useState<Shift | null>(null);
   const [activeTab, setActiveTabState] = useState<string>(() => {
@@ -106,6 +108,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (cachedUser) {
       setUser(JSON.parse(cachedUser));
     }
+    setIsAuthReady(true);
 
     // 3. Load database configs
     refreshStore();
@@ -258,7 +261,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         platform,
         setPlatform,
         canInstall: !!deferredPrompt,
-        installApp
+        installApp,
+        isAuthReady
       }}
     >
       {children}
