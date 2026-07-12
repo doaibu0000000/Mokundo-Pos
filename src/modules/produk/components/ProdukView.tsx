@@ -713,14 +713,6 @@ export const ProdukView: React.FC = () => {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', alignItems: 'flex-end' }}>
             <NeumorphicInput
-              label="Harga Jual (Rp)"
-              type="number"
-              placeholder="0"
-              value={prodHarga}
-              onChange={(e) => setProdHarga(e.target.value)}
-              required
-            />
-            <NeumorphicInput
               label="Harga Pokok (Rp)"
               type="number"
               placeholder="0"
@@ -728,22 +720,30 @@ export const ProdukView: React.FC = () => {
               onChange={(e) => setProdHPP(e.target.value)}
               required
             />
+            <NeumorphicInput
+              label="Harga Jual (Rp)"
+              type="number"
+              placeholder="0"
+              value={prodHarga}
+              onChange={(e) => setProdHarga(e.target.value)}
+              required
+            />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', alignItems: 'flex-end' }}>
+            <NeumorphicInput
+              label="Barcode"
+              placeholder="Misal: 888001"
+              value={prodSku}
+              onChange={(e) => setProdSku(e.target.value)}
+              required
+            />
             <NeumorphicInput
               label="Stok Awal"
               type="number"
               placeholder="0"
               value={prodStok}
               onChange={(e) => setProdStok(e.target.value)}
-              required
-            />
-            <NeumorphicInput
-              label="Barcode"
-              placeholder="Misal: 888001"
-              value={prodSku}
-              onChange={(e) => setProdSku(e.target.value)}
               required
             />
           </div>
