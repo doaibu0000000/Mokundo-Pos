@@ -15,6 +15,7 @@ const formatRupiah = (number: number) => {
 export const ProdukView: React.FC = () => {
   const [activeSubTab, setActiveSubTab] = useState<'produk' | 'kategori'>('produk');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -350,28 +351,63 @@ export const ProdukView: React.FC = () => {
         >
           {isMobile ? (
             <div style={{ position: 'relative', display: 'flex', flexShrink: 0 }}>
-              <NeumorphicButton active={true} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 16px' }}>
+              <NeumorphicButton 
+                active={true} 
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 16px' }}
+              >
                 <span style={{ whiteSpace: 'nowrap', fontSize: '14px', fontWeight: 600 }}>
                   {activeSubTab === 'produk' ? 'Produk' : 'Kategori'}
                 </span>
-                <span style={{ fontSize: '10px', flexShrink: 0, marginLeft: '8px' }}>▼</span>
+                <span style={{ fontSize: '10px', flexShrink: 0, marginLeft: '8px', transform: isDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
               </NeumorphicButton>
-              <select
-                value={activeSubTab}
-                onChange={(e) => setActiveSubTab(e.target.value as any)}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  opacity: 0,
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="produk">Produk</option>
-                <option value="kategori">Kategori</option>
-              </select>
+              
+              {isDropdownOpen && (
+                <>
+                  <div 
+                    style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 40 }}
+                    onClick={() => setIsDropdownOpen(false)}
+                  />
+                  <div 
+                    className="nm-flat"
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      marginTop: '8px',
+                      padding: '8px',
+                      borderRadius: 'var(--radius-md)',
+                      zIndex: 50,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                      minWidth: '150px',
+                      background: 'var(--bg-surface)'
+                    }}
+                  >
+                    <NeumorphicButton 
+                      active={activeSubTab === 'produk'} 
+                      onClick={() => {
+                        setActiveSubTab('produk');
+                        setIsDropdownOpen(false);
+                      }}
+                      style={{ padding: '8px 12px', justifyContent: 'flex-start' }}
+                    >
+                      Produk
+                    </NeumorphicButton>
+                    <NeumorphicButton 
+                      active={activeSubTab === 'kategori'} 
+                      onClick={() => {
+                        setActiveSubTab('kategori');
+                        setIsDropdownOpen(false);
+                      }}
+                      style={{ padding: '8px 12px', justifyContent: 'flex-start' }}
+                    >
+                      Kategori
+                    </NeumorphicButton>
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             <>
