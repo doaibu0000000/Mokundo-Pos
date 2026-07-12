@@ -351,7 +351,9 @@ export const ProdukView: React.FC = () => {
           {isMobile ? (
             <div style={{ position: 'relative', display: 'flex', flex: 1, minWidth: 0 }}>
               <NeumorphicButton active={true} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 8px' }}>
-                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '13px' }}>Manajemen Produk</span>
+                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '14px', fontWeight: 600 }}>
+                  {activeSubTab === 'produk' ? 'Produk' : 'Kategori'}
+                </span>
                 <span style={{ fontSize: '10px', flexShrink: 0, marginLeft: '6px' }}>▼</span>
               </NeumorphicButton>
               <select
