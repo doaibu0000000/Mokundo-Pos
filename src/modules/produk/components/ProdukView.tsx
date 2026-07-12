@@ -341,22 +341,18 @@ export const ProdukView: React.FC = () => {
         }}
       >
         <div 
-          className="overflow-x-auto"
           style={{ 
             display: 'flex', 
             gap: '8px',
-            paddingBottom: '4px',
-            maxWidth: '100%',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
+            width: isMobile ? '100%' : 'auto',
+            maxWidth: '100%'
           }}
         >
-          <style>{`.overflow-x-auto::-webkit-scrollbar { display: none; }`}</style>
           {isMobile ? (
-            <div style={{ position: 'relative', display: 'flex', flexShrink: 0 }}>
-              <NeumorphicButton active={true} style={{ whiteSpace: 'nowrap', paddingRight: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>Manajemen Produk</span>
-                <span style={{ fontSize: '10px' }}>▼</span>
+            <div style={{ position: 'relative', display: 'flex', flex: 1, minWidth: 0 }}>
+              <NeumorphicButton active={true} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 8px' }}>
+                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '13px' }}>Manajemen Produk</span>
+                <span style={{ fontSize: '10px', flexShrink: 0, marginLeft: '6px' }}>▼</span>
               </NeumorphicButton>
               <select
                 value={activeSubTab}
@@ -387,14 +383,20 @@ export const ProdukView: React.FC = () => {
           )}
 
           {activeSubTab === 'produk' && (
-            <NeumorphicButton variant="success" onClick={() => openProductForm(null)} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-              <Plus size={16} /> Tambah Produk
+            <NeumorphicButton variant="success" onClick={() => openProductForm(null)} style={{ flex: isMobile ? 1 : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0, padding: isMobile ? '10px 8px' : undefined }}>
+              <Plus size={16} style={{ flexShrink: 0 }} /> 
+              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: isMobile ? '13px' : 'inherit', marginLeft: '6px' }}>
+                Tambah Produk
+              </span>
             </NeumorphicButton>
           )}
 
           {activeSubTab === 'kategori' && (
-            <NeumorphicButton variant="success" onClick={() => openCategoryForm(null)} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-              <Plus size={16} /> Tambah Kategori
+            <NeumorphicButton variant="success" onClick={() => openCategoryForm(null)} style={{ flex: isMobile ? 1 : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0, padding: isMobile ? '10px 8px' : undefined }}>
+              <Plus size={16} style={{ flexShrink: 0 }} /> 
+              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: isMobile ? '13px' : 'inherit', marginLeft: '6px' }}>
+                Tambah Kategori
+              </span>
             </NeumorphicButton>
           )}
         </div>
