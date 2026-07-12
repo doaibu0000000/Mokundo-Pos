@@ -46,11 +46,13 @@ interface AppContextType {
   setPlatform: (val: 'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood') => void;
   canInstall: boolean;
   installApp: () => Promise<void>;
+  isInitializing: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isInitializing, setIsInitializing] = useState<boolean>(true);
   const [user, setUser] = useState<User | null>(null);
   const [store, setStore] = useState<Store | null>(null);
   const [currentShift, setCurrentShift] = useState<Shift | null>(null);
@@ -107,9 +109,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setUser(JSON.parse(cachedUser));
     }
 
-    // 3. Load database configs
-    refreshStore();
-    refreshShift();
+    // 3. Load database configs and finish initializing
+    const initApp = async () => {
+      await refreshStore();
+      await refreshShift();
+      setIsInitializing(false);
+    };
+    initApp();
   }, []);
 
   // Update theme classes on change
@@ -258,7 +264,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         platform,
         setPlatform,
         canInstall: !!deferredPrompt,
-        installApp
+        installApp,
+        isInitializing
       }}
     >
       {children}
