@@ -739,34 +739,6 @@ export const TransaksiView: React.FC = () => {
 
 
 
-          {/* Payment Method chips */}
-          <div style={{ marginBottom: '18px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Metode Bayar</span>
-            <div 
-              style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', 
-                gap: '8px', 
-                marginTop: '8px' 
-              }}
-            >
-              {(['Tunai', 'QRIS', 'DANA', 'GoPay', 'OVO', 'Bank'] as const).map(m => (
-                <NeumorphicButton
-                  key={m}
-                  size="sm"
-                  active={paymentMethod === m}
-                  onClick={() => {
-                    setPaymentMethod(m);
-                    if (m !== 'Tunai') setCashPaid('');
-                  }}
-                  style={{ padding: '8px 4px' }}
-                >
-                  {m}
-                </NeumorphicButton>
-              ))}
-            </div>
-          </div>
-
           {/* Discount input row */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: 'var(--text-secondary)' }}>
@@ -846,6 +818,35 @@ export const TransaksiView: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Payment Method chips */}
+          <div style={{ marginBottom: '18px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Metode Bayar</span>
+            <div 
+              style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', 
+                gap: '8px', 
+                marginTop: '8px' 
+              }}
+            >
+              {(['Tunai', 'QRIS', 'DANA', 'GoPay', 'OVO', 'Bank'] as const).map(m => (
+                <NeumorphicButton
+                  key={m}
+                  size="sm"
+                  active={paymentMethod === m}
+                  onClick={() => {
+                    setPaymentMethod(m);
+                    if (m !== 'Tunai') setCashPaid('');
+                  }}
+                  style={{ padding: '8px 4px' }}
+                >
+                  {m}
+                </NeumorphicButton>
+              ))}
+            </div>
+          </div>
+
 
           {/* Cash Payment calculator inputs */}
           {paymentMethod === 'Tunai' && (
