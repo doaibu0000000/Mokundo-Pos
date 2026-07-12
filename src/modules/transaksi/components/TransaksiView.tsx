@@ -594,7 +594,6 @@ export const TransaksiView: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 10px 20px rgba(0,0,0,0.15), var(--shadow-out)',
               }}
             >
               <ShoppingCart size={36} color="var(--accent-blue)" />
