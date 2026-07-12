@@ -124,7 +124,8 @@ export const LoginView: React.FC = () => {
             icon={<UserIcon size={18} />}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            containerClassName="w-full mb-5"
+            containerClassName="w-full"
+            containerStyle={{ marginBottom: '24px' }}
             autoComplete="new-password"
             data-lpignore="true"
           />
@@ -138,7 +139,8 @@ export const LoginView: React.FC = () => {
             icon={<Lock size={18} />}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            containerClassName="w-full mb-6"
+            containerClassName="w-full"
+            containerStyle={{ marginBottom: '28px' }}
             autoComplete="new-password"
             data-lpignore="true"
           />

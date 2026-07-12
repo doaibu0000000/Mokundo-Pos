@@ -5,6 +5,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   icon?: React.ReactNode;
   containerClassName?: string;
+  containerStyle?: React.CSSProperties;
   borderRadius?: 'sm' | 'md' | 'lg' | 'xl' | 'pill';
 }
 
@@ -13,6 +14,7 @@ export const NeumorphicInput: React.FC<InputProps> = ({
   icon,
   type = 'text',
   containerClassName = '',
+  containerStyle,
   borderRadius = 'md',
   className = '',
   id,
@@ -28,6 +30,7 @@ export const NeumorphicInput: React.FC<InputProps> = ({
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
+    ...containerStyle,
   };
 
   const inputContainerStyle: React.CSSProperties = {
