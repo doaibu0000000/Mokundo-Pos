@@ -816,8 +816,8 @@ export const TransaksiView: React.FC = () => {
                     fontWeight: 800,
                     borderRadius: 'var(--radius-sm)',
                     border: 'none',
-                    backgroundColor: discountType === 'Rp' ? 'var(--bg-surface)' : 'transparent',
-                    color: discountType === 'Rp' ? 'var(--accent-blue)' : 'var(--text-secondary)',
+                    backgroundColor: discountType === 'Rp' ? 'var(--accent-blue)' : 'transparent',
+                    color: discountType === 'Rp' ? '#ffffff' : 'var(--text-secondary)',
                     boxShadow: discountType === 'Rp' ? 'var(--shadow-sm)' : 'none',
                     cursor: 'pointer'
                   }}
@@ -833,8 +833,8 @@ export const TransaksiView: React.FC = () => {
                     fontWeight: 800,
                     borderRadius: 'var(--radius-sm)',
                     border: 'none',
-                    backgroundColor: discountType === '%' ? 'var(--bg-surface)' : 'transparent',
-                    color: discountType === '%' ? 'var(--accent-blue)' : 'var(--text-secondary)',
+                    backgroundColor: discountType === '%' ? 'var(--accent-blue)' : 'transparent',
+                    color: discountType === '%' ? '#ffffff' : 'var(--text-secondary)',
                     boxShadow: discountType === '%' ? 'var(--shadow-sm)' : 'none',
                     cursor: 'pointer'
                   }}
