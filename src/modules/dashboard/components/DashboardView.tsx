@@ -169,7 +169,7 @@ export const DashboardView: React.FC = () => {
           display: 'grid',
           gridTemplateColumns: isMobile ? 'minmax(0, 1fr) minmax(0, 1fr)' : 'repeat(auto-fit, minmax(220px, 1fr))',
           gap: isMobile ? '12px' : '20px',
-          marginBottom: '30px',
+          marginBottom: isMobile ? '16px' : '30px',
           width: '100%'
         }}
       >
