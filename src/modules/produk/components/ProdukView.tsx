@@ -352,24 +352,28 @@ export const ProdukView: React.FC = () => {
         {/* Action Button Row */}
         {activeSubTab === 'produk' && (
           <div style={{ display: 'flex', gap: '8px' }}>
-            <NeumorphicButton size="sm" onClick={handleExportCSV}>
-              <Download size={14} /> Export CSV
-            </NeumorphicButton>
-            
-            <label className="nm-button" style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              fontSize: '12px',
-              fontWeight: 600,
-              padding: '6px 12px',
-              borderRadius: 'var(--radius-md)',
-              cursor: 'pointer'
-            }}>
-              <Upload size={14} /> Import CSV
-              <input type="file" accept=".csv" onChange={handleImportCSV} style={{ display: 'none' }} />
-            </label>
+            {!isMobile && (
+              <>
+                <NeumorphicButton size="sm" onClick={handleExportCSV}>
+                  <Download size={14} /> Export CSV
+                </NeumorphicButton>
+                
+                <label className="nm-button" style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  padding: '6px 12px',
+                  borderRadius: 'var(--radius-md)',
+                  cursor: 'pointer'
+                }}>
+                  <Upload size={14} /> Import CSV
+                  <input type="file" accept=".csv" onChange={handleImportCSV} style={{ display: 'none' }} />
+                </label>
+              </>
+            )}
 
             <NeumorphicButton variant="success" size="sm" onClick={() => openProductForm(null)}>
               <Plus size={14} /> Tambah Produk

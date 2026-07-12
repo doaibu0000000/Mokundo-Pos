@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Settings, Key, Cloud, FolderLock, Power, AlertTriangle } from 'lucide-react';
+import { Settings, Key, Cloud, FolderLock, Power, AlertTriangle, Download, Upload } from 'lucide-react';
 import { useApp } from '../../../store/AppContext';
 import { db, hashPassword } from '../../../shared/services/db';
 import { SyncService } from '../../../shared/services/syncService';
@@ -59,6 +59,99 @@ export const PengaturanView: React.FC = () => {
   const [cashRegister, setCashRegister] = useState('');
   const [shiftSuccess, setShiftSuccess] = useState('');
   const [shiftError, setShiftError] = useState('');
+
+  // CSV Import/Export States
+  const [csvSuccess, setCsvSuccess] = useState('');
+  const [csvError, setCsvError] = useState('');
+
+  const handleExportCSV = async () => {
+    try {
+      const products = await db.products.toArray();
+      let csv = 'SKU,Nama,Harga,HPP,Stok,ThresholdStok,Varian,GambarUrl\n';
+      products.forEach(p => {
+        csv += `"${p.sku}","${p.nama}",${p.harga},${p.HPP},${p.stok},${p.threshold_stok},"${p.varian.join('|')}","${p.gambar_url}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', `Daftar_Produk_Mokundo_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setCsvSuccess('Data produk berhasil diekspor!');
+      setCsvError('');
+    } catch (e) {
+      setCsvError('Gagal melakukan ekspor produk');
+      setCsvSuccess('');
+    }
+  };
+
+  const handleImportCSV = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const text = event.target?.result as string;
+        const lines = text.split('\n');
+        let addedCount = 0;
+
+        const categories = await db.categories.orderBy('urutan').toArray();
+        let defaultCatId = categories.length > 0 ? categories[0].id! : 1;
+
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+
+          const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+          if (cols.length < 5) continue;
+
+          const sku = cols[0].replace(/"/g, '').trim();
+          const nama = cols[1].replace(/"/g, '').trim();
+          const harga = parseFloat(cols[2]);
+          const HPP = parseFloat(cols[3]);
+          const stok = parseInt(cols[4]);
+          const threshold = parseInt(cols[5]) || 5;
+          const varianStr = cols[6] ? cols[6].replace(/"/g, '').trim() : 'Normal';
+          const gambarUrl = cols[7] ? cols[7].replace(/"/g, '').trim() : '';
+
+          const varian = varianStr.split('|').map(v => v.trim()).filter(v => v.length > 0);
+
+          const existing = await db.products.where('sku').equals(sku).first();
+          if (existing) {
+            await db.products.update(existing.id!, {
+              nama, harga, HPP, stok, threshold_stok: threshold, varian, gambar_url: gambarUrl
+            });
+          } else {
+            await db.products.add({
+              sku,
+              nama,
+              harga,
+              HPP,
+              stok,
+              threshold_stok: threshold,
+              kategori_id: defaultCatId,
+              varian,
+              gambar_url: gambarUrl
+            });
+          }
+          addedCount++;
+        }
+
+        setCsvSuccess(`Berhasil mengimpor/memperbarui ${addedCount} produk!`);
+        setCsvError('');
+        
+        // Refresh component state/store if store is loaded
+        if (refreshStore) await refreshStore();
+      } catch (err: any) {
+        setCsvError('Format file CSV salah atau tidak valid');
+        setCsvSuccess('');
+      }
+    };
+    reader.readAsText(file);
+  };
 
   useEffect(() => {
     if (store) {
@@ -201,7 +294,7 @@ export const PengaturanView: React.FC = () => {
       await refreshShift();
 
       // Also trigger cloud sync since shift closed
-      SyncService.syncAll().catch(e => console.error(e));
+      SyncService.syncAll().catch((err: any) => console.error(err));
     } catch (e) {
       setShiftError('Gagal melakukan penutupan laci kasir');
     }
@@ -420,6 +513,58 @@ export const PengaturanView: React.FC = () => {
                 Simpan Profil Toko
               </NeumorphicButton>
             </form>
+          </NeumorphicCard>
+
+          <NeumorphicCard style={{ width: '100%' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '12px' }}>Ekspor & Impor Data Produk (CSV)</h3>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px', lineHeight: '1.4' }}>
+              Ekspor daftar produk saat ini ke file spreadsheet CSV, atau impor dari file CSV untuk menambahkan produk baru secara massal.
+            </p>
+            
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <NeumorphicButton size="sm" onClick={handleExportCSV} style={{ flex: 1, minWidth: '120px' }}>
+                <Download size={14} style={{ marginRight: '6px' }} /> Ekspor ke CSV
+              </NeumorphicButton>
+              
+              <label 
+                className="nm-button" 
+                style={{
+                  flex: 1,
+                  minWidth: '120px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '10px 16px',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  color: 'var(--text-primary)',
+                  boxShadow: '3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light)',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <Upload size={14} /> Impor dari CSV
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleImportCSV}
+                  style={{ display: 'none' }}
+                />
+              </label>
+            </div>
+
+            {csvError && (
+              <div style={{ color: 'var(--accent-red)', fontSize: '12px', fontWeight: 600, marginTop: '12px' }}>
+                ⚠️ {csvError}
+              </div>
+            )}
+            {csvSuccess && (
+              <div style={{ color: 'var(--accent-green)', fontSize: '12px', fontWeight: 600, marginTop: '12px' }}>
+                ✓ {csvSuccess}
+              </div>
+            )}
           </NeumorphicCard>
         </div>
       )}
