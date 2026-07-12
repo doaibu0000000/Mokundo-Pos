@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Plus, Edit2, Trash2, Download, Upload, AlertCircle, Search, ChevronDown, Check } from 'lucide-react';
 import { db, type Product, type Category } from '../../../shared/services/db';
 import { NeumorphicCard, NeumorphicButton, NeumorphicInput, NeumorphicModal } from '../../../shared/components';
+import Cropper from 'react-easy-crop';
+import { getCroppedImg } from '../../../utils/cropImage';
 
 const formatRupiah = (number: number) => {
   return new Intl.NumberFormat('id-ID', {
@@ -41,6 +43,13 @@ export const ProdukView: React.FC = () => {
   const [prodThreshold, setProdThreshold] = useState('');
   const [prodKategoriId, setProdKategoriId] = useState<number>(0);
   const [prodError, setProdError] = useState('');
+
+  // Crop states
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [imageSrcToCrop, setImageSrcToCrop] = useState('');
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
 
   // Category Form Modal States
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -188,11 +197,28 @@ export const ProdukView: React.FC = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       if (event.target?.result) {
-        setProdGambarUrl(event.target.result as string);
+        setImageSrcToCrop(event.target.result as string);
+        setIsCropModalOpen(true);
         setProdError('');
+        e.target.value = ''; // Reset input so same file can be chosen again
       }
     };
     reader.readAsDataURL(file);
+  };
+
+  const onCropComplete = (_: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  };
+
+  const handleSaveCrop = async () => {
+    try {
+      const croppedImage = await getCroppedImg(imageSrcToCrop, croppedAreaPixels);
+      setProdGambarUrl(croppedImage);
+      setIsCropModalOpen(false);
+    } catch (e) {
+      console.error(e);
+      setProdError('Gagal memotong gambar.');
+    }
   };
 
   const deleteProduct = (id: number) => {
@@ -862,6 +888,29 @@ export const ProdukView: React.FC = () => {
             Simpan Kategori
           </NeumorphicButton>
         </form>
+      </NeumorphicModal>
+
+      {/* Crop Modal */}
+      <NeumorphicModal isOpen={isCropModalOpen} onClose={() => setIsCropModalOpen(false)} title="Potong Gambar">
+        <div style={{ position: 'relative', width: '100%', height: '300px', background: '#333', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+          <Cropper
+            image={imageSrcToCrop}
+            crop={crop}
+            zoom={zoom}
+            aspect={1}
+            onCropChange={setCrop}
+            onCropComplete={onCropComplete}
+            onZoomChange={setZoom}
+          />
+        </div>
+        <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+          <NeumorphicButton style={{ flex: 1, justifyContent: 'center' }} onClick={() => setIsCropModalOpen(false)}>
+            Batal
+          </NeumorphicButton>
+          <NeumorphicButton active style={{ flex: 1, justifyContent: 'center' }} onClick={handleSaveCrop}>
+            Simpan Potongan
+          </NeumorphicButton>
+        </div>
       </NeumorphicModal>
 
       {/* Confirmation Modal */}
