@@ -424,33 +424,35 @@ export const TransaksiView: React.FC = () => {
           </div>
 
           {/* Barcode scanner triggers */}
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <NeumorphicButton onClick={() => setShowScannerMock(!showScannerMock)}>
-              <Barcode size={18} />
-              <span className="hidden sm:inline">Scan SKU</span>
-            </NeumorphicButton>
-            
-            {/* Wake Lock Status Badge */}
-            <div
-              className="nm-inset"
-              title="Status Wake Lock (Screen Keep-Alive)"
-              style={{
-                borderRadius: 'var(--radius-md)',
-                padding: '0 12px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '11px',
-                fontWeight: 700,
-                color: wakeLockStatus === 'Active' ? 'var(--accent-green)' : 'var(--text-secondary)'
-              }}
-            >
-              <Sun size={14} className={wakeLockStatus === 'Active' ? 'animate-pulse' : ''} />
-              <span className="hidden sm:inline">
-                {wakeLockStatus === 'Active' ? 'Stay-Awake: ON' : 'Stay-Awake: OFF'}
-              </span>
+          {!isMobile && (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <NeumorphicButton onClick={() => setShowScannerMock(!showScannerMock)}>
+                <Barcode size={18} />
+                <span className="hidden sm:inline">Scan SKU</span>
+              </NeumorphicButton>
+              
+              {/* Wake Lock Status Badge */}
+              <div
+                className="nm-inset"
+                title="Status Wake Lock (Screen Keep-Alive)"
+                style={{
+                  borderRadius: 'var(--radius-md)',
+                  padding: '0 12px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  color: wakeLockStatus === 'Active' ? 'var(--accent-green)' : 'var(--text-secondary)'
+                }}
+              >
+                <Sun size={14} className={wakeLockStatus === 'Active' ? 'animate-pulse' : ''} />
+                <span className="hidden sm:inline">
+                  {wakeLockStatus === 'Active' ? 'Stay-Awake: ON' : 'Stay-Awake: OFF'}
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Scan input mockup block if triggered */}
