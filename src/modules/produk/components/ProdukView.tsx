@@ -915,8 +915,8 @@ export const ProdukView: React.FC = () => {
           <NeumorphicButton style={{ flex: 1, justifyContent: 'center' }} onClick={() => setIsCropModalOpen(false)}>
             Batal
           </NeumorphicButton>
-          <NeumorphicButton active style={{ flex: 1, justifyContent: 'center' }} onClick={handleSaveCrop}>
-            Simpan Potongan
+          <NeumorphicButton style={{ flex: 1, justifyContent: 'center' }} onClick={handleSaveCrop}>
+            Simpan
           </NeumorphicButton>
         </div>
       </NeumorphicModal>
