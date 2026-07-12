@@ -367,8 +367,8 @@ export const ProdukView: React.FC = () => {
                   cursor: 'pointer'
                 }}
               >
-                <option value="produk">Tampilkan: Kelola Produk</option>
-                <option value="kategori">Tampilkan: Kelola Kategori</option>
+                <option value="produk">Produk</option>
+                <option value="kategori">Kategori</option>
               </select>
             </div>
           ) : (
