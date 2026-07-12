@@ -117,6 +117,7 @@ export const LoginView: React.FC = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             containerClassName="w-full mb-5"
+            autoComplete="off"
           />
 
           <NeumorphicInput
@@ -128,6 +129,7 @@ export const LoginView: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             containerClassName="w-full mb-6"
+            autoComplete="off"
           />
 
           {/* Error Message */}
