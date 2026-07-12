@@ -139,7 +139,7 @@ export const DashboardView: React.FC = () => {
   }, [filterDays]);
 
   return (
-    <div style={{ padding: isMobile ? '0' : '20px', height: isMobile ? 'auto' : '100%', overflowY: isMobile ? 'visible' : 'auto', overflowX: 'hidden', width: '100%' }}>
+    <div style={{ padding: isMobile ? '0' : '20px', height: isMobile ? 'auto' : '100%', overflowY: isMobile ? 'visible' : 'auto', overflowX: 'visible', width: '100%' }}>
       {/* Header Title */}
       {!isMobile && (
         <div
