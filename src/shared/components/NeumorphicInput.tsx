@@ -82,7 +82,7 @@ export const NeumorphicInput: React.FC<InputProps> = ({
             letterSpacing: '0.05em',
             color: 'var(--text-secondary)',
             textTransform: 'uppercase',
-            marginBottom: '6px'
+            marginBottom: '10px'
           }}
         >
           {label}
