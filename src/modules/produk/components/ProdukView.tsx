@@ -352,12 +352,39 @@ export const ProdukView: React.FC = () => {
           }}
         >
           <style>{`.overflow-x-auto::-webkit-scrollbar { display: none; }`}</style>
-          <NeumorphicButton active={activeSubTab === 'produk'} onClick={() => setActiveSubTab('produk')} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-            Kelola Produk
-          </NeumorphicButton>
-          <NeumorphicButton active={activeSubTab === 'kategori'} onClick={() => setActiveSubTab('kategori')} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-            Kelola Kategori
-          </NeumorphicButton>
+          {isMobile ? (
+            <div style={{ position: 'relative', display: 'flex', flexShrink: 0 }}>
+              <NeumorphicButton active={true} style={{ whiteSpace: 'nowrap', paddingRight: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>Manajemen Produk</span>
+                <span style={{ fontSize: '10px' }}>▼</span>
+              </NeumorphicButton>
+              <select
+                value={activeSubTab}
+                onChange={(e) => setActiveSubTab(e.target.value as any)}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  opacity: 0,
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="produk">Tampilkan: Kelola Produk</option>
+                <option value="kategori">Tampilkan: Kelola Kategori</option>
+              </select>
+            </div>
+          ) : (
+            <>
+              <NeumorphicButton active={activeSubTab === 'produk'} onClick={() => setActiveSubTab('produk')} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+                Kelola Produk
+              </NeumorphicButton>
+              <NeumorphicButton active={activeSubTab === 'kategori'} onClick={() => setActiveSubTab('kategori')} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+                Kelola Kategori
+              </NeumorphicButton>
+            </>
+          )}
 
           {activeSubTab === 'produk' && (
             <NeumorphicButton variant="success" onClick={() => openProductForm(null)} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
