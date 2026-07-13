@@ -578,9 +578,7 @@ export const ProdukView: React.FC = () => {
             alignContent: 'start' 
           }}>
             {isLoadingData ? (
-              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
-                Memuat data...
-              </div>
+              <></>
             ) : products.length === 0 ? (
               <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
                 Belum ada produk terdaftar. Tambahkan produk atau gunakan import CSV.
@@ -666,9 +664,7 @@ export const ProdukView: React.FC = () => {
       {activeSubTab === 'kategori' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', flex: 1, paddingBottom: '20px', paddingRight: '4px', margin: '0 -4px' }}>
           {isLoadingData ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
-              Memuat data...
-            </div>
+            <></>
           ) : categories.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
               Belum ada kategori terdaftar. Klik "+ Tambah Kategori".
