@@ -40,8 +40,14 @@ export const TransaksiView: React.FC = () => {
   } = useApp();
 
   // State Management
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>(() => {
+    const cached = sessionStorage.getItem('mokundo_cached_categories');
+    return cached ? JSON.parse(cached) : [];
+  });
+  const [products, setProducts] = useState<Product[]>(() => {
+    const cached = sessionStorage.getItem('mokundo_cached_products');
+    return cached ? JSON.parse(cached) : [];
+  });
   const [selectedCategory, setSelectedCategory] = useState<number | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -143,6 +149,7 @@ export const TransaksiView: React.FC = () => {
   const loadCategories = async () => {
     const cats = await db.categories.orderBy('urutan').toArray();
     setCategories(cats);
+    sessionStorage.setItem('mokundo_cached_categories', JSON.stringify(cats));
   };
 
   const loadProducts = async () => {
@@ -162,6 +169,8 @@ export const TransaksiView: React.FC = () => {
         p.nama.toLowerCase().includes(lower) || 
         p.sku.toLowerCase().includes(lower)
       );
+    } else if (selectedCategory === 'all') {
+      sessionStorage.setItem('mokundo_cached_products', JSON.stringify(items));
     }
 
     setProducts(filtered);

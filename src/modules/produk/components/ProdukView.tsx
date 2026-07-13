@@ -43,10 +43,18 @@ export const ProdukView: React.FC = () => {
   }, []);
   
   // Products states
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>(() => {
+    const cached = sessionStorage.getItem('mokundo_cached_products');
+    return cached ? JSON.parse(cached) : [];
+  });
+  const [categories, setCategories] = useState<Category[]>(() => {
+    const cached = sessionStorage.getItem('mokundo_cached_categories');
+    return cached ? JSON.parse(cached) : [];
+  });
   const [productSearch, setProductSearch] = useState('');
-  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [isLoadingData, setIsLoadingData] = useState(() => {
+    return !sessionStorage.getItem('mokundo_cached_products');
+  });
   
   // Product Form Modal States
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -94,6 +102,7 @@ export const ProdukView: React.FC = () => {
       // Load categories
       const cats = await db.categories.orderBy('urutan').toArray();
       setCategories(cats);
+      sessionStorage.setItem('mokundo_cached_categories', JSON.stringify(cats));
       if (cats.length > 0 && prodKategoriId === 0) {
         setProdKategoriId(cats[0].id!);
       }
@@ -107,6 +116,8 @@ export const ProdukView: React.FC = () => {
           p.nama.toLowerCase().includes(lower) || 
           p.sku.toLowerCase().includes(lower)
         );
+      } else {
+        sessionStorage.setItem('mokundo_cached_products', JSON.stringify(prods));
       }
       setProducts(filteredProds);
     } finally {
