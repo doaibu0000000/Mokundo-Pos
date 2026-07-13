@@ -76,6 +76,8 @@ export const TransaksiView: React.FC = () => {
   const [completedTx, setCompletedTx] = useState<Transaction | null>(null);
   const [completedItems, setCompletedItems] = useState<TransactionItem[]>([]);
   const [bluetoothName, setBluetoothName] = useState('');
+  const [isBluetoothConnecting, setIsBluetoothConnecting] = useState(false);
+  const [bluetoothError, setBluetoothError] = useState('');
   
   // Discount State
   const [discountType, setDiscountType] = useState<'Rp' | '%'>('Rp');
@@ -343,11 +345,15 @@ export const TransaksiView: React.FC = () => {
   };
 
   const handlePairBluetooth = async () => {
+    setBluetoothError('');
+    setIsBluetoothConnecting(true);
     try {
       const name = await PrintService.connectBluetoothPrinter();
       setBluetoothName(name);
     } catch (e: any) {
-      alert(e.message);
+      setBluetoothError(e.message);
+    } finally {
+      setIsBluetoothConnecting(false);
     }
   };
 
@@ -900,20 +906,23 @@ export const TransaksiView: React.FC = () => {
               <NeumorphicButton 
                 size="sm" 
                 active={PrintService.isBluetoothConnected()}
+                disabled={isBluetoothConnecting}
+                style={{ opacity: isBluetoothConnecting ? 0.7 : 1 }}
                 onClick={async () => {
+                  setBluetoothError('');
                   if (!PrintService.isBluetoothConnected()) {
                     await handlePairBluetooth();
                   } else {
                     try {
                       await PrintService.printViaBluetooth(completedTx, completedItems, store!);
                     } catch (e: any) {
-                      alert(e.message);
+                      setBluetoothError(e.message);
                     }
                   }
                 }}
               >
                 <Smartphone size={16} /> 
-                {PrintService.isBluetoothConnected() ? 'Print Bluetooth' : 'Pair Bluetooth'}
+                {isBluetoothConnecting ? 'Menyandingkan...' : (PrintService.isBluetoothConnected() ? 'Print Bluetooth' : 'Pair Bluetooth')}
               </NeumorphicButton>
 
               <NeumorphicButton size="sm" onClick={() => window.open(PrintService.shareWhatsAppReceipt(completedTx, completedItems, store!), '_blank')}>
@@ -927,7 +936,13 @@ export const TransaksiView: React.FC = () => {
 
             {bluetoothName && (
               <div style={{ fontSize: '11px', color: 'var(--accent-green)', fontWeight: 600, marginBottom: '16px' }}>
-                Connected to: {bluetoothName}
+                ✓ Connected to: {bluetoothName}
+              </div>
+            )}
+            
+            {bluetoothError && (
+              <div style={{ fontSize: '11px', color: 'var(--accent-red)', fontWeight: 600, marginBottom: '16px' }}>
+                {bluetoothError}
               </div>
             )}
 

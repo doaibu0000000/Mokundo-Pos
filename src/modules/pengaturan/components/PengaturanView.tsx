@@ -44,6 +44,7 @@ export const PengaturanView: React.FC = () => {
   // Bluetooth Print State
   const [connectedBluetooth, setConnectedBluetooth] = useState<string | null>(null);
   const [bluetoothError, setBluetoothError] = useState('');
+  const [isBluetoothConnecting, setIsBluetoothConnecting] = useState(false);
 
   // Password Security States
   const [oldPassword, setOldPassword] = useState('');
@@ -179,12 +180,15 @@ export const PengaturanView: React.FC = () => {
 
   const handlePairBluetooth = async () => {
     setBluetoothError('');
+    setIsBluetoothConnecting(true);
     try {
       const { PrintService } = await import('../../../shared/services/printService');
       const name = await PrintService.connectBluetoothPrinter();
       setConnectedBluetooth(name);
     } catch (e: any) {
       setBluetoothError(e.message);
+    } finally {
+      setIsBluetoothConnecting(false);
     }
   };
 
@@ -473,8 +477,12 @@ export const PengaturanView: React.FC = () => {
                 {bluetoothError}
               </div>
             )}
-            <NeumorphicButton onClick={handlePairBluetooth} style={{ width: '100%' }}>
-              {connectedBluetooth ? 'Hubungkan Ulang Bluetooth' : 'Pair / Hubungkan Bluetooth Printer'}
+            <NeumorphicButton 
+              onClick={handlePairBluetooth} 
+              style={{ width: '100%', opacity: isBluetoothConnecting ? 0.7 : 1 }}
+              disabled={isBluetoothConnecting}
+            >
+              {isBluetoothConnecting ? 'Sedang Menyandingkan...' : (connectedBluetooth ? 'Hubungkan Ulang Bluetooth' : 'Pair / Hubungkan Bluetooth Printer')}
             </NeumorphicButton>
           </NeumorphicCard>
 
