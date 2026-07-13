@@ -350,7 +350,7 @@ export const LaporanView: React.FC = () => {
                           color: t.status === 'COMPLETED' ? 'var(--accent-green)' : 'var(--accent-red)'
                         }}
                       >
-                        {t.status}
+                        {t.status === 'COMPLETED' ? 'SUCCESS' : t.status}
                       </span>
                     </td>
                     <td style={{ padding: '12px 8px', textAlign: 'center' }}>
@@ -442,7 +442,7 @@ export const LaporanView: React.FC = () => {
                     color: selectedTx.status === 'COMPLETED' ? 'var(--accent-green)' : 'var(--accent-red)'
                   }}
                 >
-                  {selectedTx.status}
+                  {selectedTx.status === 'COMPLETED' ? 'SUCCESS' : selectedTx.status}
                 </span>
               </div>
             </div>
