@@ -349,7 +349,7 @@ export class PrintService {
 
   * { box-sizing: border-box; }
   body {
-    background: #121212;
+    background: #2b2b2b;
     font-family: 'Poppins', sans-serif;
     display: flex;
     justify-content: center;
@@ -358,11 +358,11 @@ export class PrintService {
   }
 
   .receipt {
-    background: #1a1a1a;
+    background: #fff;
     width: 340px;
     padding: 28px 26px 20px;
     position: relative;
-    color: #f0f0f0;
+    color: #1a1a1a;
   }
 
   /* zigzag top & bottom */
@@ -374,10 +374,10 @@ export class PrintService {
     right: 0;
     height: 12px;
     background:
-      linear-gradient(135deg, #1a1a1a 50%, transparent 50%) 0 0/16px 16px,
-      linear-gradient(-135deg, #1a1a1a 50%, transparent 50%) 0 0/16px 16px;
+      linear-gradient(135deg, #fff 50%, transparent 50%) 0 0/16px 16px,
+      linear-gradient(-135deg, #fff 50%, transparent 50%) 0 0/16px 16px;
     background-repeat: repeat-x;
-    background-color: #121212;
+    background-color: #2b2b2b;
   }
   .receipt::before { top: -12px; }
   .receipt::after   { bottom: -12px; transform: rotate(180deg); }
@@ -407,7 +407,7 @@ export class PrintService {
 
   .divider {
     border: none;
-    border-top: 1px dashed #555;
+    border-top: 1px dashed #999;
     margin: 14px 0;
   }
 
@@ -468,13 +468,21 @@ export class PrintService {
     width: 92px;
     height: 92px;
     margin: 0 auto 6px;
-    border: 1px solid #555;
+    border: 1px solid #333;
+    background-color: #f9f9f9;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 10px;
-    color: #aaa;
+    color: #666;
     text-align: center;
+  }
+
+  .scan-text {
+    text-align: center;
+    font-size: 10.5px;
+    color: #555;
+    margin-bottom: 14px;
   }
 
   .thankyou {
@@ -525,9 +533,9 @@ export class PrintService {
 <body>
 
 <div class="receipt">
-  <h1>${store.nama || 'Toko'}</h1>
-  <div class="addr">${store.alamat || ''}</div>
-  <div class="phone">${store.receipt_header || ''}</div>
+  <h1>${store.nama || 'SURANTAKA COFFEE'}</h1>
+  <div class="addr">${store.alamat || 'Kp. Surantaka, RT.02/RW.01, Desa Kalijati Timur, Kecamatan Kalijati, Kabupaten Subang, Jawa Barat, 41271'}</div>
+  <div class="phone">${store.receipt_header || 'Telp: 0812-3456-7890'}</div>
 
   <hr class="divider">
 
@@ -568,12 +576,15 @@ export class PrintService {
   </div>
 
   <div class="qr-box">[ QR Code ]</div>
+  <div class="scan-text">Scan untuk bayar</div>
 
   <div class="thankyou">Thank you for your order!</div>
 
+  <hr class="divider">
+
   <div class="footer-msg">
-    ${store.receipt_footer ? store.receipt_footer.replace(/\\n/g, '<br>') : ''}
-    <div class="brand">— ${store.nama || 'Mokundo POS'} —</div>
+    ${store.receipt_footer ? store.receipt_footer.replace(/\\n/g, '<br>') : 'Mengunjungi kami kembali adalah<br>kebahagiaan terbesar kami!'}
+    <div class="brand">— ${store.nama || 'Surantaka Coffee'} —</div>
   </div>
 </div>
 
