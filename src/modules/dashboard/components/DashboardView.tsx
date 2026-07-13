@@ -24,6 +24,12 @@ const formatRupiah = (number: number) => {
   }).format(number);
 };
 
+const formatRupiahCompact = (val: number) => {
+  if (val >= 1000000) return `Rp ${(val / 1000000).toFixed(1).replace('.0', '')}M`;
+  if (val >= 1000) return `Rp ${(val / 1000).toFixed(0)}k`;
+  return formatRupiah(val);
+};
+
 export const DashboardView: React.FC = () => {
   const [stats, setStats] = useState(() => {
     const cached = sessionStorage.getItem('mokundo_cached_dashboard_stats');
@@ -212,7 +218,7 @@ export const DashboardView: React.FC = () => {
               Omset Hari Ini
             </div>
             <div style={{ fontSize: isMobile ? '15px' : '18px', fontWeight: 800, marginTop: '2px', color: 'var(--accent-blue)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {formatRupiah(stats.omsetHariIni)}
+              {formatRupiahCompact(stats.omsetHariIni)}
             </div>
           </div>
         </NeumorphicCard>
@@ -247,7 +253,7 @@ export const DashboardView: React.FC = () => {
               Profit Hari Ini
             </div>
             <div style={{ fontSize: isMobile ? '15px' : '18px', fontWeight: 800, marginTop: '2px', color: 'var(--accent-green)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {formatRupiah(stats.profitHariIni)}
+              {formatRupiahCompact(stats.profitHariIni)}
             </div>
           </div>
         </NeumorphicCard>
