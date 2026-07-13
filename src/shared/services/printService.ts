@@ -349,7 +349,7 @@ export class PrintService {
 
   * { box-sizing: border-box; }
   body {
-    background: #2b2b2b;
+    background: #121212;
     font-family: 'Poppins', sans-serif;
     display: flex;
     justify-content: center;
@@ -358,11 +358,11 @@ export class PrintService {
   }
 
   .receipt {
-    background: #fff;
+    background: #1a1a1a;
     width: 340px;
     padding: 28px 26px 20px;
     position: relative;
-    color: #1a1a1a;
+    color: #f0f0f0;
   }
 
   /* zigzag top & bottom */
@@ -374,10 +374,10 @@ export class PrintService {
     right: 0;
     height: 12px;
     background:
-      linear-gradient(135deg, #fff 50%, transparent 50%) 0 0/16px 16px,
-      linear-gradient(-135deg, #fff 50%, transparent 50%) 0 0/16px 16px;
+      linear-gradient(135deg, #1a1a1a 50%, transparent 50%) 0 0/16px 16px,
+      linear-gradient(-135deg, #1a1a1a 50%, transparent 50%) 0 0/16px 16px;
     background-repeat: repeat-x;
-    background-color: #2b2b2b;
+    background-color: #121212;
   }
   .receipt::before { top: -12px; }
   .receipt::after   { bottom: -12px; transform: rotate(180deg); }
@@ -407,7 +407,7 @@ export class PrintService {
 
   .divider {
     border: none;
-    border-top: 1px dashed #999;
+    border-top: 1px dashed #555;
     margin: 14px 0;
   }
 
@@ -468,12 +468,12 @@ export class PrintService {
     width: 92px;
     height: 92px;
     margin: 0 auto 6px;
-    border: 1px solid #333;
+    border: 1px solid #555;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 10px;
-    color: #666;
+    color: #aaa;
     text-align: center;
   }
 
@@ -502,10 +502,19 @@ export class PrintService {
       margin: 0;
     }
     .receipt {
+      background: #fff;
+      color: #000;
       width: 100%;
       max-width: 100%;
       padding: 0;
       box-shadow: none;
+    }
+    .divider {
+      border-top: 1px dashed #000;
+    }
+    .qr-box {
+      border-color: #000;
+      color: #000;
     }
     .receipt::before, .receipt::after {
       display: none;
