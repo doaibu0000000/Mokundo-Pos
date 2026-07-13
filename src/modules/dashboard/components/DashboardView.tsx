@@ -360,7 +360,17 @@ export const DashboardView: React.FC = () => {
             <ComposedChart data={chartData} margin={{ left: isMobile ? -5 : -10, right: 10, top: 10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--shadow-dark)" opacity={0.3} />
               <XAxis dataKey="date" stroke="var(--text-secondary)" fontSize={10} tickLine={false} />
-              <YAxis stroke="var(--text-secondary)" fontSize={10} tickLine={false} width={isMobile ? 28 : 40} />
+              <YAxis 
+                stroke="var(--text-secondary)" 
+                fontSize={10} 
+                tickLine={false} 
+                width={isMobile ? 36 : 45} 
+                tickFormatter={(val: number) => {
+                  if (val >= 1000000) return `${(val / 1000000).toFixed(1)}M`;
+                  if (val >= 1000) return `${(val / 1000).toFixed(0)}k`;
+                  return val.toString();
+                }}
+              />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'var(--bg-surface)',
