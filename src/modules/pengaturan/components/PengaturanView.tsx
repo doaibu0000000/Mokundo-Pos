@@ -416,14 +416,6 @@ export const PengaturanView: React.FC = () => {
         </div>
 
         <div style={{ display: 'flex', gap: '8px' }}>
-          <NeumorphicButton 
-            size="sm"
-            active={isHighContrast}
-            onClick={toggleHighContrast}
-          >
-            ♿ High Contrast
-          </NeumorphicButton>
-
           <NeumorphicButton size="sm" onClick={logoutUser} style={{ color: 'var(--accent-red)' }}>
             Keluar (Logout)
           </NeumorphicButton>
