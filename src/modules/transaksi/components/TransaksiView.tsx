@@ -316,8 +316,8 @@ export const TransaksiView: React.FC = () => {
       
       if (txWritten) {
         if (store) {
-          // Otomatis trigger dialog print system browser saat sukses
-          PrintService.printViaBrowser(txWritten, itemsWritten, store);
+          // Hanya menampilkan popup sukses, tidak auto-print
+          // PrintService.printViaBrowser(txWritten, itemsWritten, store);
         }
         setCompletedTx(txWritten);
         setCompletedItems(itemsWritten);
