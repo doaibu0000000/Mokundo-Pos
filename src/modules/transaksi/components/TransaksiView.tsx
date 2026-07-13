@@ -598,7 +598,7 @@ export const TransaksiView: React.FC = () => {
             backgroundColor: 'var(--bg-surface)'
           }}
         >
-          <CartInnerContent />
+          {CartInnerContent()}
         </div>
       ) : (
         // Mobile Bottom Sheet Cart View
@@ -608,7 +608,7 @@ export const TransaksiView: React.FC = () => {
           title="Keranjang Belanja"
         >
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-            <CartInnerContent />
+            {CartInnerContent()}
           </div>
         </NeumorphicBottomSheet>
       ))}
