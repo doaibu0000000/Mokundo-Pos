@@ -341,7 +341,22 @@ export class PrintService {
       `;
     }).join('');
 
-    return `
+    const paperSize = store.ukuran_kertas_struk || '80mm';
+  // Untuk layar (preview), kurangi margin (misal potong 8mm).
+  // Di print media, biarkan full sesuai paperSize.
+  let containerWidth = '72mm'; 
+  let baseFontSize = '11px';
+  let printBaseFontSize = '10px';
+
+  if (paperSize === '44mm') { containerWidth = '36mm'; baseFontSize = '8px'; printBaseFontSize = '7px'; }
+  if (paperSize === '48mm') { containerWidth = '40mm'; baseFontSize = '8.5px'; printBaseFontSize = '7.5px'; }
+  if (paperSize === '57mm') { containerWidth = '49mm'; baseFontSize = '9px'; printBaseFontSize = '8px'; }
+  if (paperSize === '58mm') { containerWidth = '50mm'; baseFontSize = '9px'; printBaseFontSize = '8px'; }
+  if (paperSize === '76mm') { containerWidth = '68mm'; baseFontSize = '10.5px'; printBaseFontSize = '9.5px'; }
+  if (paperSize === '80mm') { containerWidth = '72mm'; baseFontSize = '11px'; printBaseFontSize = '10px'; }
+  if (paperSize === '112mm') { containerWidth = '104mm'; baseFontSize = '13px'; printBaseFontSize = '12px'; }
+
+  return `
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -349,6 +364,11 @@ export class PrintService {
 <title>Struk - ${store.nama}</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+  :root {
+    --base-font: ${baseFontSize};
+    --print-base-font: ${printBaseFontSize};
+  }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -362,11 +382,11 @@ export class PrintService {
 
   .receipt {
     background: #fff;
-    width: 72mm; /* standar kertas thermal 80mm minus margin */
+    width: ${containerWidth};
     padding: 4mm 3mm;
     position: relative;
     color: #1a1a1a;
-    font-size: 11px;
+    font-size: var(--base-font);
     line-height: 1.4;
   }
 
@@ -389,7 +409,7 @@ export class PrintService {
 
   h1 {
     text-align: center;
-    font-size: 16px;
+    font-size: calc(var(--base-font) * 1.45);
     letter-spacing: 1px;
     margin: 0 0 6px;
     text-transform: uppercase;
@@ -399,14 +419,14 @@ export class PrintService {
   .addr {
     text-align: justify;
     text-align-last: center;
-    font-size: 9px;
+    font-size: calc(var(--base-font) * 0.8);
     line-height: 1.4;
     margin-bottom: 2px;
   }
 
   .phone {
     text-align: center;
-    font-size: 9px;
+    font-size: calc(var(--base-font) * 0.8);
     line-height: 1.4;
     margin-bottom: 8px;
   }
@@ -419,15 +439,15 @@ export class PrintService {
 
   .info-row {
     display: flex;
-    font-size: 10px;
+    font-size: calc(var(--base-font) * 0.9);
     margin-bottom: 2px;
   }
-  .info-row .label { width: 70px; flex-shrink: 0; }
+  .info-row .label { width: 35%; flex-shrink: 0; }
   .info-row .colon { width: 10px; flex-shrink: 0; }
   .info-row .value { flex: 1; }
 
   .items {
-    font-size: 10px;
+    font-size: calc(var(--base-font) * 0.9);
   }
   .item-row {
     display: flex;
@@ -438,7 +458,7 @@ export class PrintService {
   .item-row .price { white-space: nowrap; text-align: right; }
 
   .totals {
-    font-size: 10px;
+    font-size: calc(var(--base-font) * 0.9);
   }
   .totals .row {
     display: flex;
@@ -447,11 +467,11 @@ export class PrintService {
   }
   .totals .grand {
     font-weight: bold;
-    font-size: 12px;
+    font-size: calc(var(--base-font) * 1.1);
   }
 
   .payment {
-    font-size: 10px;
+    font-size: calc(var(--base-font) * 0.9);
   }
   .payment .row {
     display: flex;
@@ -461,7 +481,7 @@ export class PrintService {
 
   .promo {
     text-align: center;
-    font-size: 9px;
+    font-size: calc(var(--base-font) * 0.8);
     line-height: 1.4;
     margin: 4px 0 8px;
   }
@@ -471,36 +491,36 @@ export class PrintService {
   }
 
   .qr-box {
-    width: 70px;
-    height: 70px;
+    width: 60%;
+    aspect-ratio: 1;
     margin: 0 auto 4px;
     border: 1px solid #333;
     background-color: #f9f9f9;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 8px;
+    font-size: calc(var(--base-font) * 0.7);
     color: #666;
     text-align: center;
   }
 
   .scan-text {
     text-align: center;
-    font-size: 8px;
+    font-size: calc(var(--base-font) * 0.7);
     color: #555;
     margin-bottom: 8px;
   }
 
   .thankyou {
     text-align: center;
-    font-size: 11px;
+    font-size: var(--base-font);
     font-weight: bold;
     margin-bottom: 8px;
   }
 
   .footer-msg {
     text-align: center;
-    font-size: 9px;
+    font-size: calc(var(--base-font) * 0.8);
     line-height: 1.4;
     white-space: pre-wrap;
   }
@@ -511,13 +531,13 @@ export class PrintService {
 
   /* ===== THERMAL PRINTER PRINT STYLES ===== */
   @page {
-    size: 80mm auto; /* lebar kertas thermal 80mm, panjang otomatis */
+    size: ${paperSize} auto; /* Lebar dinamis */
     margin: 0;
   }
 
   @media print {
     html, body {
-      width: 80mm;
+      width: ${paperSize};
       background: none;
       padding: 0;
       margin: 0;
@@ -526,23 +546,21 @@ export class PrintService {
       background: #fff;
       color: #000;
       width: 100%;
-      max-width: 80mm;
+      max-width: ${paperSize};
       padding: 2mm 2mm;
       box-shadow: none;
-      font-size: 10px;
+      font-size: var(--print-base-font);
     }
-    h1 { font-size: 14px; }
-    .addr, .phone, .promo, .footer-msg { font-size: 8px; }
-    .info-row, .items, .totals, .payment { font-size: 9px; }
-    .totals .grand { font-size: 11px; }
-    .thankyou { font-size: 10px; }
-    .scan-text { font-size: 7px; }
+    h1 { font-size: calc(var(--print-base-font) * 1.4); }
+    .addr, .phone, .promo, .footer-msg { font-size: calc(var(--print-base-font) * 0.8); }
+    .info-row, .items, .totals, .payment { font-size: calc(var(--print-base-font) * 0.9); }
+    .totals .grand { font-size: calc(var(--print-base-font) * 1.1); }
+    .thankyou { font-size: var(--print-base-font); }
+    .scan-text { font-size: calc(var(--print-base-font) * 0.7); }
     .divider {
       border-top: 1px dashed #000;
     }
     .qr-box {
-      width: 60px;
-      height: 60px;
       border-color: #000;
       color: #000;
     }

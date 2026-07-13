@@ -29,6 +29,7 @@ export interface Store {
   supabase_url: string;
   supabase_anon_key: string;
   sync_enabled: number; // 0 = false, 1 = true
+  ukuran_kertas_struk?: string; // e.g. "80mm", "58mm"
 }
 
 export interface Product {
@@ -179,6 +180,7 @@ export async function seedDatabase() {
       supabase_url: '',
       supabase_anon_key: '',
       sync_enabled: 0,
+      ukuran_kertas_struk: '80mm',
     });
 
     // 3. Seed default categories

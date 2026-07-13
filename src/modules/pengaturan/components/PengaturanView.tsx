@@ -37,6 +37,7 @@ export const PengaturanView: React.FC = () => {
   const [storeService, setStoreService] = useState(store?.service_charge?.toString() || '');
   const [receiptHeader, setReceiptHeader] = useState(store?.receipt_header || '');
   const [receiptFooter, setReceiptFooter] = useState(store?.receipt_footer || '');
+  const [ukuranKertas, setUkuranKertas] = useState(store?.ukuran_kertas_struk || '80mm');
   const [storeSuccess, setStoreSuccess] = useState('');
 
   // Password Security States
@@ -162,6 +163,7 @@ export const PengaturanView: React.FC = () => {
       setSupabaseUrl(store.supabase_url);
       setSupabaseKey(store.supabase_anon_key);
       setSyncEnabled(store.sync_enabled === 1);
+      setUkuranKertas(store.ukuran_kertas_struk || '80mm');
     }
   }, [store]);
 
@@ -184,7 +186,8 @@ export const PengaturanView: React.FC = () => {
         PPN: 0,
         service_charge: serviceCharge,
         receipt_header: receiptHeader,
-        receipt_footer: receiptFooter
+        receipt_footer: receiptFooter,
+        ukuran_kertas_struk: ukuranKertas
       });
       setStoreSuccess('Pengaturan profil toko berhasil diperbarui!');
       await refreshStore();
@@ -457,6 +460,34 @@ export const PengaturanView: React.FC = () => {
                   onChange={(e) => setStoreService(e.target.value)}
                   required
                 />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Ukuran Kertas Thermal</label>
+                  <select
+                    value={ukuranKertas}
+                    onChange={(e) => setUkuranKertas(e.target.value)}
+                    className="nm-input"
+                    style={{
+                      padding: '12px',
+                      borderRadius: '12px',
+                      border: 'none',
+                      backgroundColor: 'var(--bg-primary)',
+                      boxShadow: 'inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light)',
+                      color: 'var(--text-primary)',
+                      fontSize: '14px',
+                      fontFamily: 'inherit',
+                      outline: 'none',
+                      appearance: 'none'
+                    }}
+                  >
+                    <option value="44mm">44 mm (Mini EDC / Bluetooth)</option>
+                    <option value="48mm">48 mm (Kasir Kecil)</option>
+                    <option value="57mm">57 mm (Standar Bluetooth)</option>
+                    <option value="58mm">58 mm (Printer Warung/GrabFood)</option>
+                    <option value="76mm">76 mm (Medium POS)</option>
+                    <option value="80mm">80 mm (Restoran/Supermarket - Standar)</option>
+                    <option value="112mm">112 mm (Laporan / EDC Besar)</option>
+                  </select>
+                </div>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
