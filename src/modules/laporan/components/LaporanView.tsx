@@ -247,7 +247,7 @@ export const LaporanView: React.FC = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gridTemplateColumns: '3fr 2fr',
             gap: '16px'
           }}
         >
