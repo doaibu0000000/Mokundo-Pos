@@ -488,12 +488,12 @@ export const TransaksiView: React.FC = () => {
             return (
               <NeumorphicCard
                 key={prod.id}
-                hoverable
-                onClick={() => handleProductClick(prod)}
+                hoverable={prod.stok > 0}
+                onClick={prod.stok > 0 ? () => handleProductClick(prod) : undefined}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  cursor: 'pointer',
+                  cursor: prod.stok === 0 ? 'not-allowed' : 'pointer',
                   padding: '12px',
                   opacity: prod.stok === 0 ? 0.6 : 1,
                   position: 'relative'
