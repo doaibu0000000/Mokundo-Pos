@@ -21,8 +21,6 @@ const formatRupiah = (number: number) => {
   }).format(number);
 };
 
-import { printReceipt } from '../../../utils/printReceipt';
-
 export const TransaksiView: React.FC = () => {
   const {
     user,
@@ -346,7 +344,8 @@ export const TransaksiView: React.FC = () => {
       
       if (txWritten) {
         if (store) {
-          printReceipt(txWritten, itemsWritten, store);
+          // Otomatis trigger dialog print system browser saat sukses
+          PrintService.printViaBrowser(txWritten, itemsWritten, store);
         }
         setCompletedTx(txWritten);
         setCompletedItems(itemsWritten);
