@@ -11,7 +11,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      includeAssets: ['favicon.svg', 'pwa-192x192.png', 'pwa-512x512.png', 'pwa-512x512-maskable.png'],
+      includeAssets: ['favicon.png', 'pwa-192x192.png', 'pwa-512x512.png', 'pwa-512x512-maskable.png'],
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         cleanupOutdatedCaches: true,
@@ -42,7 +42,7 @@ export default defineConfig({
         short_name: 'Mokundo POS',
         description: 'Sistem Kasir (POS) Offline-First untuk UMKM',
         theme_color: '#2B2F3A',
-        background_color: '#2B2F3A',
+        background_color: '#0B204D',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/Mokundo-Pos/',
