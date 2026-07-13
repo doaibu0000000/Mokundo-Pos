@@ -268,25 +268,7 @@ export const TransaksiView: React.FC = () => {
 
       // 2. Perform DB transaction updates
       const tId = await db.transaction('rw', [db.products, db.transactions, db.transaction_items, db.shifts, db.stock_logs], async () => {
-        // Decrease stocks & write logs
-        for (const item of cart) {
-          const prod = await db.products.get(item.product.id!);
-          if (prod) {
-            const newStock = prod.stok - item.qty;
-            await db.products.update(item.product.id!, { stok: newStock });
-          }
-          
-          await db.stock_logs.add({
-            produk_id: item.product.id!,
-            jenis: 'OUT',
-            qty: item.qty,
-            keterangan: `Transaksi Penjualan TRX-${tId}`,
-            tanggal: new Date().toISOString(),
-            sync_status: 'PENDING'
-          });
-        }
-
-        // Create transaction row
+        // Create transaction row first so we have the txId
         const txId = await db.transactions.add({
           kasir_id: user?.id || 0,
           kasir_nama: user?.nama_lengkap || 'Kasir',
@@ -304,6 +286,24 @@ export const TransaksiView: React.FC = () => {
           sync_status: 'PENDING',
           shift_id: currentShift!.id!
         });
+
+        // Decrease stocks & write logs
+        for (const item of cart) {
+          const prod = await db.products.get(item.product.id!);
+          if (prod) {
+            const newStock = prod.stok - item.qty;
+            await db.products.update(item.product.id!, { stok: newStock });
+          }
+          
+          await db.stock_logs.add({
+            produk_id: item.product.id!,
+            jenis: 'OUT',
+            qty: item.qty,
+            keterangan: `Transaksi Penjualan TRX-${txId}`,
+            tanggal: new Date().toISOString(),
+            sync_status: 'PENDING'
+          });
+        }
 
         // Insert transaction items
         for (const item of cart) {
@@ -355,9 +355,10 @@ export const TransaksiView: React.FC = () => {
       clearCart();
       setIsPaymentOpen(false);
       setCashPaid('');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setCheckoutError('Gagal menyelesaikan transaksi checkout');
+      alert('Error Checkout: ' + (err.message || JSON.stringify(err)));
+      setCheckoutError('Gagal menyelesaikan transaksi checkout: ' + (err.message || 'Error internal'));
     }
   };
 
