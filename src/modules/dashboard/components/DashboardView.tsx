@@ -25,13 +25,19 @@ const formatRupiah = (number: number) => {
 };
 
 export const DashboardView: React.FC = () => {
-  const [stats, setStats] = useState({
-    omsetHariIni: 0,
-    profitHariIni: 0,
-    transaksiHariIni: 0,
-    stokMenipis: 0,
+  const [stats, setStats] = useState(() => {
+    const cached = sessionStorage.getItem('mokundo_cached_dashboard_stats');
+    return cached ? JSON.parse(cached) : {
+      omsetHariIni: 0,
+      profitHariIni: 0,
+      transaksiHariIni: 0,
+      stokMenipis: 0,
+    };
   });
-  const [chartData, setChartData] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<any[]>(() => {
+    const cached = sessionStorage.getItem('mokundo_cached_dashboard_chart');
+    return cached ? JSON.parse(cached) : [];
+  });
   const [loading, setLoading] = useState(false);
   const [filterDays, setFilterDays] = useState<7 | 30>(7);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
@@ -78,12 +84,14 @@ export const DashboardView: React.FC = () => {
       const products = await db.products.toArray();
       const lowStockCount = products.filter(p => p.stok <= p.threshold_stok).length;
 
-      setStats({
+      const newStats = {
         omsetHariIni: omsetToday,
         profitHariIni: Math.max(0, omsetToday - costToday),
         transaksiHariIni: completedCount,
         stokMenipis: lowStockCount,
-      });
+      };
+      setStats(newStats);
+      sessionStorage.setItem('mokundo_cached_dashboard_stats', JSON.stringify(newStats));
 
       // 3. Generate chart data for last 7/30 days
       const daysArray = [];
@@ -126,7 +134,8 @@ export const DashboardView: React.FC = () => {
         });
       }
 
-      setChartData(daysArray);
+      setChartData(daysArray.reverse());
+      sessionStorage.setItem('mokundo_cached_dashboard_chart', JSON.stringify(daysArray));
     } catch (error) {
       console.error('Failed loading dashboard data:', error);
     } finally {

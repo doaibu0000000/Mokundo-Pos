@@ -59,8 +59,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const cachedUser = localStorage.getItem('mokundo_user');
     return cachedUser ? JSON.parse(cachedUser) : null;
   });
-  const [store, setStore] = useState<Store | null>(null);
-  const [currentShift, setCurrentShift] = useState<Shift | null>(null);
+  const [store, setStore] = useState<Store | null>(() => {
+    const cached = sessionStorage.getItem('mokundo_cached_store');
+    return cached ? JSON.parse(cached) : null;
+  });
+  const [currentShift, setCurrentShift] = useState<Shift | null>(() => {
+    const cached = sessionStorage.getItem('mokundo_cached_shift');
+    return cached ? JSON.parse(cached) : null;
+  });
   const [activeTab, setActiveTabState] = useState<string>(() => {
     return localStorage.getItem('mokundo_activeTab') || 'dashboard';
   });
@@ -154,9 +160,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [isHighContrast]);
 
   const refreshStore = async () => {
-    const storeInfo = await db.stores.toCollection().first();
-    if (storeInfo) {
-      setStore(storeInfo);
+    try {
+      const dbStore = await db.stores.toCollection().first();
+      if (dbStore) {
+        setStore(dbStore);
+        sessionStorage.setItem('mokundo_cached_store', JSON.stringify(dbStore));
+      }
+      
+      const dbShift = await db.shifts.where('status').equals('OPEN').first();
+      if (dbShift) {
+        setCurrentShift(dbShift);
+        sessionStorage.setItem('mokundo_cached_shift', JSON.stringify(dbShift));
+      } else {
+        setCurrentShift(null);
+        sessionStorage.removeItem('mokundo_cached_shift');
+      }
+    } catch (error) {
+      console.error('Failed to refresh store/shift', error);
     }
   };
 
@@ -164,8 +184,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const openShift = await db.shifts.where('status').equals('OPEN').first();
     if (openShift) {
       setCurrentShift(openShift);
+      sessionStorage.setItem('mokundo_cached_shift', JSON.stringify(openShift));
     } else {
       setCurrentShift(null);
+      sessionStorage.removeItem('mokundo_cached_shift');
     }
   };
 

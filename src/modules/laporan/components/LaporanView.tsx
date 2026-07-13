@@ -14,7 +14,10 @@ const formatRupiah = (number: number) => {
 };
 
 export const LaporanView: React.FC = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>(() => {
+    const cached = sessionStorage.getItem('mokundo_cached_laporan_tx');
+    return cached ? JSON.parse(cached) : [];
+  });
   const [filterRange, setFilterRange] = useState<'today' | '7days' | '30days'>('today');
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
 
@@ -25,15 +28,21 @@ export const LaporanView: React.FC = () => {
   }, []);
   
   // Stats
-  const [summary, setSummary] = useState({
-    omset: 0,
-    HPP: 0,
-    profit: 0,
-    count: 0
+  const [summary, setSummary] = useState(() => {
+    const cached = sessionStorage.getItem('mokundo_cached_laporan_summary');
+    return cached ? JSON.parse(cached) : {
+      omset: 0,
+      HPP: 0,
+      profit: 0,
+      count: 0
+    };
   });
   
   // Best sellers
-  const [bestSellers, setBestSellers] = useState<Array<{ name: string, qty: number, revenue: number }>>([]);
+  const [bestSellers, setBestSellers] = useState<Array<{ name: string, qty: number, revenue: number }>>(() => {
+    const cached = sessionStorage.getItem('mokundo_cached_laporan_bestsellers');
+    return cached ? JSON.parse(cached) : [];
+  });
   
   // Detail Modal States
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
@@ -96,20 +105,27 @@ export const LaporanView: React.FC = () => {
       }
     }
 
-    setSummary({
+    const newSummary = {
       omset: totalOmset,
       HPP: totalHPP,
       profit: Math.max(0, totalOmset - totalHPP),
       count: completedCount
-    });
+    };
+    setSummary(newSummary);
+    sessionStorage.setItem('mokundo_cached_laporan_summary', JSON.stringify(newSummary));
 
     // Best sellers sorting
     const sortedBest = Array.from(itemsMap.entries())
       .map(([name, val]) => ({ name, qty: val.qty, revenue: val.revenue }))
       .sort((a, b) => b.qty - a.qty)
       .slice(0, 5);
-
+      
     setBestSellers(sortedBest);
+    sessionStorage.setItem('mokundo_cached_laporan_bestsellers', JSON.stringify(sortedBest));
+
+    const sortedTx = txList.sort((a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
+    setTransactions(sortedTx);
+    sessionStorage.setItem('mokundo_cached_laporan_tx', JSON.stringify(sortedTx));
   };
 
   const viewTransactionDetails = async (tx: Transaction) => {

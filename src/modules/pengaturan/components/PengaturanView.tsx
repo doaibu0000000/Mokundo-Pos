@@ -32,11 +32,11 @@ export const PengaturanView: React.FC = () => {
   const [activeSubTab, setActiveSubTab] = useState<'profil' | 'keamanan' | 'sync' | 'shift'>('profil');
 
   // Profil & Pajak States
-  const [storeNama, setStoreNama] = useState('');
-  const [storeAlamat, setStoreAlamat] = useState('');
-  const [storeService, setStoreService] = useState('');
-  const [receiptHeader, setReceiptHeader] = useState('');
-  const [receiptFooter, setReceiptFooter] = useState('');
+  const [storeNama, setStoreNama] = useState(store?.nama || '');
+  const [storeAlamat, setStoreAlamat] = useState(store?.alamat || '');
+  const [storeService, setStoreService] = useState(store?.service_charge?.toString() || '');
+  const [receiptHeader, setReceiptHeader] = useState(store?.receipt_header || '');
+  const [receiptFooter, setReceiptFooter] = useState(store?.receipt_footer || '');
   const [storeSuccess, setStoreSuccess] = useState('');
 
   // Password Security States
@@ -47,9 +47,9 @@ export const PengaturanView: React.FC = () => {
   const [securitySuccess, setSecuritySuccess] = useState('');
 
   // Supabase Sync States
-  const [supabaseUrl, setSupabaseUrl] = useState('');
-  const [supabaseKey, setSupabaseKey] = useState('');
-  const [syncEnabled, setSyncEnabled] = useState(false);
+  const [supabaseUrl, setSupabaseUrl] = useState(store?.supabase_url || '');
+  const [supabaseKey, setSupabaseKey] = useState(store?.supabase_anon_key || '');
+  const [syncEnabled, setSyncEnabled] = useState(store?.sync_enabled === 1);
   const [syncError, setSyncError] = useState('');
   const [syncSuccess, setSyncSuccess] = useState('');
   const [isSyncingNow, setIsSyncingNow] = useState(false);
