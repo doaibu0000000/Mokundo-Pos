@@ -323,7 +323,7 @@ export class PrintService {
   }
 
   // Internally formats HTML for print media widths
-  private static generateReceiptHtml(transaction: Transaction, items: TransactionItem[], store: Store, paperWidth: '58mm' | '80mm'): string {
+  private static generateReceiptHtml(transaction: Transaction, items: TransactionItem[], store: Store, _paperWidth: '58mm' | '80mm'): string {
     const padZero = (n: number) => n.toString().padStart(2, '0');
     const dateObj = new Date(transaction.tanggal);
     const dateStr = `${padZero(dateObj.getDate())}/${padZero(dateObj.getMonth() + 1)}/${dateObj.getFullYear()} ${padZero(dateObj.getHours())}:${padZero(dateObj.getMinutes())}`;
