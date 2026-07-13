@@ -112,10 +112,11 @@ export const MobileLayout: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--accent-blue)'
+                color: 'var(--accent-blue)',
+                padding: '4px'
               }}
             >
-              <User size={20} />
+              <img src="/Mokundo-Pos/brand-icon.png" alt="Profile" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
             </div>
             <div>
               <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Selamat datang,</div>

@@ -93,9 +93,10 @@ export const LoginView: React.FC = () => {
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '20px',
+              padding: '8px'
             }}
           >
-            <Coffee size={36} color="var(--accent-blue)" />
+            <img src="/Mokundo-Pos/brand-icon.png" alt="Mokundo Logo" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
           </div>
 
           {/* Titles */}
