@@ -35,8 +35,7 @@ export const TransaksiView: React.FC = () => {
     cartTotals,
     setDiscountAmount,
     platform,
-    setPlatform,
-    isInitializing
+    setPlatform
   } = useApp();
 
   // State Management
@@ -65,9 +64,7 @@ export const TransaksiView: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
-  // Shift Modal State
-  const [modalAwalInput, setModalAwalInput] = useState('');
-  const [shiftError, setShiftError] = useState('');
+
 
   // Payment State
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
@@ -176,32 +173,7 @@ export const TransaksiView: React.FC = () => {
     setProducts(filtered);
   };
 
-  // Seeding open shifts
-  const handleOpenShift = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const modalAwal = parseFloat(modalAwalInput);
-    if (isNaN(modalAwal) || modalAwal < 0) {
-      setShiftError('Masukkan modal awal yang valid');
-      return;
-    }
 
-    try {
-      await db.shifts.add({
-        kasir_id: user?.id || 0,
-        kasir_nama: user?.nama_lengkap || 'Kasir',
-        waktu_buka: new Date().toISOString(),
-        modal_awal: modalAwal,
-        total_penjualan_tunai: 0,
-        total_penjualan_non_tunai: 0,
-        status: 'OPEN',
-        sync_status: 'PENDING',
-      });
-      setShiftError('');
-      await refreshShift();
-    } catch (err) {
-      setShiftError('Gagal membuka shift kasir');
-    }
-  };
 
   // Add Product to Cart flow
   const handleProductClick = (product: Product) => {
@@ -375,59 +347,8 @@ export const TransaksiView: React.FC = () => {
   return (
     <div style={{ display: 'flex', height: '100%', width: '100%', overflow: 'hidden' }}>
       
-      {/* SHIFT GATEWAY BLOCK (Force Modal) */}
-      {!isInitializing && !currentShift && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.6)',
-            backdropFilter: 'blur(8px)',
-            zIndex: 999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px'
-          }}
-        >
-          <NeumorphicCard
-            style={{
-              width: '100%',
-              maxWidth: '400px',
-              padding: '30px',
-              textAlign: 'center'
-            }}
-          >
-            <h2 style={{ fontSize: '20px', fontWeight: 800, marginBottom: '8px' }}>Buka Shift Kasir</h2>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
-              Masukkan jumlah saldo modal awal laci kasir (cash drawer) Anda hari ini.
-            </p>
-            
-            <form onSubmit={handleOpenShift}>
-              <NeumorphicInput
-                label="Modal Awal (Rp)"
-                placeholder="Misal: 50000"
-                type="number"
-                value={modalAwalInput}
-                onChange={(e) => setModalAwalInput(e.target.value)}
-                containerClassName="mb-5"
-                required
-              />
-              {shiftError && (
-                <div style={{ color: 'var(--accent-red)', fontSize: '12px', marginBottom: '12px', fontWeight: 600 }}>
-                  ⚠️ {shiftError}
-                </div>
-              )}
-              <NeumorphicButton type="submit" variant="primary" style={{ width: '100%' }}>
-                Buka Laci & Mulai Shift
-              </NeumorphicButton>
-            </form>
-          </NeumorphicCard>
-        </div>
-      )}
+
+
 
       {/* LEFT COLUMN: Products catalog + search */}
       <div 

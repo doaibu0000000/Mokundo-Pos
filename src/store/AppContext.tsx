@@ -181,13 +181,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const refreshShift = async () => {
-    const openShift = await db.shifts.where('status').equals('OPEN').first();
+    let openShift: Shift | undefined = await db.shifts.where('status').equals('OPEN').first();
+    if (!openShift) {
+      // Auto-create shift so the user never sees the "Buka Shift" modal
+      const newId = await db.shifts.add({
+        kasir_id: user?.id || 0,
+        kasir_nama: user?.nama_lengkap || 'Kasir',
+        waktu_buka: new Date().toISOString(),
+        modal_awal: 0,
+        total_penjualan_tunai: 0,
+        total_penjualan_non_tunai: 0,
+        status: 'OPEN',
+        sync_status: 'PENDING',
+      });
+      openShift = await db.shifts.get(newId as number);
+    }
     if (openShift) {
       setCurrentShift(openShift);
       sessionStorage.setItem('mokundo_cached_shift', JSON.stringify(openShift));
-    } else {
-      setCurrentShift(null);
-      sessionStorage.removeItem('mokundo_cached_shift');
     }
   };
 
