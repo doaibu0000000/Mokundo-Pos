@@ -243,33 +243,34 @@ export const LaporanView: React.FC = () => {
       </div>
 
       {/* Laba Rugi overview stats */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-          gap: '16px',
-          marginBottom: '30px'
-        }}
-      >
-        <NeumorphicCard>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-            Omset Penjualan
-          </div>
-          <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--accent-blue)', marginTop: '4px' }}>
-            {formatRupiah(summary.omset)}
-          </div>
-          <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Total pendapatan kotor</span>
-        </NeumorphicCard>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '30px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: '16px'
+          }}
+        >
+          <NeumorphicCard>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+              Omset Penjualan
+            </div>
+            <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--accent-blue)', marginTop: '4px' }}>
+              {formatRupiah(summary.omset)}
+            </div>
+            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Total pendapatan kotor</span>
+          </NeumorphicCard>
 
-        <NeumorphicCard>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-            Jumlah Penjualan
-          </div>
-          <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
-            {summary.count}
-          </div>
-          <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Total transaksi terselesaikan</span>
-        </NeumorphicCard>
+          <NeumorphicCard>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+              Jumlah Penjualan
+            </div>
+            <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
+              {summary.count}
+            </div>
+            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Total transaksi terselesaikan</span>
+          </NeumorphicCard>
+        </div>
 
         <NeumorphicCard>
           <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
