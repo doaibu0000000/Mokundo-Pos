@@ -39,29 +39,29 @@
 
 :root.dark {
   /* Dark Mode Tokens */
-  --bg-base: #2B2F3A;
-  --bg-surface: #2B2F3A;
-  --bg-inset: #20232b;
+  --bg-base: #1E2128;
+  --bg-surface: #242730;
+  --bg-inset: #181A20;
   
-  --shadow-light: #363b4a;
-  --shadow-dark: #1c1f27;
+  --shadow-light: rgba(255, 255, 255, 0.05);
+  --shadow-dark: rgba(0, 0, 0, 0.4);
   
-  --shadow-light-inset: #323744;
-  --shadow-dark-inset: #15171d;
+  --shadow-light-inset: rgba(255, 255, 255, 0.04);
+  --shadow-dark-inset: rgba(0, 0, 0, 0.5);
   
-  --text-primary: #E6E9EF;
-  --text-secondary: #9CA3AF;
-  --text-muted: #6B7280;
+  --text-primary: #F3F4F6;
+  --text-secondary: #D1D5DB;
+  --text-muted: #9CA3AF;
   
-  --accent-blue: #60A5FA;
-  --accent-blue-gradient: linear-gradient(135deg, #6366F1, #60A5FA);
-  --accent-green: #34D399;
-  --accent-green-gradient: linear-gradient(135deg, #10B981, #34D399);
-  --accent-red: #F87171;
-  --accent-red-gradient: linear-gradient(135deg, #EF4444, #F87171);
-  --accent-orange: #FBBF24;
+  --accent-blue: #93C5FD;
+  --accent-blue-gradient: linear-gradient(135deg, #818CF8, #60A5FA);
+  --accent-green: #6EE7B7;
+  --accent-green-gradient: linear-gradient(135deg, #34D399, #10B981);
+  --accent-red: #FCA5A5;
+  --accent-red-gradient: linear-gradient(135deg, #F87171, #EF4444);
+  --accent-orange: #FCD34D;
   
-  --border-focus: rgba(96, 165, 250, 0.6);
+  --border-focus: rgba(147, 197, 253, 0.6);
 }
 
 :root.high-contrast {
