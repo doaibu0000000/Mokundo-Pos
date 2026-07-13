@@ -184,7 +184,41 @@ export const DashboardView: React.FC = () => {
       >
         <NeumorphicCard 
           style={{ 
-            gridColumn: isMobile ? 'span 2' : 'auto',
+            display: 'flex', 
+            flexDirection: 'row',
+            alignItems: 'center', 
+            gap: isMobile ? '12px' : '16px',
+            padding: isMobile ? '14px 12px' : '16px',
+            minWidth: 0
+          }}
+        >
+          <div
+            className="nm-inset"
+            style={{
+              width: isMobile ? '40px' : '48px',
+              height: isMobile ? '40px' : '48px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--accent-blue)',
+              flexShrink: 0
+            }}
+          >
+            <TrendingUp size={isMobile ? 20 : 24} />
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              Omset Hari Ini
+            </div>
+            <div style={{ fontSize: isMobile ? '15px' : '18px', fontWeight: 800, marginTop: '2px', color: 'var(--accent-blue)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {formatRupiah(stats.omsetHariIni)}
+            </div>
+          </div>
+        </NeumorphicCard>
+
+        <NeumorphicCard 
+          style={{ 
             display: 'flex', 
             flexDirection: 'row',
             alignItems: 'center', 
