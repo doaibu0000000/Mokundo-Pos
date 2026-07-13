@@ -75,10 +75,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
   const [isHighContrast, setIsHighContrast] = useState<boolean>(false);
   
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    const cached = localStorage.getItem('mokundo_cart');
+    return cached ? JSON.parse(cached) : [];
+  });
   const [discountAmount, setDiscountAmount] = useState<number>(0);
-  const [platform, setPlatform] = useState<'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood' | 'TikTok'>('Dine-in');
+  const [platform, setPlatform] = useState<'Dine-in' | 'Take Away' | 'GrabFood' | 'GoFood' | 'ShopeeFood' | 'TikTok'>(() => {
+    return (localStorage.getItem('mokundo_platform') as any) || 'Dine-in';
+  });
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  // Persist cart to localStorage
+  useEffect(() => {
+    localStorage.setItem('mokundo_cart', JSON.stringify(cart));
+  }, [cart]);
+
+  // Persist platform to localStorage
+  useEffect(() => {
+    localStorage.setItem('mokundo_platform', platform);
+  }, [platform]);
 
   // Listen to PWA installation events
   useEffect(() => {
