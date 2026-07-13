@@ -21,17 +21,6 @@ export const LaporanView: React.FC = () => {
   const [filterRange, setFilterRange] = useState<'today' | '7days' | '30days'>('today');
   const [viewMode, setViewMode] = useState<'riwayat' | 'terlaris'>('riwayat');
   
-  // Stats
-  const [summary, setSummary] = useState(() => {
-    const cached = sessionStorage.getItem('mokundo_cached_laporan_summary');
-    return cached ? JSON.parse(cached) : {
-      omset: 0,
-      HPP: 0,
-      profit: 0,
-      count: 0
-    };
-  });
-  
   // Best sellers
   const [bestSellers, setBestSellers] = useState<Array<{ name: string, qty: number, revenue: number }>>(() => {
     const cached = sessionStorage.getItem('mokundo_cached_laporan_bestsellers');
@@ -67,28 +56,12 @@ export const LaporanView: React.FC = () => {
 
     setTransactions(txList);
 
-    // Compute stats
-    let totalOmset = 0;
-    let totalHPP = 0;
-    let completedCount = 0;
-
     const itemsMap = new Map<string, { qty: number, revenue: number }>();
-    const productHppMap = new Map<number, number>();
-    
-    // Pre-cache product cost prices
-    const products = await db.products.toArray();
-    products.forEach(p => productHppMap.set(p.id!, p.HPP));
 
     for (const tx of txList) {
       if (tx.status === 'COMPLETED') {
-        totalOmset += tx.total;
-        completedCount++;
-
         const items = await db.transaction_items.where('transaksi_id').equals(tx.id!).toArray();
         for (const item of items) {
-          const hpp = productHppMap.get(item.produk_id) || 0;
-          totalHPP += hpp * item.qty;
-
           // Group by name for best seller computation
           const existing = itemsMap.get(item.nama_produk) || { qty: 0, revenue: 0 };
           itemsMap.set(item.nama_produk, {
@@ -98,15 +71,6 @@ export const LaporanView: React.FC = () => {
         }
       }
     }
-
-    const newSummary = {
-      omset: totalOmset,
-      HPP: totalHPP,
-      profit: Math.max(0, totalOmset - totalHPP),
-      count: completedCount
-    };
-    setSummary(newSummary);
-    sessionStorage.setItem('mokundo_cached_laporan_summary', JSON.stringify(newSummary));
 
     // Best sellers sorting
     const sortedBest = Array.from(itemsMap.entries())
@@ -240,57 +204,6 @@ export const LaporanView: React.FC = () => {
             30 Hari
           </NeumorphicButton>
         </div>
-      </div>
-
-      {/* Laba Rugi overview stats */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '30px' }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '3fr 2fr',
-            gap: '16px'
-          }}
-        >
-          <NeumorphicCard>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              Omset Penjualan
-            </div>
-            <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--accent-blue)', marginTop: '4px' }}>
-              {formatRupiah(summary.omset)}
-            </div>
-            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Total pendapatan kotor</span>
-          </NeumorphicCard>
-
-          <NeumorphicCard>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              Jumlah Penjualan
-            </div>
-            <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
-              {summary.count}
-            </div>
-            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Total transaksi terselesaikan</span>
-          </NeumorphicCard>
-        </div>
-
-        <NeumorphicCard>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-            Harga Pokok (HPP)
-          </div>
-          <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
-            {formatRupiah(summary.HPP)}
-          </div>
-          <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Total modal produk</span>
-        </NeumorphicCard>
-
-        <NeumorphicCard>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-            Laba Bersih (Profit)
-          </div>
-          <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--accent-green)', marginTop: '4px' }}>
-            {formatRupiah(summary.profit)}
-          </div>
-          <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Omset dikurangi HPP</span>
-        </NeumorphicCard>
       </div>
 
       {/* View Mode Toggle Tabs */}
