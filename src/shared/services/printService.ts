@@ -350,7 +350,7 @@ export class PrintService {
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: #2b2b2b;
     font-family: 'Poppins', sans-serif;
@@ -362,13 +362,15 @@ export class PrintService {
 
   .receipt {
     background: #fff;
-    width: 340px;
-    padding: 28px 26px 20px;
+    width: 72mm; /* standar kertas thermal 80mm minus margin */
+    padding: 4mm 3mm;
     position: relative;
     color: #1a1a1a;
+    font-size: 11px;
+    line-height: 1.4;
   }
 
-  /* zigzag top & bottom */
+  /* zigzag top & bottom (hanya untuk preview layar) */
   .receipt::before,
   .receipt::after {
     content: "";
@@ -387,127 +389,135 @@ export class PrintService {
 
   h1 {
     text-align: center;
-    font-size: 20px;
+    font-size: 16px;
     letter-spacing: 1px;
-    margin: 0 0 14px;
+    margin: 0 0 6px;
     text-transform: uppercase;
+    font-weight: 700;
   }
 
   .addr {
     text-align: justify;
     text-align-last: center;
-    font-size: 11px;
-    line-height: 1.5;
-    margin-bottom: 4px;
+    font-size: 9px;
+    line-height: 1.4;
+    margin-bottom: 2px;
   }
 
   .phone {
     text-align: center;
-    font-size: 11px;
-    line-height: 1.5;
-    margin-bottom: 14px;
+    font-size: 9px;
+    line-height: 1.4;
+    margin-bottom: 8px;
   }
 
   .divider {
     border: none;
-    border-top: 1px dashed #999;
-    margin: 14px 0;
+    border-top: 1px dashed #555;
+    margin: 8px 0;
   }
 
   .info-row {
     display: flex;
-    font-size: 12px;
-    margin-bottom: 4px;
+    font-size: 10px;
+    margin-bottom: 2px;
   }
-  .info-row .label { width: 90px; }
-  .info-row .colon { width: 12px; }
+  .info-row .label { width: 70px; flex-shrink: 0; }
+  .info-row .colon { width: 10px; flex-shrink: 0; }
   .info-row .value { flex: 1; }
 
   .items {
-    font-size: 12px;
+    font-size: 10px;
   }
   .item-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 6px;
+    margin-bottom: 3px;
   }
-  .item-row .qty-name { padding-right: 8px; }
-  .item-row .price { white-space: nowrap; }
+  .item-row .qty-name { padding-right: 6px; flex: 1; }
+  .item-row .price { white-space: nowrap; text-align: right; }
 
   .totals {
-    font-size: 12px;
+    font-size: 10px;
   }
   .totals .row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 6px;
+    margin-bottom: 3px;
   }
   .totals .grand {
     font-weight: bold;
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .payment {
-    font-size: 12px;
+    font-size: 10px;
   }
   .payment .row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 6px;
+    margin-bottom: 3px;
   }
 
   .promo {
     text-align: center;
-    font-size: 11.5px;
-    line-height: 1.5;
-    margin: 4px 0 12px;
+    font-size: 9px;
+    line-height: 1.4;
+    margin: 4px 0 8px;
   }
   .promo strong {
     display: block;
-    margin-top: 6px;
+    margin-top: 4px;
   }
 
   .qr-box {
-    width: 92px;
-    height: 92px;
-    margin: 0 auto 6px;
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 4px;
     border: 1px solid #333;
     background-color: #f9f9f9;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
+    font-size: 8px;
     color: #666;
     text-align: center;
   }
 
   .scan-text {
     text-align: center;
-    font-size: 10.5px;
+    font-size: 8px;
     color: #555;
-    margin-bottom: 14px;
+    margin-bottom: 8px;
   }
 
   .thankyou {
     text-align: center;
-    font-size: 12.5px;
+    font-size: 11px;
     font-weight: bold;
-    margin-bottom: 14px;
+    margin-bottom: 8px;
   }
 
   .footer-msg {
     text-align: center;
-    font-size: 11px;
-    line-height: 1.5;
+    font-size: 9px;
+    line-height: 1.4;
     white-space: pre-wrap;
   }
   .footer-msg .brand {
     font-style: italic;
-    margin-top: 4px;
+    margin-top: 2px;
+  }
+
+  /* ===== THERMAL PRINTER PRINT STYLES ===== */
+  @page {
+    size: 80mm auto; /* lebar kertas thermal 80mm, panjang otomatis */
+    margin: 0;
   }
 
   @media print {
-    body {
+    html, body {
+      width: 80mm;
       background: none;
       padding: 0;
       margin: 0;
@@ -516,14 +526,23 @@ export class PrintService {
       background: #fff;
       color: #000;
       width: 100%;
-      max-width: 100%;
-      padding: 0;
+      max-width: 80mm;
+      padding: 2mm 2mm;
       box-shadow: none;
+      font-size: 10px;
     }
+    h1 { font-size: 14px; }
+    .addr, .phone, .promo, .footer-msg { font-size: 8px; }
+    .info-row, .items, .totals, .payment { font-size: 9px; }
+    .totals .grand { font-size: 11px; }
+    .thankyou { font-size: 10px; }
+    .scan-text { font-size: 7px; }
     .divider {
       border-top: 1px dashed #000;
     }
     .qr-box {
+      width: 60px;
+      height: 60px;
       border-color: #000;
       color: #000;
     }
