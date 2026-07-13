@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Home, ShoppingCart, Coffee, BarChart2, Settings, 
-  Sun, Moon, User, LogOut
+  Sun, Moon, LogOut
 } from 'lucide-react';
 import { useApp } from '../../store/AppContext';
 import { db } from '../../shared/services/db';

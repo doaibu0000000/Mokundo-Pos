@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User as UserIcon, Lock, Coffee } from 'lucide-react';
+import { User as UserIcon, Lock } from 'lucide-react';
 import { useApp } from '../../../store/AppContext';
 import { db, hashPassword } from '../../../shared/services/db';
 import { NeumorphicCard, NeumorphicButton, NeumorphicInput } from '../../../shared/components';
