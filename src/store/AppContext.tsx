@@ -64,7 +64,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeTab, setActiveTabState] = useState<string>(() => {
     return localStorage.getItem('mokundo_activeTab') || 'dashboard';
   });
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false); // Default light
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    return localStorage.getItem('mokundo_isDarkMode') === 'true';
+  });
   const [isHighContrast, setIsHighContrast] = useState<boolean>(false);
   
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -195,7 +197,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('mokundo_activeTab', tab);
   };
 
-  const toggleDarkMode = () => setIsDarkMode(prev => !prev);
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => {
+      const newValue = !prev;
+      localStorage.setItem('mokundo_isDarkMode', String(newValue));
+      return newValue;
+    });
+  };
   const toggleHighContrast = () => setIsHighContrast(prev => !prev);
 
   // Cart operations
