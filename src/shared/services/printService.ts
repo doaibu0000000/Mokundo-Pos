@@ -453,6 +453,30 @@ export class PrintService {
     margin-bottom: 6px;
   }
 
+  .promo {
+    text-align: center;
+    font-size: 11.5px;
+    line-height: 1.5;
+    margin: 4px 0 12px;
+  }
+  .promo strong {
+    display: block;
+    margin-top: 6px;
+  }
+
+  .qr-box {
+    width: 92px;
+    height: 92px;
+    margin: 0 auto 6px;
+    border: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #666;
+    text-align: center;
+  }
+
   .thankyou {
     text-align: center;
     font-size: 12.5px;
@@ -527,6 +551,14 @@ export class PrintService {
   </div>
 
   <hr class="divider">
+
+  <div class="promo">
+    Mau pesan lagi tanpa antre atau<br>
+    tertarik punya bisnis kopi sendiri?<br>
+    <strong>Pindai saya!</strong>
+  </div>
+
+  <div class="qr-box">[ QR Code ]</div>
 
   <div class="thankyou">Thank you for your order!</div>
 
