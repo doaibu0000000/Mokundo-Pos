@@ -169,13 +169,13 @@ export async function seedDatabase() {
 
     // 2. Seed default store info
     await db.stores.add({
-      nama: 'Mokundo Café & Resto',
-      alamat: 'Jl. Malioboro No. 42, Yogyakarta',
+      nama: 'Surantaka Coffee',
+      alamat: 'Kp. Surantaka, RT.02/RW.01, Desa Kalijati Timur, Kecamatan Kalijati, Kabupaten Subang, Jawa Barat, 41271',
       logo: '',
       PPN: 11,
       service_charge: 0,
-      receipt_header: 'MOKUNDO CAFÉ\nYogyakarta\nTelp: 0812-3456-7890',
-      receipt_footer: 'Terima Kasih atas Kunjungan Anda!\nBarang yang sudah dibeli tidak dapat ditukar.',
+      receipt_header: 'Telp: 0812-3456-7890',
+      receipt_footer: 'Mengunjungi kami kembali adalah\nkebahagiaan terbesar kami!',
       supabase_url: '',
       supabase_anon_key: '',
       sync_enabled: 0,
