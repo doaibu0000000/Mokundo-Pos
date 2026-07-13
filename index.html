@@ -15,8 +15,18 @@
         } catch (e) {}
       })();
     </script>
+    <style>
+      .preload * {
+        transition: none !important;
+      }
+    </style>
   </head>
-  <body>
+  <body class="preload">
+    <script>
+      window.addEventListener('load', function() {
+        document.body.classList.remove('preload');
+      });
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
