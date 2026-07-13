@@ -265,9 +265,7 @@ export class PrintService {
       leftRightText('Service Charge:', formatRupiah(transaction.service_charge));
     }
     
-    doc.setFont('courier', 'bold');
     leftRightText('TOTAL:', formatRupiah(transaction.total));
-    doc.setFont('courier', 'normal');
     centerText('--------------------------------');
 
     leftRightText('Bayar:', formatRupiah(transaction.cash_paid));
@@ -311,7 +309,7 @@ export class PrintService {
     if (transaction.service_charge > 0) {
       text += `Biaya Svc : ${formatRupiah(transaction.service_charge)}\n`;
     }
-    text += `*TOTAL     : ${formatRupiah(transaction.total)}*\n`;
+    text += `TOTAL     : ${formatRupiah(transaction.total)}\n`;
     text += `================================\n`;
     text += `Bayar     : ${formatRupiah(transaction.cash_paid)}\n`;
     text += `Kembali   : ${formatRupiah(transaction.cash_change)}\n`;
@@ -484,7 +482,6 @@ export class PrintService {
     margin-bottom: 3px;
   }
   .totals .grand {
-    font-weight: bold;
     font-size: calc(var(--base-font) * 1.1);
   }
 
@@ -502,10 +499,6 @@ export class PrintService {
     font-size: calc(var(--base-font) * 0.8);
     line-height: 1.4;
     margin: 4px 0 8px;
-  }
-  .promo strong {
-    display: block;
-    margin-top: 4px;
   }
 
   .qr-box {
@@ -531,7 +524,6 @@ export class PrintService {
   .thankyou {
     text-align: center;
     font-size: var(--base-font);
-    font-weight: bold;
     margin-bottom: 8px;
   }
 
@@ -628,7 +620,7 @@ export class PrintService {
   <div class="promo">
     Mau pesan lagi tanpa antre atau<br>
     tertarik punya bisnis kopi sendiri?<br>
-    <strong>Pindai saya!</strong>
+    <div style="margin-top: 4px;">Pindai saya!</div>
   </div>
   <div class="qr-box">${qrCodeImg}</div>
   ` : ''}
