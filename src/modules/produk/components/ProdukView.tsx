@@ -46,6 +46,7 @@ export const ProdukView: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [productSearch, setProductSearch] = useState('');
+  const [isLoadingData, setIsLoadingData] = useState(true);
   
   // Product Form Modal States
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -88,24 +89,29 @@ export const ProdukView: React.FC = () => {
   }, [productSearch]);
 
   const loadData = async () => {
-    // Load categories
-    const cats = await db.categories.orderBy('urutan').toArray();
-    setCategories(cats);
-    if (cats.length > 0 && prodKategoriId === 0) {
-      setProdKategoriId(cats[0].id!);
-    }
+    setIsLoadingData(true);
+    try {
+      // Load categories
+      const cats = await db.categories.orderBy('urutan').toArray();
+      setCategories(cats);
+      if (cats.length > 0 && prodKategoriId === 0) {
+        setProdKategoriId(cats[0].id!);
+      }
 
-    // Load products
-    const prods = await db.products.toArray();
-    let filteredProds = prods;
-    if (productSearch) {
-      const lower = productSearch.toLowerCase();
-      filteredProds = prods.filter(p => 
-        p.nama.toLowerCase().includes(lower) || 
-        p.sku.toLowerCase().includes(lower)
-      );
+      // Load products
+      const prods = await db.products.toArray();
+      let filteredProds = prods;
+      if (productSearch) {
+        const lower = productSearch.toLowerCase();
+        filteredProds = prods.filter(p => 
+          p.nama.toLowerCase().includes(lower) || 
+          p.sku.toLowerCase().includes(lower)
+        );
+      }
+      setProducts(filteredProds);
+    } finally {
+      setIsLoadingData(false);
     }
-    setProducts(filteredProds);
   };
 
   // Open product form for edit/new
@@ -571,7 +577,11 @@ export const ProdukView: React.FC = () => {
             paddingRight: '6px', 
             alignContent: 'start' 
           }}>
-            {products.length === 0 ? (
+            {isLoadingData ? (
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+                Memuat data...
+              </div>
+            ) : products.length === 0 ? (
               <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
                 Belum ada produk terdaftar. Tambahkan produk atau gunakan import CSV.
               </div>
@@ -655,7 +665,11 @@ export const ProdukView: React.FC = () => {
       {/* CATEGORIES TAB VIEW */}
       {activeSubTab === 'kategori' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', flex: 1, paddingBottom: '20px', paddingRight: '4px', margin: '0 -4px' }}>
-          {categories.length === 0 ? (
+          {isLoadingData ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+              Memuat data...
+            </div>
+          ) : categories.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
               Belum ada kategori terdaftar. Klik "+ Tambah Kategori".
             </div>
