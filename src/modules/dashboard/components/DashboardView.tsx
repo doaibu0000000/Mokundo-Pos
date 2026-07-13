@@ -184,6 +184,7 @@ export const DashboardView: React.FC = () => {
       >
         <NeumorphicCard 
           style={{ 
+            gridColumn: isMobile ? 'span 2' : 'auto',
             display: 'flex', 
             flexDirection: 'row',
             alignItems: 'center', 
@@ -254,7 +255,6 @@ export const DashboardView: React.FC = () => {
 
         <NeumorphicCard 
           style={{ 
-            gridColumn: isMobile ? 'span 2' : 'auto',
             display: 'flex', 
             flexDirection: 'row',
             alignItems: 'center', 
