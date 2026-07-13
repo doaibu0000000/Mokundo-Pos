@@ -57,6 +57,10 @@ export class PrintService {
     return !!this.bluetoothCharacteristic;
   }
 
+  public static getConnectedBluetoothName(): string | null {
+    return this.bluetoothDevice?.name || null;
+  }
+
   public static disconnectBluetooth(): void {
     if (this.bluetoothDevice && this.bluetoothDevice.gatt.connected) {
       this.bluetoothDevice.gatt.disconnect();

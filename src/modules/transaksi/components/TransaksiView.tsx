@@ -316,8 +316,16 @@ export const TransaksiView: React.FC = () => {
       
       if (txWritten) {
         if (store) {
-          // Otomatis trigger dialog print system browser saat sukses
-          PrintService.printViaBrowser(txWritten, itemsWritten, store);
+          if (PrintService.isBluetoothConnected()) {
+            PrintService.printViaBluetooth(txWritten, itemsWritten, store).catch(e => {
+              console.error('Auto Bluetooth Print Error:', e);
+              // Fallback to browser print if bluetooth fails
+              PrintService.printViaBrowser(txWritten, itemsWritten, store);
+            });
+          } else {
+            // Otomatis trigger dialog print system browser saat sukses
+            PrintService.printViaBrowser(txWritten, itemsWritten, store);
+          }
         }
         setCompletedTx(txWritten);
         setCompletedItems(itemsWritten);

@@ -40,6 +40,10 @@ export const PengaturanView: React.FC = () => {
   const [ukuranKertas, setUkuranKertas] = useState(store?.ukuran_kertas_struk || '80mm');
   const [qrBarcode, setQrBarcode] = useState(store?.qr_barcode || '');
   const [storeSuccess, setStoreSuccess] = useState('');
+  
+  // Bluetooth Print State
+  const [connectedBluetooth, setConnectedBluetooth] = useState<string | null>(null);
+  const [bluetoothError, setBluetoothError] = useState('');
 
   // Password Security States
   const [oldPassword, setOldPassword] = useState('');
@@ -155,6 +159,10 @@ export const PengaturanView: React.FC = () => {
   };
 
   useEffect(() => {
+    import('../../../shared/services/printService').then(({ PrintService }) => {
+      setConnectedBluetooth(PrintService.getConnectedBluetoothName());
+    });
+    
     if (store) {
       setStoreNama(store.nama);
       setStoreAlamat(store.alamat);
@@ -168,6 +176,17 @@ export const PengaturanView: React.FC = () => {
       setQrBarcode(store.qr_barcode || '');
     }
   }, [store]);
+
+  const handlePairBluetooth = async () => {
+    setBluetoothError('');
+    try {
+      const { PrintService } = await import('../../../shared/services/printService');
+      const name = await PrintService.connectBluetoothPrinter();
+      setConnectedBluetooth(name);
+    } catch (e: any) {
+      setBluetoothError(e.message);
+    }
+  };
 
   // Update Store info
   const handleSaveStore = async (e: React.FormEvent) => {
@@ -437,6 +456,27 @@ export const PengaturanView: React.FC = () => {
               </NeumorphicButton>
             </NeumorphicCard>
           )}
+
+          <NeumorphicCard>
+            <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '8px' }}>Printer Bluetooth</h3>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px', lineHeight: '1.4' }}>
+              Hubungkan printer thermal Bluetooth Anda. Jika sudah terhubung, struk dapat dicetak langsung tanpa popup konfirmasi browser.
+            </p>
+            {connectedBluetooth ? (
+              <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--accent-green)' }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Status: <strong style={{ color: 'var(--accent-green)' }}>Terhubung</strong></div>
+                <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{connectedBluetooth}</div>
+              </div>
+            ) : null}
+            {bluetoothError && (
+              <div style={{ marginBottom: '16px', color: 'var(--accent-red)', fontSize: '12px', fontWeight: 600 }}>
+                {bluetoothError}
+              </div>
+            )}
+            <NeumorphicButton onClick={handlePairBluetooth} style={{ width: '100%' }}>
+              {connectedBluetooth ? 'Hubungkan Ulang Bluetooth' : 'Pair / Hubungkan Bluetooth Printer'}
+            </NeumorphicButton>
+          </NeumorphicCard>
 
           <NeumorphicCard style={{ width: '100%' }}>
             <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '20px' }}>Pengaturan Toko & Struk</h3>
