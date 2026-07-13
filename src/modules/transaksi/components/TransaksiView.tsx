@@ -21,6 +21,8 @@ const formatRupiah = (number: number) => {
   }).format(number);
 };
 
+import { printReceipt } from '../../../utils/printReceipt';
+
 export const TransaksiView: React.FC = () => {
   const {
     user,
@@ -343,6 +345,9 @@ export const TransaksiView: React.FC = () => {
       const itemsWritten = await db.transaction_items.where('transaksi_id').equals(tId as number).toArray();
       
       if (txWritten) {
+        if (store) {
+          printReceipt(txWritten, itemsWritten, store);
+        }
         setCompletedTx(txWritten);
         setCompletedItems(itemsWritten);
       }

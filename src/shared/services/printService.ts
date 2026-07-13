@@ -324,91 +324,220 @@ export class PrintService {
 
   // Internally formats HTML for print media widths
   private static generateReceiptHtml(transaction: Transaction, items: TransactionItem[], store: Store, paperWidth: '58mm' | '80mm'): string {
+    const padZero = (n: number) => n.toString().padStart(2, '0');
+    const dateObj = new Date(transaction.tanggal);
+    const dateStr = `${padZero(dateObj.getDate())}/${padZero(dateObj.getMonth() + 1)}/${dateObj.getFullYear()} ${padZero(dateObj.getHours())}:${padZero(dateObj.getMinutes())}`;
+
     const itemsHtml = items.map(item => {
       const varianStr = item.varian && item.varian !== 'Normal' ? ` (${item.varian})` : '';
       return `
-        <div class="item-name">${item.nama_produk}${varianStr}</div>
-        <div class="item-detail">
-          <span>${item.qty} x ${formatRupiah(item.harga_satuan)}</span>
-          <span>${formatRupiah(item.qty * item.harga_satuan)}</span>
+        <div class="item-row">
+          <span class="qty-name">${item.qty} x ${item.nama_produk}${varianStr}</span>
+          <span class="price">${formatRupiah(item.qty * item.harga_satuan)}</span>
         </div>
-        ${item.catatan ? `<div class="item-notes">* ${item.catatan}</div>` : ''}
       `;
     }).join('');
 
     return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Struk TRX-${transaction.id}</title>
-        <style>
-          @page {
-            size: ${paperWidth} auto;
-            margin: 0;
-          }
-          body {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 11px;
-            line-height: 1.3;
-            color: #000;
-            background: #fff;
-            width: ${paperWidth === '58mm' ? '48mm' : '70mm'};
-            padding: 4mm 4mm 10mm 4mm;
-            box-sizing: border-box;
-          }
-          .center { text-align: center; }
-          .right { text-align: right; }
-          .bold { font-weight: bold; }
-          .header-name { font-size: 14px; font-weight: bold; margin-bottom: 2px; }
-          .divider { border-top: 1px dashed #000; margin: 6px 0; }
-          .item-name { font-weight: bold; margin-top: 4px; }
-          .item-detail { display: flex; justify-content: space-between; }
-          .item-notes { font-style: italic; font-size: 9px; padding-left: 2mm; }
-          .totals-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
-          .totals-row.grand { font-size: 12px; font-weight: bold; margin-top: 4px; }
-          .meta-row { display: flex; justify-content: space-between; font-size: 10px; }
-        </style>
-      </head>
-      <body>
-        <div class="center">
-          <div class="header-name">${store.nama}</div>
-          <div>${store.alamat.replace(/\n/g, '<br>')}</div>
-        </div>
-        
-        <div class="divider"></div>
-        
-        <div class="meta-row"><span>Tgl:</span> <span>${new Date(transaction.tanggal).toLocaleString('id-ID')}</span></div>
-        <div class="meta-row"><span>No :</span> <span>TRX-${transaction.id}</span></div>
-        <div class="meta-row"><span>Kasir:</span> <span>${transaction.kasir_nama}</span></div>
-        <div class="meta-row"><span>Tipe :</span> <span>${transaction.platform}</span></div>
-        
-        <div class="divider"></div>
-        
-        ${itemsHtml}
-        
-        <div class="divider"></div>
-        
-        <div class="totals-row"><span>Subtotal:</span> <span>${formatRupiah(transaction.subtotal)}</span></div>
-        ${transaction.diskon > 0 ? `<div class="totals-row"><span>Diskon:</span> <span>-${formatRupiah(transaction.diskon)}</span></div>` : ''}
-        ${transaction.pajak > 0 ? `<div class="totals-row"><span>PPN (${store.PPN}%):</span> <span>${formatRupiah(transaction.pajak)}</span></div>` : ''}
-        ${transaction.service_charge > 0 ? `<div class="totals-row"><span>Svc Charge:</span> <span>${formatRupiah(transaction.service_charge)}</span></div>` : ''}
-        
-        <div class="totals-row grand"><span>TOTAL:</span> <span>${formatRupiah(transaction.total)}</span></div>
-        
-        <div class="divider"></div>
-        
-        <div class="totals-row"><span>Bayar (Tunai):</span> <span>${formatRupiah(transaction.cash_paid)}</span></div>
-        <div class="totals-row"><span>Kembali:</span> <span>${formatRupiah(transaction.cash_change)}</span></div>
-        <div class="totals-row"><span>Metode:</span> <span>${transaction.metode_bayar}</span></div>
-        
-        <div class="divider"></div>
-        
-        <div class="center" style="white-space: pre-line; margin-top: 8px;">
-          ${store.receipt_footer}
-        </div>
-      </body>
-      </html>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Struk - ${store.nama}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+  * { box-sizing: border-box; }
+  body {
+    background: #2b2b2b;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 40px 10px;
+    margin: 0;
+  }
+
+  .receipt {
+    background: #fff;
+    width: 340px;
+    padding: 28px 26px 20px;
+    position: relative;
+    color: #1a1a1a;
+  }
+
+  /* zigzag top & bottom */
+  .receipt::before,
+  .receipt::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background:
+      linear-gradient(135deg, #fff 50%, transparent 50%) 0 0/16px 16px,
+      linear-gradient(-135deg, #fff 50%, transparent 50%) 0 0/16px 16px;
+    background-repeat: repeat-x;
+    background-color: #2b2b2b;
+  }
+  .receipt::before { top: -12px; }
+  .receipt::after   { bottom: -12px; transform: rotate(180deg); }
+
+  h1 {
+    text-align: center;
+    font-size: 20px;
+    letter-spacing: 1px;
+    margin: 0 0 14px;
+    text-transform: uppercase;
+  }
+
+  .addr {
+    text-align: justify;
+    text-align-last: center;
+    font-size: 11px;
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+
+  .phone {
+    text-align: center;
+    font-size: 11px;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px dashed #999;
+    margin: 14px 0;
+  }
+
+  .info-row {
+    display: flex;
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  .info-row .label { width: 90px; }
+  .info-row .colon { width: 12px; }
+  .info-row .value { flex: 1; }
+
+  .items {
+    font-size: 12px;
+  }
+  .item-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .item-row .qty-name { padding-right: 8px; }
+  .item-row .price { white-space: nowrap; }
+
+  .totals {
+    font-size: 12px;
+  }
+  .totals .row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .totals .grand {
+    font-weight: bold;
+    font-size: 13px;
+  }
+
+  .payment {
+    font-size: 12px;
+  }
+  .payment .row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .thankyou {
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: bold;
+    margin-bottom: 14px;
+  }
+
+  .footer-msg {
+    text-align: center;
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+  .footer-msg .brand {
+    font-style: italic;
+    margin-top: 4px;
+  }
+
+  @media print {
+    body {
+      background: none;
+      padding: 0;
+      margin: 0;
+    }
+    .receipt {
+      width: 100%;
+      max-width: 100%;
+      padding: 0;
+      box-shadow: none;
+    }
+    .receipt::before, .receipt::after {
+      display: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="receipt">
+  <h1>${store.nama || 'Toko'}</h1>
+  <div class="addr">${store.alamat || ''}</div>
+  <div class="phone">${store.receipt_header || ''}</div>
+
+  <hr class="divider">
+
+  <div class="info-row"><span class="label">Order ID</span><span class="colon">:</span><span class="value">TRX-${transaction.id}</span></div>
+  <div class="info-row"><span class="label">Tanggal</span><span class="colon">:</span><span class="value">${dateStr}</span></div>
+  <div class="info-row"><span class="label">Kasir</span><span class="colon">:</span><span class="value">${transaction.kasir_nama || '-'}</span></div>
+  <div class="info-row"><span class="label">Platform</span><span class="colon">:</span><span class="value">${transaction.platform || '-'}</span></div>
+
+  <hr class="divider">
+
+  <div class="items">
+    ${itemsHtml}
+  </div>
+
+  <hr class="divider">
+
+  <div class="totals">
+    <div class="row"><span>Total</span><span>${formatRupiah(transaction.subtotal)}</span></div>
+    ${transaction.diskon > 0 ? `<div class="row"><span>Diskon</span><span>-${formatRupiah(transaction.diskon)}</span></div>` : ''}
+    ${transaction.pajak > 0 ? `<div class="row"><span>PPN</span><span>${formatRupiah(transaction.pajak)}</span></div>` : ''}
+    ${transaction.service_charge > 0 ? `<div class="row"><span>Service</span><span>${formatRupiah(transaction.service_charge)}</span></div>` : ''}
+    <div class="row grand"><span>Grand Total</span><span>${formatRupiah(transaction.total)}</span></div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="payment">
+    <div class="row"><span>Payment (${transaction.metode_bayar})</span><span>${formatRupiah(transaction.cash_paid || transaction.total)}</span></div>
+    ${transaction.metode_bayar === 'Tunai' ? `<div class="row"><span>Kembalian</span><span>${formatRupiah(transaction.cash_change || 0)}</span></div>` : ''}
+  </div>
+
+  <hr class="divider">
+
+  <div class="thankyou">Thank you for your order!</div>
+
+  <div class="footer-msg">
+    ${store.receipt_footer ? store.receipt_footer.replace(/\\n/g, '<br>') : ''}
+    <div class="brand">— ${store.nama || 'Mokundo POS'} —</div>
+  </div>
+</div>
+
+</body>
+</html>
     `;
   }
 }
