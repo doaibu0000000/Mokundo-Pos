@@ -863,7 +863,6 @@ export const TransaksiView: React.FC = () => {
       <NeumorphicModal
         isOpen={!!completedTx}
         onClose={() => setCompletedTx(null)}
-        title="Pembayaran Berhasil"
       >
         {completedTx && (
           <div style={{ textAlign: 'center' }}>
@@ -941,14 +940,10 @@ export const TransaksiView: React.FC = () => {
             )}
             
             {bluetoothError && (
-              <div style={{ fontSize: '11px', color: 'var(--accent-red)', fontWeight: 600, marginBottom: '16px' }}>
+              <div style={{ fontSize: '11px', color: 'var(--accent-red)', fontWeight: 600, marginBottom: '0' }}>
                 {bluetoothError}
               </div>
             )}
-
-            <NeumorphicButton variant="primary" onClick={() => setCompletedTx(null)} style={{ width: '100%' }}>
-              Transaksi Baru
-            </NeumorphicButton>
           </div>
         )}
       </NeumorphicModal>

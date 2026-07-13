@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   children: React.ReactNode;
   width?: string;
   hideCloseButton?: boolean;
@@ -13,7 +13,7 @@ interface ModalProps {
 export const NeumorphicModal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
-  title,
+  title = '',
   children,
   width = '480px',
   hideCloseButton = false,
@@ -90,18 +90,20 @@ export const NeumorphicModal: React.FC<ModalProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '20px',
+            marginBottom: title ? '20px' : '0px',
           }}
         >
-          <h3
-            style={{
-              fontWeight: 800,
-              fontSize: '18px',
-              color: 'var(--text-primary)',
-            }}
-          >
-            {title}
-          </h3>
+          {title ? (
+            <h3
+              style={{
+                fontWeight: 800,
+                fontSize: '18px',
+                color: 'var(--text-primary)',
+              }}
+            >
+              {title}
+            </h3>
+          ) : <div />}
           
           {!hideCloseButton && (
             <button
