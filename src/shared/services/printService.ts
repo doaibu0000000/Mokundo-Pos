@@ -509,11 +509,10 @@ export class PrintService {
   }
 
   .qr-box {
-    width: 60%;
+    width: 40%;
+    max-width: 90px;
     aspect-ratio: 1;
-    margin: 0 auto 4px;
-    border: 1px solid #333;
-    background-color: #f9f9f9;
+    margin: 0 auto 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -578,7 +577,6 @@ export class PrintService {
       border-top: 1px dashed #000;
     }
     .qr-box {
-      border-color: #000;
       color: #000;
     }
     .receipt::before, .receipt::after {
@@ -627,8 +625,12 @@ export class PrintService {
   <hr class="divider">
 
   ${qrCodeImg ? `
+  <div class="promo">
+    Mau pesan lagi tanpa antre atau<br>
+    tertarik punya bisnis kopi sendiri?<br>
+    <strong>Pindai saya!</strong>
+  </div>
   <div class="qr-box">${qrCodeImg}</div>
-  <div class="scan-text">Scan & Hubungi Kami</div>
   ` : ''}
 
   <div class="thankyou">Thank you for your order!</div>
