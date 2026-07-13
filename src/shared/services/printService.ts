@@ -368,9 +368,16 @@ export class PrintService {
   :root {
     --base-font: ${baseFontSize};
     --print-base-font: ${printBaseFontSize};
+    color-scheme: light only; /* Mencegah dark mode OS meng-invert struk */
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
   body {
     background: #2b2b2b;
     font-family: 'Poppins', sans-serif;
@@ -542,8 +549,8 @@ export class PrintService {
       margin: 0;
     }
     .receipt {
-      background: #fff;
-      color: #000;
+      background: #fff !important;
+      color: #000 !important;
       width: 100%;
       max-width: ${paperSize};
       padding: 2mm 2mm;
