@@ -30,6 +30,7 @@ export interface Store {
   supabase_anon_key: string;
   sync_enabled: number; // 0 = false, 1 = true
   ukuran_kertas_struk?: string; // e.g. "80mm", "58mm"
+  qr_barcode?: string; // Teks atau URL untuk QR Code di struk
 }
 
 export interface Product {

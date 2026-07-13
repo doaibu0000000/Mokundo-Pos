@@ -38,6 +38,7 @@ export const PengaturanView: React.FC = () => {
   const [receiptHeader, setReceiptHeader] = useState(store?.receipt_header || '');
   const [receiptFooter, setReceiptFooter] = useState(store?.receipt_footer || '');
   const [ukuranKertas, setUkuranKertas] = useState(store?.ukuran_kertas_struk || '80mm');
+  const [qrBarcode, setQrBarcode] = useState(store?.qr_barcode || '');
   const [storeSuccess, setStoreSuccess] = useState('');
 
   // Password Security States
@@ -164,6 +165,7 @@ export const PengaturanView: React.FC = () => {
       setSupabaseKey(store.supabase_anon_key);
       setSyncEnabled(store.sync_enabled === 1);
       setUkuranKertas(store.ukuran_kertas_struk || '80mm');
+      setQrBarcode(store.qr_barcode || '');
     }
   }, [store]);
 
@@ -187,7 +189,8 @@ export const PengaturanView: React.FC = () => {
         service_charge: serviceCharge,
         receipt_header: receiptHeader,
         receipt_footer: receiptFooter,
-        ukuran_kertas_struk: ukuranKertas
+        ukuran_kertas_struk: ukuranKertas,
+        qr_barcode: qrBarcode
       });
       setStoreSuccess('Pengaturan profil toko berhasil diperbarui!');
       await refreshStore();
@@ -513,6 +516,24 @@ export const PengaturanView: React.FC = () => {
                   value={receiptFooter}
                   onChange={(e) => setReceiptFooter(e.target.value)}
                   rows={3}
+                  className="nm-input"
+                  style={{
+                    padding: '12px',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '13px',
+                    fontFamily: 'monospace',
+                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>QR Code / Barcode (Opsional)</label>
+                <textarea
+                  value={qrBarcode}
+                  onChange={(e) => setQrBarcode(e.target.value)}
+                  placeholder="Masukkan Link URL (misal: wa.me/628... atau namatoko.com)"
+                  rows={2}
                   className="nm-input"
                   style={{
                     padding: '12px',

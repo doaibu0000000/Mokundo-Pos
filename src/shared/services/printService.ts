@@ -66,7 +66,7 @@ export class PrintService {
   }
 
   // Print via window.print() fallback using a hidden iframe
-  public static printViaBrowser(transaction: Transaction, items: TransactionItem[], store: Store, paperWidth: '58mm' | '80mm' = '58mm'): void {
+  public static async printViaBrowser(transaction: Transaction, items: TransactionItem[], store: Store, paperWidth: '58mm' | '80mm' = '58mm'): Promise<void> {
     const iframe = document.createElement('iframe');
     iframe.style.position = 'fixed';
     iframe.style.right = '0';
@@ -79,7 +79,7 @@ export class PrintService {
     const doc = iframe.contentDocument || iframe.contentWindow?.document;
     if (!doc) return;
 
-    const receiptHtml = this.generateReceiptHtml(transaction, items, store, paperWidth);
+    const receiptHtml = await this.generateReceiptHtml(transaction, items, store, paperWidth);
     doc.write(receiptHtml);
     doc.close();
 
@@ -323,7 +323,7 @@ export class PrintService {
   }
 
   // Internally formats HTML for print media widths
-  private static generateReceiptHtml(transaction: Transaction, items: TransactionItem[], store: Store, _paperWidth: '58mm' | '80mm'): string {
+  private static async generateReceiptHtml(transaction: Transaction, items: TransactionItem[], store: Store, _paperWidth: '58mm' | '80mm'): Promise<string> {
     const padZero = (n: number) => n.toString().padStart(2, '0');
     const dateObj = new Date(transaction.tanggal);
     const dateStr = `${padZero(dateObj.getDate())}/${padZero(dateObj.getMonth() + 1)}/${dateObj.getFullYear()} ${padZero(dateObj.getHours())}:${padZero(dateObj.getMinutes())}`;
@@ -340,6 +340,17 @@ export class PrintService {
         </div>
       `;
     }).join('');
+
+    let qrCodeImg = '';
+    if (store.qr_barcode) {
+      try {
+        const QRCode = (await import('qrcode')).default;
+        const qrBase64 = await QRCode.toDataURL(store.qr_barcode, { margin: 0, width: 150 });
+        qrCodeImg = `<img src="${qrBase64}" style="width: 100%; height: 100%; object-fit: contain;" alt="QR Code" />`;
+      } catch (err) {
+        console.error("Failed to generate QR Code", err);
+      }
+    }
 
     const paperSize = store.ukuran_kertas_struk || '80mm';
   // Untuk layar (preview), kurangi margin (misal potong 8mm).
@@ -615,14 +626,10 @@ export class PrintService {
 
   <hr class="divider">
 
-  <div class="promo">
-    Mau pesan lagi tanpa antre atau<br>
-    tertarik punya bisnis kopi sendiri?<br>
-    <strong>Pindai saya!</strong>
-  </div>
-
-  <div class="qr-box">[ QR Code ]</div>
-  <div class="scan-text">Scan untuk bayar</div>
+  ${qrCodeImg ? `
+  <div class="qr-box">${qrCodeImg}</div>
+  <div class="scan-text">Scan & Hubungi Kami</div>
+  ` : ''}
 
   <div class="thankyou">Thank you for your order!</div>
 
