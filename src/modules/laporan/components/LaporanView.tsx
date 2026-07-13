@@ -313,7 +313,6 @@ export const LaporanView: React.FC = () => {
       <div style={{ marginBottom: '20px' }}>
         
         {viewMode === 'riwayat' && (
-        {/* Left Card: Transaction History list */}
         <NeumorphicCard style={{ padding: '20px', minWidth: 0 }}>
           <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '16px' }}>Riwayat Transaksi</h3>
           <div style={{ width: '100%', overflowX: 'auto' }}>
@@ -381,7 +380,6 @@ export const LaporanView: React.FC = () => {
         )}
 
         {viewMode === 'terlaris' && (
-        {/* Right Card: Best Sellers list */}
         <NeumorphicCard style={{ padding: '20px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '16px' }}>Menu Terlaris</h3>
           
