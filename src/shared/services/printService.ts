@@ -328,12 +328,15 @@ export class PrintService {
     const dateObj = new Date(transaction.tanggal);
     const dateStr = `${padZero(dateObj.getDate())}/${padZero(dateObj.getMonth() + 1)}/${dateObj.getFullYear()} ${padZero(dateObj.getHours())}:${padZero(dateObj.getMinutes())}`;
 
+    // Format angka polos tanpa simbol mata uang: 165.000
+    const fmtNum = (n: number) => new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n);
+
     const itemsHtml = items.map(item => {
       const varianStr = item.varian && item.varian !== 'Normal' ? ` (${item.varian})` : '';
       return `
         <div class="item-row">
           <span class="qty-name">${item.qty} x ${item.nama_produk}${varianStr}</span>
-          <span class="price">${formatRupiah(item.qty * item.harga_satuan)}</span>
+          <span class="price">${fmtNum(item.qty * item.harga_satuan)}</span>
         </div>
       `;
     }).join('');
@@ -553,18 +556,18 @@ export class PrintService {
   <hr class="divider">
 
   <div class="totals">
-    <div class="row"><span>Total</span><span>${formatRupiah(transaction.subtotal)}</span></div>
-    ${transaction.diskon > 0 ? `<div class="row"><span>Diskon</span><span>-${formatRupiah(transaction.diskon)}</span></div>` : ''}
-    ${transaction.pajak > 0 ? `<div class="row"><span>PPN</span><span>${formatRupiah(transaction.pajak)}</span></div>` : ''}
-    ${transaction.service_charge > 0 ? `<div class="row"><span>Service</span><span>${formatRupiah(transaction.service_charge)}</span></div>` : ''}
-    <div class="row grand"><span>Grand Total</span><span>${formatRupiah(transaction.total)}</span></div>
+    <div class="row"><span>Total</span><span>${fmtNum(transaction.subtotal)}</span></div>
+    ${transaction.diskon > 0 ? `<div class="row"><span>Diskon${transaction.subtotal > 0 ? ` (${Math.round(transaction.diskon / transaction.subtotal * 100)}%)` : ''}</span><span>-${fmtNum(transaction.diskon)}</span></div>` : ''}
+    ${transaction.pajak > 0 ? `<div class="row"><span>PPN</span><span>${fmtNum(transaction.pajak)}</span></div>` : ''}
+    ${transaction.service_charge > 0 ? `<div class="row"><span>Service</span><span>${fmtNum(transaction.service_charge)}</span></div>` : ''}
+    <div class="row grand"><span>Grand Total</span><span>${fmtNum(transaction.total)}</span></div>
   </div>
 
   <hr class="divider">
 
   <div class="payment">
-    <div class="row"><span>Payment (${transaction.metode_bayar})</span><span>${formatRupiah(transaction.cash_paid || transaction.total)}</span></div>
-    ${transaction.metode_bayar === 'Tunai' ? `<div class="row"><span>Kembalian</span><span>${formatRupiah(transaction.cash_change || 0)}</span></div>` : ''}
+    <div class="row"><span>Payment (${transaction.metode_bayar})</span><span>${fmtNum(transaction.cash_paid || transaction.total)}</span></div>
+    ${transaction.metode_bayar === 'Tunai' ? `<div class="row"><span>Kembalian</span><span>${fmtNum(transaction.cash_change || 0)}</span></div>` : ''}
   </div>
 
   <hr class="divider">
