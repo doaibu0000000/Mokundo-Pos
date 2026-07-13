@@ -246,8 +246,8 @@ export const LaporanView: React.FC = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '20px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+          gap: '16px',
           marginBottom: '30px'
         }}
       >
@@ -263,12 +263,22 @@ export const LaporanView: React.FC = () => {
 
         <NeumorphicCard>
           <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            Jumlah Penjualan
+          </div>
+          <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
+            {summary.count}
+          </div>
+          <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Total transaksi terselesaikan</span>
+        </NeumorphicCard>
+
+        <NeumorphicCard>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
             Harga Pokok (HPP)
           </div>
           <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
             {formatRupiah(summary.HPP)}
           </div>
-          <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Modal modal bahan pokok</span>
+          <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Total modal produk</span>
         </NeumorphicCard>
 
         <NeumorphicCard>
@@ -278,17 +288,7 @@ export const LaporanView: React.FC = () => {
           <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--accent-green)', marginTop: '4px' }}>
             {formatRupiah(summary.profit)}
           </div>
-          <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Selisih omset dikurang HPP</span>
-        </NeumorphicCard>
-
-        <NeumorphicCard>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-            Jumlah Penjualan
-          </div>
-          <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
-            {summary.count}
-          </div>
-          <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Total transaksi terselesaikan</span>
+          <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Omset dikurangi HPP</span>
         </NeumorphicCard>
       </div>
 
