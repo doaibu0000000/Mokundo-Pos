@@ -593,7 +593,7 @@ export const ProdukView: React.FC = () => {
                     <div
                       style={{
                         width: '100%',
-                        paddingTop: '75%', // 4:3 aspect ratio
+                        paddingTop: '100%', // 1:1 aspect ratio
                         backgroundImage: `url(${p.gambar_url || 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=150'})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
