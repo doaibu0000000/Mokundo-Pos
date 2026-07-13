@@ -19,13 +19,7 @@ export const LaporanView: React.FC = () => {
     return cached ? JSON.parse(cached) : [];
   });
   const [filterRange, setFilterRange] = useState<'today' | '7days' | '30days'>('today');
-  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
-
-  useEffect(() => {
-    const handleResize = () => setIsLargeScreen(window.innerWidth >= 1024);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const [viewMode, setViewMode] = useState<'riwayat' | 'terlaris'>('riwayat');
   
   // Stats
   const [summary, setSummary] = useState(() => {
@@ -298,8 +292,27 @@ export const LaporanView: React.FC = () => {
         </NeumorphicCard>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: isLargeScreen ? '3fr 2fr' : '1fr', gap: '20px', marginBottom: '20px' }}>
+      {/* View Mode Toggle Tabs */}
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
+        <NeumorphicButton 
+          active={viewMode === 'riwayat'} 
+          onClick={() => setViewMode('riwayat')}
+          style={{ flex: 1, padding: '12px' }}
+        >
+          Riwayat Transaksi
+        </NeumorphicButton>
+        <NeumorphicButton 
+          active={viewMode === 'terlaris'} 
+          onClick={() => setViewMode('terlaris')}
+          style={{ flex: 1, padding: '12px' }}
+        >
+          Menu Terlaris
+        </NeumorphicButton>
+      </div>
+
+      <div style={{ marginBottom: '20px' }}>
         
+        {viewMode === 'riwayat' && (
         {/* Left Card: Transaction History list */}
         <NeumorphicCard style={{ padding: '20px', minWidth: 0 }}>
           <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '16px' }}>Riwayat Transaksi</h3>
@@ -365,7 +378,9 @@ export const LaporanView: React.FC = () => {
           </table>
           </div>
         </NeumorphicCard>
+        )}
 
+        {viewMode === 'terlaris' && (
         {/* Right Card: Best Sellers list */}
         <NeumorphicCard style={{ padding: '20px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '16px' }}>Menu Terlaris</h3>
@@ -412,6 +427,7 @@ export const LaporanView: React.FC = () => {
             )}
           </div>
         </NeumorphicCard>
+        )}
       </div>
 
       {/* TRANSACTION DETAIL MODAL */}
