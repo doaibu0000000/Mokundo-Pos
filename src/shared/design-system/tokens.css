@@ -92,6 +92,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+button, input, select, textarea {
+  color: inherit;
+}
+
 body {
   background-color: var(--bg-base);
   color: var(--text-primary);
