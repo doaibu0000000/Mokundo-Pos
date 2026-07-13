@@ -531,7 +531,6 @@ export class PrintService {
 
   /* ===== THERMAL PRINTER PRINT STYLES ===== */
   @page {
-    size: ${paperSize} auto; /* Lebar dinamis */
     margin: 0;
   }
 
