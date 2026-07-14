@@ -139,7 +139,7 @@ export const LaporanView: React.FC = () => {
     if (voidTxId === null) return;
 
     try {
-      await db.transaction('rw', [db.products, db.transactions, db.stock_logs, db.shifts], async () => {
+      await db.transaction('rw', [db.products, db.transactions, db.stock_logs, db.shifts, db.transaction_items], async () => {
         const tx = await db.transactions.get(voidTxId);
         if (!tx || tx.status === 'VOIDED') return;
 
