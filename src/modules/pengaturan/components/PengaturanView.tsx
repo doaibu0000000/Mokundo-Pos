@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Settings, Key, Cloud, FolderLock, Power, AlertTriangle, Download, Upload } from 'lucide-react';
+import { Settings, Key, Cloud, FolderLock, Power, AlertTriangle, Download, Upload, Sun, Moon } from 'lucide-react';
 import { useApp } from '../../../store/AppContext';
 import { db, hashPassword } from '../../../shared/services/db';
 import { SyncService } from '../../../shared/services/syncService';
@@ -374,6 +374,19 @@ export const PengaturanView: React.FC = () => {
 
           <NeumorphicCard style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px' }}>
             <h3 style={{ fontSize: '15px', fontWeight: 800 }}>Akses & Tampilan</h3>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px dashed var(--text-muted)' }}>
+              <span style={{ fontSize: '13px' }}>Mode Gelap (Dark Mode)</span>
+              <NeumorphicButton 
+                size="sm"
+                active={isDarkMode}
+                onClick={toggleDarkMode}
+                style={{ padding: '6px 12px' }}
+              >
+                {isDarkMode ? <Sun size={14} color="var(--accent-orange)" /> : <Moon size={14} />}
+                <span style={{ marginLeft: '6px' }}>{isDarkMode ? 'ON' : 'OFF'}</span>
+              </NeumorphicButton>
+            </div>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px dashed var(--text-muted)' }}>
               <span style={{ fontSize: '13px' }}>Mode Kontras Tinggi</span>

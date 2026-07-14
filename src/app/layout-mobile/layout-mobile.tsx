@@ -123,13 +123,6 @@ export const MobileLayout: React.FC = () => {
               <div style={{ fontSize: '14px', fontWeight: 800 }}>{user?.nama_lengkap?.replace(' Utama', '')} ({user?.role})</div>
             </div>
           </div>
-
-          <NeumorphicButton 
-            onClick={toggleDarkMode}
-            style={{ width: '40px', height: '40px', borderRadius: '50%', padding: 0 }}
-          >
-            {isDarkMode ? <Sun size={18} color="var(--accent-orange)" /> : <Moon size={18} />}
-          </NeumorphicButton>
         </div>
 
         {/* PWA Install Banner */}
