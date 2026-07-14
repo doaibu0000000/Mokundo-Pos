@@ -39,7 +39,7 @@ export const PengaturanView: React.FC = () => {
   };
 
   useEffect(() => {
-    const handlePopState = (e: PopStateEvent) => {
+    const handlePopState = () => {
       if (activeScreen !== 'menu') {
         setActiveScreen('menu');
       }
