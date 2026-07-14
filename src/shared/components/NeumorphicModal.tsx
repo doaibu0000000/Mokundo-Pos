@@ -62,7 +62,7 @@ export const NeumorphicModal: React.FC<ModalProps> = ({
           backgroundColor: 'rgba(0,0,0,0.5)',
           backdropFilter: 'blur(4px)',
           opacity: animateShow ? 1 : 0,
-          transition: 'opacity 0.2s ease-out',
+          transition: 'opacity 0.1s ease-out',
         }}
       />
       
@@ -79,9 +79,9 @@ export const NeumorphicModal: React.FC<ModalProps> = ({
           flexDirection: 'column',
           zIndex: 1001,
           boxShadow: 'none',
-          transform: `scale(${animateShow ? 1 : 0.9})`,
+          transform: `scale(${animateShow ? 1 : 0.95})`,
           opacity: animateShow ? 1 : 0,
-          transition: 'transform 0.2s ease-out, opacity 0.2s ease-out',
+          transition: 'transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.1s ease-out',
         }}
       >
         {/* Header */}

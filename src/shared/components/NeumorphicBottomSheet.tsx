@@ -60,7 +60,7 @@ export const NeumorphicBottomSheet: React.FC<BottomSheetProps> = ({
           backgroundColor: 'rgba(0,0,0,0.4)',
           backdropFilter: 'blur(3px)',
           opacity: animateShow ? 1 : 0,
-          transition: 'opacity 0.25s ease-out',
+          transition: 'opacity 0.15s ease-out',
         }}
       />
       
@@ -82,7 +82,7 @@ export const NeumorphicBottomSheet: React.FC<BottomSheetProps> = ({
           zIndex: 1001,
           boxShadow: 'none',
           transform: `translateY(${animateShow ? '0%' : '100%'})`,
-          transition: 'transform 0.25s ease-out',
+          transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         {/* Handle Bar (Drag Indicator) */}
