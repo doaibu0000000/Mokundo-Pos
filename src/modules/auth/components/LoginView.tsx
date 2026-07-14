@@ -92,7 +92,7 @@ export const LoginView: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: '20px',
+              marginBottom: '8px',
               padding: '8px'
             }}
           >
