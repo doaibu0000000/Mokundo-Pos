@@ -26,7 +26,9 @@ export const PengaturanView: React.FC = () => {
     toggleHighContrast,
     logoutUser,
     canInstall,
-    installApp
+    installApp,
+    isDarkMode,
+    toggleDarkMode
   } = useApp();
 
   const [activeScreen, setActiveScreen] = useState<'menu' | 'profil' | 'printer' | 'keamanan' | 'sync' | 'shift'>('menu');
