@@ -31,6 +31,23 @@ export const PengaturanView: React.FC = () => {
 
   const [activeScreen, setActiveScreen] = useState<'menu' | 'profil' | 'printer' | 'keamanan' | 'sync' | 'shift'>('menu');
 
+  const navigateTo = (screen: 'menu' | 'profil' | 'printer' | 'keamanan' | 'sync' | 'shift') => {
+    if (screen !== 'menu' && activeScreen === 'menu') {
+      window.history.pushState({ screen }, '');
+    }
+    setActiveScreen(screen);
+  };
+
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      if (activeScreen !== 'menu') {
+        setActiveScreen('menu');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [activeScreen]);
+
   // Profil & Pajak States
   const [storeNama, setStoreNama] = useState(store?.nama || '');
   const [storeAlamat, setStoreAlamat] = useState(store?.alamat || '');
@@ -399,7 +416,7 @@ export const PengaturanView: React.FC = () => {
 
   const renderHeader = (title: string, subtitle: string) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-      <NeumorphicButton size="sm" onClick={() => setActiveScreen('menu')} style={{ padding: '8px 12px' }}>
+      <NeumorphicButton size="sm" onClick={() => { window.history.back(); }} style={{ padding: '8px 12px' }}>
         ← Kembali
       </NeumorphicButton>
       <div>
@@ -446,7 +463,7 @@ export const PengaturanView: React.FC = () => {
 
           <NeumorphicCard 
             className="nm-button"
-            onClick={() => setActiveScreen('profil')}
+            onClick={() => navigateTo('profil')}
             style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
           >
             <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-blue)' }}><Settings size={20} /></div>
@@ -458,7 +475,7 @@ export const PengaturanView: React.FC = () => {
 
           <NeumorphicCard 
             className="nm-button"
-            onClick={() => setActiveScreen('printer')}
+            onClick={() => navigateTo('printer')}
             style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
           >
             <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--text-primary)' }}><Settings size={20} /></div>
@@ -470,7 +487,7 @@ export const PengaturanView: React.FC = () => {
 
           <NeumorphicCard 
             className="nm-button"
-            onClick={() => setActiveScreen('keamanan')}
+            onClick={() => navigateTo('keamanan')}
             style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
           >
             <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-orange)' }}><Key size={20} /></div>
@@ -482,7 +499,7 @@ export const PengaturanView: React.FC = () => {
 
           <NeumorphicCard 
             className="nm-button"
-            onClick={() => setActiveScreen('sync')}
+            onClick={() => navigateTo('sync')}
             style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
           >
             <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-green)' }}><Cloud size={20} /></div>
@@ -494,7 +511,7 @@ export const PengaturanView: React.FC = () => {
 
           <NeumorphicCard 
             className="nm-button"
-            onClick={() => setActiveScreen('shift')}
+            onClick={() => navigateTo('shift')}
             style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
           >
             <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-blue)' }}><FolderLock size={20} /></div>
