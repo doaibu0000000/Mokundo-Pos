@@ -92,6 +92,39 @@ export const ProdukView: React.FC = () => {
     onConfirm: () => {}
   });
 
+  // --- Global History Back Logic for Popups ---
+  const hasPopup = isProductModalOpen || isCropModalOpen || isCategoryModalOpen || confirmConfig.isOpen;
+  const prevHasPopup = React.useRef(false);
+
+  useEffect(() => {
+    if (hasPopup && !prevHasPopup.current) {
+      window.history.pushState({ popupOpen: true }, '');
+      prevHasPopup.current = true;
+    } else if (!hasPopup && prevHasPopup.current) {
+      prevHasPopup.current = false;
+      setTimeout(() => {
+        if (window.history.state?.popupOpen) {
+          window.history.back();
+        }
+      }, 50);
+    }
+  }, [hasPopup]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (prevHasPopup.current) {
+        setIsProductModalOpen(false);
+        setIsCropModalOpen(false);
+        setIsCategoryModalOpen(false);
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+  // ----------------------------------------------
+
+
   useEffect(() => {
     loadData();
   }, [productSearch]);

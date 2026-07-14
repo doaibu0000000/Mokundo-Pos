@@ -32,6 +32,36 @@ export const LaporanView: React.FC = () => {
   const [selectedItems, setSelectedItems] = useState<TransactionItem[]>([]);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
+  // --- Global History Back Logic for Popups ---
+  const hasPopup = isDetailOpen;
+  const prevHasPopup = React.useRef(false);
+
+  useEffect(() => {
+    if (hasPopup && !prevHasPopup.current) {
+      window.history.pushState({ popupOpen: true }, '');
+      prevHasPopup.current = true;
+    } else if (!hasPopup && prevHasPopup.current) {
+      prevHasPopup.current = false;
+      setTimeout(() => {
+        if (window.history.state?.popupOpen) {
+          window.history.back();
+        }
+      }, 50);
+    }
+  }, [hasPopup]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (prevHasPopup.current) {
+        setIsDetailOpen(false);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+  // ----------------------------------------------
+
+
   useEffect(() => {
     loadReportData();
   }, [filterRange]);
