@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ModalProps {
   isOpen: boolean;
@@ -18,118 +19,134 @@ export const NeumorphicModal: React.FC<ModalProps> = ({
   width = '480px',
   hideCloseButton = false,
 }) => {
-  const [animateShow, setAnimateShow] = useState(false);
+  const onCloseRef = useRef(onClose);
+  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      setTimeout(() => setAnimateShow(true), 20);
-    } else {
-      document.body.style.overflow = 'unset';
-      setAnimateShow(false);
+      const currentModalId = 'modal_' + Date.now().toString() + Math.random().toString(36).substr(2, 5);
+      window.history.pushState({ modalId: currentModalId }, '');
+
+      const handlePopState = () => {
+        if (window.history.state?.modalId === currentModalId) return;
+        onCloseRef.current();
+      };
+      
+      window.addEventListener('popstate', handlePopState);
+      
+      return () => {
+        document.body.style.overflow = 'unset';
+        window.removeEventListener('popstate', handlePopState);
+        if (window.history.state?.modalId === currentModalId) {
+          window.history.back();
+        }
+      };
     }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100dvh',
-        zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px',
-      }}
-    >
-      {/* Backdrop overlay */}
-      <div
-        onClick={onClose}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          backdropFilter: 'blur(4px)',
-          opacity: animateShow ? 1 : 0,
-          transition: 'opacity 0.2s ease-out',
-        }}
-      />
-      
-      {/* Modal Dialog Card */}
-      <div
-        className="nm-flat"
-        style={{
-          position: 'relative',
-          width: '100%',
-          maxWidth: width,
-          borderRadius: 'var(--radius-lg)',
-          padding: '24px',
-          display: 'flex',
-          flexDirection: 'column',
-          zIndex: 1001,
-          boxShadow: 'none',
-          transform: `scale(${animateShow ? 1 : 0.9})`,
-          opacity: animateShow ? 1 : 0,
-          transition: 'transform 0.2s ease-out, opacity 0.2s ease-out',
-        }}
-      >
-        {/* Header */}
+    <AnimatePresence>
+      {isOpen && (
         <div
           style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100dvh',
+            zIndex: 1000,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: title ? '20px' : '0px',
+            justifyContent: 'center',
+            padding: '20px',
           }}
         >
-          {title ? (
-            <h3
-              style={{
-                fontWeight: 800,
-                fontSize: '18px',
-                color: 'var(--text-primary)',
-              }}
-            >
-              {title}
-            </h3>
-          ) : <div />}
+          {/* Backdrop overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            onClick={onClose}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              backdropFilter: 'blur(4px)',
+            }}
+          />
           
-          {!hideCloseButton && (
-            <button
-              onClick={onClose}
-              className="nm-button"
+          {/* Modal Dialog Card */}
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            transition={{ type: "spring", bounce: 0.3, duration: 0.4 }}
+            className="nm-flat"
+            style={{
+              position: 'relative',
+              width: '100%',
+              maxWidth: width,
+              borderRadius: 'var(--radius-lg)',
+              padding: '24px',
+              display: 'flex',
+              flexDirection: 'column',
+              zIndex: 1001,
+              boxShadow: 'none',
+            }}
+          >
+            {/* Header */}
+            <div
               style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                border: 'none',
-                color: 'var(--text-secondary)',
+                justifyContent: 'space-between',
+                marginBottom: title ? '20px' : '0px',
               }}
             >
-              <X size={18} />
-            </button>
-          )}
-        </div>
+              {title ? (
+                <h3
+                  style={{
+                    fontWeight: 800,
+                    fontSize: '18px',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  {title}
+                </h3>
+              ) : <div />}
+              
+              {!hideCloseButton && (
+                <button
+                  onClick={onClose}
+                  className="nm-button"
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: 'none',
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              )}
+            </div>
 
-        {/* Content body */}
-        <div style={{ maxHeight: '70vh', overflowY: 'auto', padding: '12px', margin: '-12px' }}>
-          {children}
+            {/* Content body */}
+            <div style={{ maxHeight: '70vh', overflowY: 'auto', padding: '12px', margin: '-12px' }}>
+              {children}
+            </div>
+          </motion.div>
         </div>
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 };
