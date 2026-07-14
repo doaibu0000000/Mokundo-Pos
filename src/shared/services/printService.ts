@@ -366,7 +366,7 @@ export class PrintService {
       }
     }
 
-    const paperSize = store.ukuran_kertas_struk || '80mm';
+    const paperSize = store.ukuran_kertas_struk || '58mm';
   // Untuk layar (preview), kurangi margin (misal potong 8mm).
   // Di print media, biarkan full sesuai paperSize.
   let containerWidth = '72mm'; 

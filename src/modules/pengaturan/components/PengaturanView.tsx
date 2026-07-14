@@ -59,7 +59,7 @@ export const PengaturanView: React.FC = () => {
   const [storeService, setStoreService] = useState(store?.service_charge?.toString() || '0');
   const [receiptHeader, setReceiptHeader] = useState(formatPhone(store?.receipt_header));
   const [receiptFooter, setReceiptFooter] = useState(store?.receipt_footer || '');
-  const [ukuranKertas, setUkuranKertas] = useState(store?.ukuran_kertas_struk || '80mm');
+  const [ukuranKertas, setUkuranKertas] = useState(store?.ukuran_kertas_struk || '58mm');
   const [qrBarcode, setQrBarcode] = useState(store?.qr_barcode || '');
   const [qrPromoText, setQrPromoText] = useState(store?.qr_promo_text || 'Mau pesan lagi tanpa antre atau\ntertarik punya bisnis kopi sendiri?');
   const [qrScanText, setQrScanText] = useState(store?.qr_scan_text || 'Pindai saya!');
@@ -110,7 +110,7 @@ export const PengaturanView: React.FC = () => {
       setSupabaseUrl(store.supabase_url);
       setSupabaseKey(store.supabase_anon_key);
       setSyncEnabled(store.sync_enabled === 1);
-      setUkuranKertas(store.ukuran_kertas_struk || '80mm');
+      setUkuranKertas(store.ukuran_kertas_struk || '58mm');
       setQrBarcode(store.qr_barcode || '');
       setQrPromoText(store.qr_promo_text || 'Mau pesan lagi tanpa antre atau\ntertarik punya bisnis kopi sendiri?');
       setQrScanText(store.qr_scan_text || 'Pindai saya!');

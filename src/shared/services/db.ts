@@ -185,7 +185,7 @@ export async function seedDatabase() {
       supabase_url: '',
       supabase_anon_key: '',
       sync_enabled: 0,
-      ukuran_kertas_struk: '80mm',
+      ukuran_kertas_struk: '58mm',
     });
 
     // 3. Seed default categories
