@@ -3,7 +3,7 @@ import { Settings, Key, Cloud, FolderLock, Power, AlertTriangle, Sun, Moon, Prin
 import { useApp } from '../../../store/AppContext';
 import { db, hashPassword } from '../../../shared/services/db';
 import { SyncService } from '../../../shared/services/syncService';
-import { NeumorphicCard, NeumorphicButton, NeumorphicInput } from '../../../shared/components';
+import { NeumorphicCard, NeumorphicButton, NeumorphicInput, NeumorphicModal } from '../../../shared/components';
 
 // Format currency helper
 const formatRupiah = (number: number) => {
@@ -961,69 +961,39 @@ export const PengaturanView: React.FC = () => {
       )}
 
       {showPaperSizeModal && (
-        <div 
-          style={{
-            position: 'fixed',
-            top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'flex-end'
-          }}
-          onClick={() => setShowPaperSizeModal(false)}
+        <NeumorphicModal
+          isOpen={showPaperSizeModal}
+          onClose={() => setShowPaperSizeModal(false)}
+          title="Pilih Ukuran Kertas"
+          width="400px"
         >
-          <div 
-            style={{
-              width: '100%',
-              backgroundColor: 'var(--bg-primary)',
-              borderTopLeftRadius: '24px',
-              borderTopRightRadius: '24px',
-              padding: '24px',
-              paddingBottom: '40px',
-              maxHeight: '70vh',
-              overflowY: 'auto',
-              boxShadow: '0 -10px 40px rgba(0,0,0,0.1)'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '20px', textAlign: 'center' }}>Pilih Ukuran Kertas</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {Object.entries(paperSizeLabels).map(([val, label]) => (
-                <div
-                  key={val}
-                  onClick={() => {
-                    setUkuranKertas(val);
-                    setShowPaperSizeModal(false);
-                  }}
-                  className="nm-button"
-                  style={{
-                    padding: '16px',
-                    borderRadius: '16px',
-                    backgroundColor: ukuranKertas === val ? 'var(--accent-blue)' : 'var(--bg-primary)',
-                    color: ukuranKertas === val ? 'white' : 'var(--text-primary)',
-                    fontWeight: ukuranKertas === val ? 800 : 600,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    boxShadow: ukuranKertas === val ? 'none' : undefined
-                  }}
-                >
-                  <span>{label}</span>
-                  {ukuranKertas === val && <span style={{ color: 'white' }}>✓</span>}
-                </div>
-              ))}
-            </div>
-            
-            <NeumorphicButton
-              variant="danger"
-              style={{ width: '100%', marginTop: '24px', padding: '14px' }}
-              onClick={() => setShowPaperSizeModal(false)}
-            >
-              Batal
-            </NeumorphicButton>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {Object.entries(paperSizeLabels).map(([val, label]) => (
+              <div
+                key={val}
+                className={ukuranKertas === val ? '' : 'nm-button'}
+                onClick={() => {
+                  setUkuranKertas(val);
+                  setShowPaperSizeModal(false);
+                }}
+                style={{
+                  padding: '16px',
+                  borderRadius: '16px',
+                  backgroundColor: ukuranKertas === val ? 'var(--accent-blue)' : 'var(--bg-primary)',
+                  color: ukuranKertas === val ? 'white' : 'var(--text-primary)',
+                  fontWeight: ukuranKertas === val ? 800 : 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <span>{label}</span>
+                {ukuranKertas === val && <span style={{ color: 'white' }}>✓</span>}
+              </div>
+            ))}
           </div>
-        </div>
+        </NeumorphicModal>
       )}
 
     </div>
