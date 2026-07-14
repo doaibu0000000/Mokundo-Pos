@@ -217,7 +217,7 @@ export const PengaturanView: React.FC = () => {
     const serviceCharge = parseFloat(storeService);
 
     if (!storeNama || isNaN(serviceCharge)) {
-      alert('Harap isi form pajak dan nama dengan benar');
+      alert('Harap isi form nama dan alamat dengan benar');
       return;
     }
 
@@ -470,7 +470,7 @@ export const PengaturanView: React.FC = () => {
             <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-blue)' }}><ReceiptText size={20} /></div>
             <div style={{ flex: 1, textAlign: 'left' }}>
               <div style={{ fontWeight: 800, fontSize: '15px' }}>Tampilan Struk</div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Ubah nama, alamat, pajak pada struk</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Ubah nama dan alamat pada struk</div>
             </div>
           </NeumorphicCard>
 
@@ -562,7 +562,7 @@ export const PengaturanView: React.FC = () => {
       
       {activeScreen === 'profil' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '600px' }}>
-          {renderHeader('Tampilan Struk', 'Ubah nama, alamat, dan pajak')}
+          {renderHeader('Tampilan Struk', 'Ubah nama dan alamat')}
           
           <NeumorphicCard style={{ width: '100%' }}>
             <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '20px' }}>Pengaturan Toko & Struk</h3>
