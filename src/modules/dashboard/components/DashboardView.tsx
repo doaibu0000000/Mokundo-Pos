@@ -288,7 +288,7 @@ export const DashboardView: React.FC = () => {
               Transaksi Hari Ini
             </div>
             <div style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: 800, marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {stats.transaksiHariIni} <span style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 500, color: 'var(--text-secondary)' }}>order</span>
+              {stats.transaksiHariIni} <span style={{ fontSize: isMobile ? '12px' : '13px', fontWeight: 500, color: 'var(--text-secondary)' }}>order</span>
             </div>
           </div>
         </NeumorphicCard>
@@ -324,7 +324,7 @@ export const DashboardView: React.FC = () => {
               Stok Menipis
             </div>
             <div style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: 800, marginTop: '2px', color: stats.stokMenipis > 0 ? 'var(--accent-red)' : 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {stats.stokMenipis} <span style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 500, color: 'var(--text-secondary)' }}>produk</span>
+              {stats.stokMenipis} <span style={{ fontSize: isMobile ? '12px' : '13px', fontWeight: 500, color: 'var(--text-secondary)' }}>produk</span>
             </div>
           </div>
         </NeumorphicCard>
