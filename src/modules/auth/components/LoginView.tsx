@@ -109,7 +109,7 @@ export const LoginView: React.FC = () => {
               textAlign: 'center',
             }}
           >
-            Mokundo Kasir
+            Surantaka Coffee
           </h2>
           <p
             style={{
