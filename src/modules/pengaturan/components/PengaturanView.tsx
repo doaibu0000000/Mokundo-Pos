@@ -64,7 +64,7 @@ export const PengaturanView: React.FC = () => {
   const [qrPromoText, setQrPromoText] = useState(store?.qr_promo_text || 'Mau pesan lagi tanpa antre atau\ntertarik punya bisnis kopi sendiri?');
   const [qrScanText, setQrScanText] = useState(store?.qr_scan_text || 'Pindai saya!');
   const [receiptThankYou, setReceiptThankYou] = useState(store?.receipt_thankyou_text || 'Thank you for your order!');
-  const [receiptFooterBrand, setReceiptFooterBrand] = useState(store?.receipt_footer_brand || '');
+  const [receiptFooterBrand, setReceiptFooterBrand] = useState(store?.receipt_footer_brand || '— Surantaka Coffee —');
   const [storeSuccess, setStoreSuccess] = useState('');
   
   // Bluetooth Print State
@@ -112,7 +112,7 @@ export const PengaturanView: React.FC = () => {
       setQrPromoText(store.qr_promo_text || 'Mau pesan lagi tanpa antre atau\ntertarik punya bisnis kopi sendiri?');
       setQrScanText(store.qr_scan_text || 'Pindai saya!');
       setReceiptThankYou(store.receipt_thankyou_text || 'Thank you for your order!');
-      setReceiptFooterBrand(store.receipt_footer_brand || '');
+      setReceiptFooterBrand(store.receipt_footer_brand || '— Surantaka Coffee —');
     }
   }, [store]);
 
