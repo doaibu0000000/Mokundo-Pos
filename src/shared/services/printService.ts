@@ -586,7 +586,7 @@ export class PrintService {
 <div class="receipt">
   <h1>${store.nama || 'SURANTAKA COFFEE'}</h1>
   <div class="addr">${store.alamat || 'Kp. Surantaka, RT.02/RW.01, Desa Kalijati Timur, Kecamatan Kalijati, Kabupaten Subang, Jawa Barat, 41271'}</div>
-  <div class="phone">${store.receipt_header || 'Telp: 0812-3456-7890'}</div>
+  <div class="phone">${store.receipt_header ? (store.receipt_header.toLowerCase().includes('telp') ? store.receipt_header : `Telp: ${store.receipt_header}`) : 'Telp: 0812-3456-7890'}</div>
 
   <hr class="divider">
 

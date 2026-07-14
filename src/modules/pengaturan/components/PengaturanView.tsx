@@ -536,65 +536,20 @@ export const PengaturanView: React.FC = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Header Struk</label>
-                <textarea
-                  value={receiptHeader}
-                  onChange={(e) => setReceiptHeader(e.target.value)}
-                  rows={3}
-                  className="nm-input"
-                  style={{
-                    padding: '12px',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: '13px',
-                    fontFamily: 'monospace',
-                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
-                  }}
-                />
-              </div>
+              <NeumorphicInput
+                label="NO TELP"
+                value={receiptHeader}
+                onChange={(e) => setReceiptHeader(e.target.value)}
+                placeholder="Misal: 081234567890"
+              />
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Footer Struk</label>
-                <textarea
-                  value={receiptFooter}
-                  onChange={(e) => setReceiptFooter(e.target.value)}
-                  rows={3}
-                  className="nm-input"
-                  style={{
-                    padding: '12px',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: '13px',
-                    fontFamily: 'monospace',
-                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
-                  }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>QR Code / Barcode (Opsional)</label>
-                <textarea
-                  value={qrBarcode}
-                  onChange={(e) => setQrBarcode(e.target.value)}
-                  placeholder="Masukkan Link URL (misal: wa.me/628... atau namatoko.com)"
-                  rows={2}
-                  className="nm-input"
-                  style={{
-                    padding: '12px',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: '13px',
-                    fontFamily: 'monospace',
-                  border: 'var(--border-width-hc) solid var(--border-high-contrast)'
-                  }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Promo QR Code</label>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>PROMO / KEMITRAAN</label>
                 <textarea
                   value={qrPromoText}
                   onChange={(e) => setQrPromoText(e.target.value)}
                   placeholder="Misal: Mau pesan lagi tanpa antre?"
-                  rows={2}
+                  rows={3}
                   className="nm-input"
                   style={{
                     padding: '12px',
@@ -607,7 +562,7 @@ export const PengaturanView: React.FC = () => {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Teks Ajak Pindai</label>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>TEKS AJAKAN</label>
                 <input
                   type="text"
                   value={qrScanText}
@@ -625,12 +580,47 @@ export const PengaturanView: React.FC = () => {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Teks Terima Kasih</label>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>BARCODE</label>
+                <textarea
+                  value={qrBarcode}
+                  onChange={(e) => setQrBarcode(e.target.value)}
+                  placeholder="Masukkan Link URL (misal: wa.me/628... atau namatoko.com)"
+                  rows={2}
+                  className="nm-input"
+                  style={{
+                    padding: '12px',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '13px',
+                    fontFamily: 'monospace',
+                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>TEKS TERIMAKASIH</label>
                 <textarea
                   value={receiptThankYou}
                   onChange={(e) => setReceiptThankYou(e.target.value)}
                   placeholder="Misal: Thank you for your order!"
                   rows={2}
+                  className="nm-input"
+                  style={{
+                    padding: '12px',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '13px',
+                    fontFamily: 'monospace',
+                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>FOOTER STRUK</label>
+                <textarea
+                  value={receiptFooter}
+                  onChange={(e) => setReceiptFooter(e.target.value)}
+                  rows={3}
                   className="nm-input"
                   style={{
                     padding: '12px',
