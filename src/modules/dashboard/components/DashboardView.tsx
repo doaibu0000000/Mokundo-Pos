@@ -285,7 +285,7 @@ export const DashboardView: React.FC = () => {
           </div>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: isMobile ? '10px' : '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              Transaksi Hari Ini
+              Transaksi
             </div>
             <div style={{ fontSize: isMobile ? '16px' : '20px', fontWeight: 800, marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {stats.transaksiHariIni} <span style={{ fontSize: isMobile ? '12px' : '13px', fontWeight: 500, color: 'var(--text-secondary)' }}>order</span>
