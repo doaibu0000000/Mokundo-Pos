@@ -698,11 +698,18 @@ export const PengaturanView: React.FC = () => {
               )}
 
 
-              {storeSuccess && (
-                <div style={{ color: 'var(--accent-green)', fontSize: '12px', fontWeight: 600 }}>
-                  ✓ {storeSuccess}
-                </div>
-              )}
+              <div style={{ 
+                visibility: storeSuccess ? 'visible' : 'hidden',
+                opacity: storeSuccess ? 1 : 0,
+                transition: 'opacity 0.2s ease-in-out',
+                color: 'var(--accent-green)', 
+                fontSize: '12px', 
+                fontWeight: 600,
+                minHeight: '18px',
+                marginTop: '4px'
+              }}>
+                ✓ {storeSuccess || 'Berhasil diperbarui!'}
+              </div>
 
               <NeumorphicButton type="submit" variant="primary" style={{ marginTop: '8px' }}>
                 {profilTab === 'setting' ? 'Simpan Pengaturan Kertas' : 'Simpan Profil Struk'}
