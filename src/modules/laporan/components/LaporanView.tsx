@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Download, AlertTriangle, Eye } from 'lucide-react';
+import { Download, Eye } from 'lucide-react';
 import { db, type Transaction, type TransactionItem } from '../../../shared/services/db';
-import { NeumorphicCard, NeumorphicButton, NeumorphicModal, NeumorphicInput } from '../../../shared/components';
+import { NeumorphicCard, NeumorphicButton, NeumorphicModal } from '../../../shared/components';
 
 // Format currency helper
 const formatRupiah = (number: number) => {
@@ -31,28 +31,21 @@ export const LaporanView: React.FC = () => {
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
   const [selectedItems, setSelectedItems] = useState<TransactionItem[]>([]);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
-  const [voidReason, setVoidReason] = useState('');
-  const [voidError, setVoidError] = useState(false);
-  const [voidTxId, setVoidTxId] = useState<number | null>(null);
+
 
   // --- Sequential Modal History Logic ---
   useEffect(() => {
     if (isDetailOpen) window.history.pushState({ modal: 'detail' }, '');
   }, [isDetailOpen]);
 
-  useEffect(() => {
-    if (isVoidModalOpen) window.history.pushState({ modal: 'void' }, '');
-  }, [isVoidModalOpen]);
+
 
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
       const stateModal = e.state?.modal;
       if (!stateModal) {
-        setIsVoidModalOpen(false);
         setIsDetailOpen(false);
       } else if (stateModal === 'detail') {
-        setIsVoidModalOpen(false);
         setIsDetailOpen(true);
       }
     };
@@ -123,73 +116,7 @@ export const LaporanView: React.FC = () => {
     setIsDetailOpen(true);
   };
 
-  // Void transaction control
-  const handleVoidTransactionClick = (txId: number) => {
-    setVoidTxId(txId);
-    setVoidReason('');
-    setVoidError(false);
-    setIsVoidModalOpen(true);
-  };
 
-  const confirmVoidTransaction = async () => {
-    if (!voidReason.trim()) {
-      setVoidError(true);
-      return;
-    }
-    if (voidTxId === null) return;
-
-    try {
-      await db.transaction('rw', [db.products, db.transactions, db.stock_logs, db.shifts, db.transaction_items], async () => {
-        const tx = await db.transactions.get(voidTxId);
-        if (!tx || tx.status === 'VOIDED') return;
-
-        // Restore stocks
-        const items = await db.transaction_items.where('transaksi_id').equals(voidTxId).toArray();
-        for (const item of items) {
-          const prod = await db.products.get(item.produk_id);
-          if (prod) {
-            await db.products.update(item.produk_id, { stok: prod.stok + item.qty });
-            
-            await db.stock_logs.add({
-              produk_id: item.produk_id,
-              jenis: 'IN',
-              qty: item.qty,
-              keterangan: `Pembatalan (Void) TRX-${voidTxId}`,
-              tanggal: new Date().toISOString(),
-              sync_status: 'PENDING'
-            });
-          }
-        }
-
-        // Update transaction status
-        await db.transactions.update(voidTxId, {
-          status: 'VOIDED',
-          void_reason: voidReason,
-          sync_status: 'PENDING'
-        });
-
-        // Decrement shift values
-        const shift = await db.shifts.get(tx.shift_id);
-        if (shift) {
-          if (tx.metode_bayar === 'Tunai') {
-            await db.shifts.update(tx.shift_id, {
-              total_penjualan_tunai: Math.max(0, shift.total_penjualan_tunai - tx.total)
-            });
-          } else {
-            await db.shifts.update(tx.shift_id, {
-              total_penjualan_non_tunai: Math.max(0, shift.total_penjualan_non_tunai - tx.total)
-            });
-          }
-        }
-      });
-
-      alert('Transaksi berhasil dibatalkan (Void) dan stok dikembalikan.');
-      setIsDetailOpen(false);
-      loadReportData();
-    } catch (e) {
-      alert('Gagal membatalkan transaksi');
-    }
-  };
 
   const handleExportCSV = () => {
     let csv = 'ID,Tanggal,Kasir,Subtotal,Diskon,Pajak,Total,MetodeBayar,Status,KeteranganVoid\n';
@@ -495,55 +422,11 @@ export const LaporanView: React.FC = () => {
               </div>
             </div>
 
-            {/* Void trigger button (Admin/Manager role ONLY) */}
-            {selectedTx.status === 'COMPLETED' && (
-              <NeumorphicButton 
-                variant="danger" 
-                onClick={() => handleVoidTransactionClick(selectedTx.id!)}
-                style={{ width: '100%' }}
-              >
-                <AlertTriangle size={16} /> Batalkan Transaksi (Void)
-              </NeumorphicButton>
-            )}
+
           </div>
         )}
       </NeumorphicModal>
 
-      {/* Void Modal */}
-      <NeumorphicModal
-        isOpen={isVoidModalOpen}
-        onClose={() => window.history.back()}
-        title="Batalkan Transaksi (Void)"
-      >
-        <div style={{ marginBottom: '20px' }}>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-            Masukkan alasan pembatalan transaksi ini:
-          </p>
-          <NeumorphicInput
-            id="voidReasonInput"
-            placeholder="Contoh: Salah input pesanan"
-            value={voidReason}
-            onChange={(e: any) => setVoidReason(e.target.value)}
-            error={voidError && !voidReason.trim()}
-          />
-        </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <NeumorphicButton 
-            variant="flat" 
-            onClick={() => window.history.back()}
-            style={{ flex: 1 }}
-          >
-            Kembali
-          </NeumorphicButton>
-          <NeumorphicButton 
-            variant="danger" 
-            onClick={confirmVoidTransaction}
-            style={{ flex: 1 }}
-          >
-            Konfirmasi
-          </NeumorphicButton>
-        </div>
-      </NeumorphicModal>
     </div>
   );
 };
