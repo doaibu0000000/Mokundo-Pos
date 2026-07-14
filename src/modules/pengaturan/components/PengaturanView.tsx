@@ -175,6 +175,7 @@ export const PengaturanView: React.FC = () => {
       } else {
         setStoreSuccess('Pengaturan profil struk berhasil diperbarui!');
       }
+      setTimeout(() => setStoreSuccess(''), 2500);
       await refreshStore();
     } catch (e) {
       alert('Gagal menyimpan profil toko');
@@ -1006,7 +1007,7 @@ export const PengaturanView: React.FC = () => {
         <div style={{
           position: 'fixed',
           top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.4)',
+          backgroundColor: 'rgba(0,0,0,0.5)',
           backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
@@ -1016,36 +1017,53 @@ export const PengaturanView: React.FC = () => {
         }}>
           <div style={{
             backgroundColor: 'var(--bg-primary)',
-            padding: '32px 48px',
+            padding: '40px 48px',
             borderRadius: '24px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '16px',
-            boxShadow: '8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light)'
+            boxShadow: '0px 10px 30px rgba(0,0,0,0.2)'
           }}>
             <div style={{
-              width: '64px', height: '64px',
+              width: '80px', height: '80px',
               borderRadius: '50%',
-              backgroundColor: 'var(--accent-green)',
+              border: '4px solid rgba(165, 220, 134, 0.2)',
+              position: 'relative',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              animation: 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+              marginBottom: '20px'
             }}>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="80" height="80" style={{ position: 'absolute', top: '-4px', left: '-4px' }}>
+                <circle cx="40" cy="40" r="38" fill="none" stroke="#a5dc86" strokeWidth="4" 
+                  style={{
+                    strokeDasharray: 240,
+                    strokeDashoffset: 240,
+                    animation: 'drawCircle 0.5s ease-in-out forwards',
+                    transform: 'rotate(-45deg)',
+                    transformOrigin: '50% 50%'
+                  }} />
+              </svg>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#a5dc86" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ zIndex: 10 }}>
                 <polyline points="20 6 9 17 4 12" style={{
                   strokeDasharray: 50,
                   strokeDashoffset: 50,
-                  animation: 'drawCheck 0.4s 0.2s ease-out forwards'
+                  animation: 'drawCheck 0.4s 0.3s ease-out forwards'
                 }} />
               </svg>
             </div>
-            <p style={{ margin: 0, fontWeight: 700, fontSize: '15px', color: 'var(--text-primary)', textAlign: 'center' }}>
+            
+            <h2 style={{ margin: '0 0 12px 0', fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)' }}>
+              Sukses!
+            </h2>
+            <p style={{ margin: 0, fontWeight: 500, fontSize: '14px', color: 'var(--text-secondary)', textAlign: 'center' }}>
               {storeSuccess}
             </p>
           </div>
           <style>{`
             @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-            @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+            @keyframes drawCircle { 
+              0% { stroke-dashoffset: 240; } 
+              100% { stroke-dashoffset: 0; } 
+            }
             @keyframes drawCheck {
               0% { stroke-dashoffset: 50; }
               100% { stroke-dashoffset: 0; }
