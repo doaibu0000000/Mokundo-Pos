@@ -533,10 +533,38 @@ export const PengaturanView: React.FC = () => {
             </div>
           </NeumorphicCard>
 
+          <NeumorphicCard style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 800 }}>Akses & Tampilan</h3>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px dashed var(--text-muted)' }}>
+              <span style={{ fontSize: '13px' }}>Mode Gelap (Dark Mode)</span>
+              <NeumorphicButton 
+                size="sm"
+                active={isDarkMode}
+                onClick={toggleDarkMode}
+                style={{ padding: '6px 12px' }}
+              >
+                {isDarkMode ? <Sun size={14} color="var(--accent-orange)" /> : <Moon size={14} />}
+                <span style={{ marginLeft: '6px' }}>{isDarkMode ? 'ON' : 'OFF'}</span>
+              </NeumorphicButton>
+            </div>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
+              <span style={{ fontSize: '13px' }}>Mode Kontras Tinggi</span>
+              <NeumorphicButton 
+                size="sm"
+                active={isHighContrast}
+                onClick={toggleHighContrast}
+              >
+                {isHighContrast ? 'ON' : 'OFF'}
+              </NeumorphicButton>
+            </div>
+          </NeumorphicCard>
+
           <NeumorphicCard 
             className="nm-button"
             onClick={logoutUser}
-            style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer', marginTop: '8px' }}
           >
             <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-red)' }}><Power size={20} /></div>
             <div style={{ flex: 1, textAlign: 'left' }}>
