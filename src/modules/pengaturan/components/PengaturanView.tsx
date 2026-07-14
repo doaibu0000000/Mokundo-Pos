@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Settings, Key, Cloud, FolderLock, Power, AlertTriangle, Sun, Moon, Printer, ReceiptText } from 'lucide-react';
+import { Settings, Key, Cloud, FolderLock, Power, AlertTriangle, Sun, Moon, Printer, ReceiptText, Download } from 'lucide-react';
 import { useApp } from '../../../store/AppContext';
 import { db, hashPassword } from '../../../shared/services/db';
 import { SyncService } from '../../../shared/services/syncService';
