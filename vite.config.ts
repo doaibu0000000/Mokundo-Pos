@@ -38,8 +38,8 @@ export default defineConfig({
         enabled: true
       },
       manifest: {
-        name: 'Mokundo POS — Sistem Kasir',
-        short_name: 'Mokundo POS',
+        name: 'Mokundo',
+        short_name: 'Mokundo',
         description: 'Sistem Kasir (POS) Offline-First untuk UMKM',
         theme_color: '#0B204D',
         background_color: '#0B204D',
