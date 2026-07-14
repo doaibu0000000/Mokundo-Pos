@@ -347,7 +347,7 @@ export const PengaturanView: React.FC = () => {
 
 
   const renderHeader = (title: string, subtitle: string) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '0px' }}>
       <div>
         <h1 style={{ fontSize: '20px', fontWeight: 800 }}>{title}</h1>
         <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{subtitle}</p>
