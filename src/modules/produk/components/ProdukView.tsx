@@ -92,6 +92,11 @@ export const ProdukView: React.FC = () => {
     onConfirm: () => {}
   });
 
+
+  // Validation States
+  const [productSubmitAttempted, setProductSubmitAttempted] = useState(false);
+  const [categorySubmitAttempted, setCategorySubmitAttempted] = useState(false);
+
   // --- Global History Back Logic for Popups ---
   const hasPopup = isProductModalOpen || isCropModalOpen || isCategoryModalOpen || confirmConfig.isOpen;
   const prevHasPopup = React.useRef(false);
@@ -183,11 +188,13 @@ export const ProdukView: React.FC = () => {
       setProdThreshold('5');
       if (categories.length > 0) setProdKategoriId(categories[0].id!);
     }
+    setProductSubmitAttempted(false);
     setIsProductModalOpen(true);
   };
 
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setProductSubmitAttempted(true);
     setProdError('');
 
     const harga = parseFloat(prodHarga);
@@ -311,11 +318,13 @@ export const ProdukView: React.FC = () => {
       setCatNama('');
       setCatUrutan((categories.length + 1).toString());
     }
+    setCategorySubmitAttempted(false);
     setIsCategoryModalOpen(true);
   };
 
   const handleCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setCategorySubmitAttempted(true);
     setCatError('');
 
     const urutan = parseInt(catUrutan);
@@ -749,7 +758,7 @@ export const ProdukView: React.FC = () => {
         onClose={() => setIsProductModalOpen(false)}
         title={editingProduct ? 'Ubah Produk' : 'Tambah Produk Baru'}
       >
-        <form onSubmit={handleProductSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <form noValidate onSubmit={handleProductSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           
           <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
             {/* Image Uploader - Left Side */}
@@ -794,7 +803,7 @@ export const ProdukView: React.FC = () => {
                 placeholder="Masukkan nama"
                 value={prodNama}
                 onChange={(e) => setProdNama(e.target.value)}
-                required
+                error={productSubmitAttempted && !prodNama}
               />
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', position: 'relative' }}>
@@ -886,7 +895,7 @@ export const ProdukView: React.FC = () => {
               placeholder="0"
               value={prodHPP}
               onChange={(e) => setProdHPP(e.target.value)}
-              required
+              error={productSubmitAttempted && (!prodHPP || isNaN(parseFloat(prodHPP)))}
             />
             <NeumorphicInput
               label="Harga Jual"
@@ -894,7 +903,7 @@ export const ProdukView: React.FC = () => {
               placeholder="0"
               value={prodHarga}
               onChange={(e) => setProdHarga(e.target.value)}
-              required
+              error={productSubmitAttempted && (!prodHarga || isNaN(parseFloat(prodHarga)))}
             />
           </div>
 
@@ -904,7 +913,7 @@ export const ProdukView: React.FC = () => {
               placeholder="Misal: 888001"
               value={prodSku}
               onChange={(e) => setProdSku(e.target.value)}
-              required
+              error={productSubmitAttempted && !prodSku}
             />
             <NeumorphicInput
               label="Jumlah Stok"
@@ -912,7 +921,7 @@ export const ProdukView: React.FC = () => {
               placeholder="0"
               value={prodStok}
               onChange={(e) => setProdStok(e.target.value)}
-              required
+              error={productSubmitAttempted && (!prodStok || isNaN(parseInt(prodStok)))}
             />
           </div>
 
@@ -943,13 +952,13 @@ export const ProdukView: React.FC = () => {
         onClose={() => setIsCategoryModalOpen(false)}
         title={editingCategory ? 'Ubah Kategori' : 'Tambah Kategori Baru'}
       >
-        <form onSubmit={handleCategorySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <form noValidate onSubmit={handleCategorySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <NeumorphicInput
             label="Nama Kategori"
             placeholder="Misal: Pasta, Dessert"
             value={catNama}
             onChange={(e) => setCatNama(e.target.value)}
-            required
+            error={categorySubmitAttempted && !catNama}
           />
 
           <NeumorphicInput
@@ -958,7 +967,7 @@ export const ProdukView: React.FC = () => {
             placeholder="1"
             value={catUrutan}
             onChange={(e) => setCatUrutan(e.target.value)}
-            required
+            error={categorySubmitAttempted && (!catUrutan || isNaN(parseInt(catUrutan)))}
           />
 
           {catError && (

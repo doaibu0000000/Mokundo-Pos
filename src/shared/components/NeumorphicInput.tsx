@@ -7,6 +7,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   containerClassName?: string;
   containerStyle?: React.CSSProperties;
   borderRadius?: 'sm' | 'md' | 'lg' | 'xl' | 'pill';
+  error?: boolean;
 }
 
 export const NeumorphicInput: React.FC<InputProps> = ({
@@ -16,6 +17,7 @@ export const NeumorphicInput: React.FC<InputProps> = ({
   containerClassName = '',
   containerStyle,
   borderRadius = 'md',
+  error = false,
   className = '',
   id,
   style,
@@ -45,7 +47,7 @@ export const NeumorphicInput: React.FC<InputProps> = ({
     padding: `12px ${isPassword ? '40px' : '16px'} 12px ${icon ? '40px' : '16px'}`,
     width: '100%',
     fontSize: '14px',
-    border: 'var(--border-width-hc) solid var(--border-high-contrast)',
+    border: `var(--border-width-hc) solid ${error ? 'var(--accent-red)' : 'var(--border-high-contrast)'}`,
     ...({ WebkitTextSecurity: (isPassword && !showPassword) ? 'disc' : 'none' } as any),
     ...style,
   };
