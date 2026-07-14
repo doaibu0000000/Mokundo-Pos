@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Download, AlertTriangle, Eye } from 'lucide-react';
 import { db, type Transaction, type TransactionItem } from '../../../shared/services/db';
-import { NeumorphicCard, NeumorphicButton, NeumorphicModal } from '../../../shared/components';
+import { NeumorphicCard, NeumorphicButton, NeumorphicModal, NeumorphicInput } from '../../../shared/components';
 
 // Format currency helper
 const formatRupiah = (number: number) => {
@@ -527,13 +527,13 @@ export const LaporanView: React.FC = () => {
             id="voidReasonInput"
             placeholder="Contoh: Salah input pesanan"
             value={voidReason}
-            onChange={(e) => setVoidReason(e.target.value)}
+            onChange={(e: any) => setVoidReason(e.target.value)}
             error={voidError && !voidReason.trim()}
           />
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <NeumorphicButton 
-            variant="secondary" 
+            variant="flat" 
             onClick={() => setIsVoidModalOpen(false)}
             style={{ flex: 1 }}
           >
