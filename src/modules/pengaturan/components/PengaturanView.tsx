@@ -510,8 +510,6 @@ export const PengaturanView: React.FC = () => {
           </div>
 
           <NeumorphicCard style={{ width: '100%' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '20px' }}>Pengaturan Toko & Struk</h3>
-            
             <form onSubmit={handleSaveStore} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {profilTab === 'struk' && (
                 <>
