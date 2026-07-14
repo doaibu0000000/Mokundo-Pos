@@ -58,6 +58,10 @@
   box-shadow: inset 3px 3px 6px var(--shadow-dark-inset), inset -3px -3px 6px var(--shadow-light-inset), 0 0 8px var(--border-focus);
 }
 
+.nm-input.has-error {
+  border: 1.5px solid var(--accent-red) !important;
+}
+
 /* Standard animation utility */
 .transition-all-custom {
   transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;

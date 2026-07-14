@@ -47,7 +47,6 @@ export const NeumorphicInput: React.FC<InputProps> = ({
     padding: `12px ${isPassword ? '40px' : '16px'} 12px ${icon ? '40px' : '16px'}`,
     width: '100%',
     fontSize: '14px',
-    border: `var(--border-width-hc) solid ${error ? 'var(--accent-red)' : 'var(--border-high-contrast)'}`,
     ...({ WebkitTextSecurity: (isPassword && !showPassword) ? 'disc' : 'none' } as any),
     ...style,
   };
@@ -99,7 +98,7 @@ export const NeumorphicInput: React.FC<InputProps> = ({
         <input
           id={id}
           type={isPassword ? 'text' : type}
-          className={`nm-input transition-all-custom ${className}`}
+          className={`nm-input transition-all-custom ${error ? 'has-error' : ''} ${className}`}
           style={inputStyle}
           autoComplete="off"
           spellCheck="false"
