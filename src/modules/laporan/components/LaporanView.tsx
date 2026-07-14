@@ -159,7 +159,7 @@ export const LaporanView: React.FC = () => {
               produk_id: item.produk_id,
               jenis: 'IN',
               qty: item.qty,
-              keterangan: `Pembatalan (Void) TRX-${txId}`,
+              keterangan: `Pembatalan (Void) TRX-${voidTxId}`,
               tanggal: new Date().toISOString(),
               sync_status: 'PENDING'
             });
@@ -167,9 +167,9 @@ export const LaporanView: React.FC = () => {
         }
 
         // Update transaction status
-        await db.transactions.update(txId, {
+        await db.transactions.update(voidTxId, {
           status: 'VOIDED',
-          void_reason: reason,
+          void_reason: voidReason,
           sync_status: 'PENDING'
         });
 
