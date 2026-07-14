@@ -56,8 +56,8 @@ export const PengaturanView: React.FC = () => {
   const [receiptFooter, setReceiptFooter] = useState(store?.receipt_footer || '');
   const [ukuranKertas, setUkuranKertas] = useState(store?.ukuran_kertas_struk || '80mm');
   const [qrBarcode, setQrBarcode] = useState(store?.qr_barcode || '');
-  const [qrPromoText, setQrPromoText] = useState(store?.qr_promo_text || '');
-  const [receiptThankYou, setReceiptThankYou] = useState(store?.receipt_thankyou_text || '');
+  const [qrPromoText, setQrPromoText] = useState(store?.qr_promo_text || 'Mau pesan lagi tanpa antre atau\ntertarik punya bisnis kopi sendiri?\nPindai saya!');
+  const [receiptThankYou, setReceiptThankYou] = useState(store?.receipt_thankyou_text || 'Thank you for your order!');
   const [storeSuccess, setStoreSuccess] = useState('');
   
   // Bluetooth Print State
@@ -102,8 +102,8 @@ export const PengaturanView: React.FC = () => {
       setSyncEnabled(store.sync_enabled === 1);
       setUkuranKertas(store.ukuran_kertas_struk || '80mm');
       setQrBarcode(store.qr_barcode || '');
-      setQrPromoText(store.qr_promo_text || '');
-      setReceiptThankYou(store.receipt_thankyou_text || '');
+      setQrPromoText(store.qr_promo_text || 'Mau pesan lagi tanpa antre atau\ntertarik punya bisnis kopi sendiri?\nPindai saya!');
+      setReceiptThankYou(store.receipt_thankyou_text || 'Thank you for your order!');
     }
   }, [store]);
 
