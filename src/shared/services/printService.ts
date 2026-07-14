@@ -622,14 +622,12 @@ export class PrintService {
 
   ${qrCodeImg ? `
   <div class="promo">
-    Mau pesan lagi tanpa antre atau<br>
-    tertarik punya bisnis kopi sendiri?<br>
-    <div style="margin-top: 4px;">Pindai saya!</div>
+    ${store.qr_promo_text ? store.qr_promo_text.replace(/\n/g, '<br>') : 'Mau pesan lagi tanpa antre atau<br>tertarik punya bisnis kopi sendiri?<br><div style="margin-top: 4px;">Pindai saya!</div>'}
   </div>
   <div class="qr-box">${qrCodeImg}</div>
   ` : ''}
 
-  <div class="thankyou">Thank you for your order!</div>
+  <div class="thankyou">${store.receipt_thankyou_text ? store.receipt_thankyou_text.replace(/\n/g, '<br>') : 'Thank you for your order!'}</div>
 
   <hr class="divider">
 

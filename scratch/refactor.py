@@ -1,339 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { Settings, Key, Cloud, FolderLock, Power, AlertTriangle, Sun, Moon, Printer, ReceiptText, Download } from 'lucide-react';
-import { useApp } from '../../../store/AppContext';
-import { db, hashPassword } from '../../../shared/services/db';
-import { SyncService } from '../../../shared/services/syncService';
-import { NeumorphicCard, NeumorphicButton, NeumorphicInput } from '../../../shared/components';
+import re
 
-// Format currency helper
-const formatRupiah = (number: number) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(number);
-};
+filepath = 'src/modules/pengaturan/components/PengaturanView.tsx'
+with open(filepath, 'r', encoding='utf-8') as f:
+    content = f.read()
 
-export const PengaturanView: React.FC = () => {
-  const {
-    user,
-    store,
-    currentShift,
-    refreshStore,
-    refreshShift,
-    logoutUser,
-    canInstall,
-    installApp,
-    isDarkMode,
-    toggleDarkMode
-  } = useApp();
+# 1. Replace activeSubTab with activeScreen
+content = content.replace(
+    "const [activeSubTab, setActiveSubTab] = useState<'profil' | 'keamanan' | 'sync' | 'shift'>('profil');",
+    "const [activeScreen, setActiveScreen] = useState<'menu' | 'profil' | 'printer' | 'keamanan' | 'sync' | 'shift'>('menu');"
+)
 
-  const [activeScreen, setActiveScreen] = useState<'menu' | 'profil' | 'printer' | 'keamanan' | 'sync' | 'shift'>('menu');
+# 2. Extract the main return part
+# It starts at: `  return (\n    <div style={{ padding: '20px', height: '100%', overflowY: 'auto' }}>`
+# after the Kasir check block.
+# Let's find the exact index.
+main_return_start = content.find("  return (\n    <div style={{ padding: '20px', height: '100%', overflowY: 'auto' }}>\n      \n      {/* Settings layout header */}")
 
-  const navigateTo = (screen: 'menu' | 'profil' | 'printer' | 'keamanan' | 'sync' | 'shift') => {
-    if (screen !== 'menu' && activeScreen === 'menu') {
-      window.history.pushState({ screen }, '');
-    }
-    setActiveScreen(screen);
-  };
+if main_return_start == -1:
+    print("Could not find main return block")
+    exit(1)
 
-  useEffect(() => {
-    const handlePopState = () => {
-      if (activeScreen !== 'menu') {
-        setActiveScreen('menu');
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [activeScreen]);
-
-  // Profil & Pajak States
-  const [storeNama, setStoreNama] = useState(store?.nama || '');
-  const [storeAlamat, setStoreAlamat] = useState(store?.alamat || '');
-  const [storeService, setStoreService] = useState(store?.service_charge?.toString() || '');
-  const [receiptHeader, setReceiptHeader] = useState(store?.receipt_header || '');
-  const [receiptFooter, setReceiptFooter] = useState(store?.receipt_footer || '');
-  const [ukuranKertas, setUkuranKertas] = useState(store?.ukuran_kertas_struk || '80mm');
-  const [qrBarcode, setQrBarcode] = useState(store?.qr_barcode || '');
-  const [qrPromoText, setQrPromoText] = useState(store?.qr_promo_text || '');
-  const [receiptThankYou, setReceiptThankYou] = useState(store?.receipt_thankyou_text || '');
-  const [storeSuccess, setStoreSuccess] = useState('');
-  
-  // Bluetooth Print State
-  const [connectedBluetooth, setConnectedBluetooth] = useState<string | null>(null);
-  const [bluetoothError, setBluetoothError] = useState('');
-  const [isBluetoothConnecting, setIsBluetoothConnecting] = useState(false);
-
-  // Password Security States
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [securityError, setSecurityError] = useState('');
-  const [securitySuccess, setSecuritySuccess] = useState('');
-
-  // Supabase Sync States
-  const [supabaseUrl, setSupabaseUrl] = useState(store?.supabase_url || '');
-  const [supabaseKey, setSupabaseKey] = useState(store?.supabase_anon_key || '');
-  const [syncEnabled, setSyncEnabled] = useState(store?.sync_enabled === 1);
-  const [syncError, setSyncError] = useState('');
-  const [syncSuccess, setSyncSuccess] = useState('');
-  const [isSyncingNow, setIsSyncingNow] = useState(false);
-
-  // Cash / Shift Reconciliation States
-  const [cashRegister, setCashRegister] = useState('');
-  const [shiftSuccess, setShiftSuccess] = useState('');
-  const [shiftError, setShiftError] = useState('');
-
-
-  useEffect(() => {
-    import('../../../shared/services/printService').then(({ PrintService }) => {
-      setConnectedBluetooth(PrintService.getConnectedBluetoothName());
-    });
-    
-    if (store) {
-      setStoreNama(store.nama);
-      setStoreAlamat(store.alamat);
-      setStoreService(store.service_charge.toString());
-      setReceiptHeader(store.receipt_header);
-      setReceiptFooter(store.receipt_footer);
-      setSupabaseUrl(store.supabase_url);
-      setSupabaseKey(store.supabase_anon_key);
-      setSyncEnabled(store.sync_enabled === 1);
-      setUkuranKertas(store.ukuran_kertas_struk || '80mm');
-      setQrBarcode(store.qr_barcode || '');
-      setQrPromoText(store.qr_promo_text || '');
-      setReceiptThankYou(store.receipt_thankyou_text || '');
-    }
-  }, [store]);
-
-  const handlePairBluetooth = async () => {
-    setBluetoothError('');
-    setIsBluetoothConnecting(true);
-    try {
-      const { PrintService } = await import('../../../shared/services/printService');
-      const name = await PrintService.connectBluetoothPrinter();
-      setConnectedBluetooth(name);
-    } catch (e: any) {
-      setBluetoothError(e.message);
-    } finally {
-      setIsBluetoothConnecting(false);
-    }
-  };
-
-  // Update Store info
-  const handleSaveStore = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStoreSuccess('');
-
-    const serviceCharge = parseFloat(storeService);
-
-    if (!storeNama || isNaN(serviceCharge)) {
-      alert('Harap isi form nama dan alamat dengan benar');
-      return;
-    }
-
-    try {
-      await db.stores.update(store!.id!, {
-        nama: storeNama,
-        alamat: storeAlamat,
-        PPN: 0,
-        service_charge: serviceCharge,
-        receipt_header: receiptHeader,
-        receipt_footer: receiptFooter,
-        ukuran_kertas_struk: ukuranKertas,
-        qr_barcode: qrBarcode,
-        qr_promo_text: qrPromoText,
-        receipt_thankyou_text: receiptThankYou
-      });
-      setStoreSuccess('Pengaturan profil toko berhasil diperbarui!');
-      await refreshStore();
-    } catch (e) {
-      alert('Gagal menyimpan profil toko');
-    }
-  };
-
-  // Change Password Security
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSecurityError('');
-    setSecuritySuccess('');
-
-    if (!oldPassword || !newPassword || !confirmPassword) {
-      setSecurityError('Semua field sandi wajib diisi');
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setSecurityError('Konfirmasi kata sandi baru tidak cocok');
-      return;
-    }
-
-    try {
-      const dbUser = await db.users.get(user!.id!);
-      if (!dbUser) return;
-
-      const oldHash = await hashPassword(oldPassword);
-      if (dbUser.password_hash !== oldHash) {
-        setSecurityError('Kata sandi lama salah');
-        return;
-      }
-
-      const newHash = await hashPassword(newPassword);
-      await db.users.update(user!.id!, { password_hash: newHash });
-
-      setSecuritySuccess('Kata sandi berhasil diubah! Jangan gunakan sandi default kembali.');
-      setOldPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch (e) {
-      setSecurityError('Gagal memperbarui kata sandi');
-    }
-  };
-
-  // Save Supabase Sync parameters
-  const handleSaveSync = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSyncError('');
-    setSyncSuccess('');
-
-    try {
-      await db.stores.update(store!.id!, {
-        supabase_url: supabaseUrl,
-        supabase_anon_key: supabaseKey,
-        sync_enabled: syncEnabled ? 1 : 0
-      });
-      
-      setSyncSuccess('Pengaturan sinkronisasi berhasil disimpan!');
-      await refreshStore();
-
-      // Trigger test sync immediately if enabled
-      if (syncEnabled && supabaseUrl && supabaseKey) {
-        setIsSyncingNow(true);
-        const res = await SyncService.syncAll();
-        setIsSyncingNow(false);
-        if (res.success) {
-          setSyncSuccess(`Sinkronisasi aktif! Berhasil mengunggah ${res.syncedCount} baris data.`);
-        }
-      }
-    } catch (err) {
-      setSyncError('Gagal menyimpan kredensial Supabase');
-    }
-  };
-
-  // Close shift cashier and reconcile balance
-  const handleCloseShift = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setShiftError('');
-    setShiftSuccess('');
-
-    const kasAkhir = parseFloat(cashRegister);
-    if (isNaN(kasAkhir) || kasAkhir < 0) {
-      setShiftError('Masukkan saldo kas laci akhir yang valid');
-      return;
-    }
-
-    // Expected cash = modal_awal + total_penjualan_tunai
-    const expectedCash = currentShift!.modal_awal + currentShift!.total_penjualan_tunai;
-    const variance = kasAkhir - expectedCash;
-
-    try {
-      await db.shifts.update(currentShift!.id!, {
-        waktu_tutup: new Date().toISOString(),
-        kas_akhir: kasAkhir,
-        selisih_kas: variance,
-        status: 'CLOSED',
-        sync_status: 'PENDING'
-      });
-
-      setShiftSuccess(`Shift kasir berhasil ditutup. Selisih Kas: ${formatRupiah(variance)}`);
-      setCashRegister('');
-      await refreshShift();
-
-      // Also trigger cloud sync since shift closed
-      SyncService.syncAll().catch((err: any) => console.error(err));
-    } catch (e) {
-      setShiftError('Gagal melakukan penutupan laci kasir');
-    }
-  };
-
-  if (user?.role === 'Kasir') {
-    return (
-      <div style={{ padding: '20px', height: '100%', overflowY: 'auto' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '500px', margin: '0 auto' }}>
-          
-          <NeumorphicCard style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', padding: '24px 20px', textAlign: 'center' }}>
-            <div
-              className="nm-inset"
-              style={{
-                width: '72px',
-                height: '72px',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--accent-blue)',
-                marginBottom: '8px'
-              }}
-            >
-              <Settings size={36} />
-            </div>
-            <div>
-              <h2 style={{ fontSize: '18px', fontWeight: 800 }}>{user.nama_lengkap}</h2>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                Peran Pengguna: <span style={{ fontWeight: 700, color: 'var(--accent-green)' }}>{user.role}</span>
-              </p>
-            </div>
-          </NeumorphicCard>
-
-          <NeumorphicCard style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 800 }}>Akses & Tampilan</h3>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
-              <span style={{ fontSize: '13px' }}>Mode Gelap (Dark Mode)</span>
-              <NeumorphicButton 
-                size="sm"
-                active={isDarkMode}
-                onClick={toggleDarkMode}
-                style={{ padding: '6px 12px' }}
-              >
-                {isDarkMode ? <Sun size={14} color="var(--accent-orange)" /> : <Moon size={14} />}
-                <span style={{ marginLeft: '6px' }}>{isDarkMode ? 'ON' : 'OFF'}</span>
-              </NeumorphicButton>
-            </div>
-            
-            
-            
-            {canInstall && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '8px' }}>
-                <span style={{ fontSize: '13px', fontWeight: 700 }}>Aplikasi POS PWA</span>
-                <NeumorphicButton variant="primary" size="sm" onClick={installApp} style={{ width: '100%' }}>
-                  Pasang Aplikasi di HP
-                </NeumorphicButton>
-              </div>
-            )}
-          </NeumorphicCard>
-
-          <NeumorphicButton 
-            onClick={logoutUser} 
-            style={{ 
-              width: '100%', 
-              padding: '14px', 
-              color: 'var(--accent-red)',
-              fontWeight: 800
-            }}
-          >
-            Keluar dari Akun (Logout)
-          </NeumorphicButton>
-
-        </div>
-      </div>
-    );
-  }
-
-
+new_render_logic = """
   const renderHeader = (title: string, subtitle: string) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+      <NeumorphicButton size="sm" onClick={() => setActiveScreen('menu')} style={{ padding: '8px 12px' }}>
+        ← Kembali
+      </NeumorphicButton>
       <div>
         <h1 style={{ fontSize: '20px', fontWeight: 800 }}>{title}</h1>
         <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{subtitle}</p>
@@ -378,22 +70,22 @@ export const PengaturanView: React.FC = () => {
 
           <NeumorphicCard 
             className="nm-button"
-            onClick={() => navigateTo('profil')}
+            onClick={() => setActiveScreen('profil')}
             style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
           >
-            <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-blue)' }}><ReceiptText size={20} /></div>
+            <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-blue)' }}><Settings size={20} /></div>
             <div style={{ flex: 1, textAlign: 'left' }}>
-              <div style={{ fontWeight: 800, fontSize: '15px' }}>Tampilan Struk</div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Ubah nama dan alamat pada struk</div>
+              <div style={{ fontWeight: 800, fontSize: '15px' }}>Profil & Pajak Toko</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Ubah nama, alamat, pajak</div>
             </div>
           </NeumorphicCard>
 
           <NeumorphicCard 
             className="nm-button"
-            onClick={() => navigateTo('printer')}
+            onClick={() => setActiveScreen('printer')}
             style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
           >
-            <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--text-primary)' }}><Printer size={20} /></div>
+            <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--text-primary)' }}><Settings size={20} /></div>
             <div style={{ flex: 1, textAlign: 'left' }}>
               <div style={{ fontWeight: 800, fontSize: '15px' }}>Printer Bluetooth</div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Koneksi ke printer thermal</div>
@@ -402,7 +94,7 @@ export const PengaturanView: React.FC = () => {
 
           <NeumorphicCard 
             className="nm-button"
-            onClick={() => navigateTo('keamanan')}
+            onClick={() => setActiveScreen('keamanan')}
             style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
           >
             <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-orange)' }}><Key size={20} /></div>
@@ -414,7 +106,7 @@ export const PengaturanView: React.FC = () => {
 
           <NeumorphicCard 
             className="nm-button"
-            onClick={() => navigateTo('sync')}
+            onClick={() => setActiveScreen('sync')}
             style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
           >
             <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-green)' }}><Cloud size={20} /></div>
@@ -426,7 +118,7 @@ export const PengaturanView: React.FC = () => {
 
           <NeumorphicCard 
             className="nm-button"
-            onClick={() => navigateTo('shift')}
+            onClick={() => setActiveScreen('shift')}
             style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
           >
             <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-blue)' }}><FolderLock size={20} /></div>
@@ -436,29 +128,10 @@ export const PengaturanView: React.FC = () => {
             </div>
           </NeumorphicCard>
 
-          <NeumorphicCard style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 800 }}>Akses & Tampilan</h3>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
-              <span style={{ fontSize: '13px' }}>Mode Gelap (Dark Mode)</span>
-              <NeumorphicButton 
-                size="sm"
-                active={isDarkMode}
-                onClick={toggleDarkMode}
-                style={{ padding: '6px 12px' }}
-              >
-                {isDarkMode ? <Sun size={14} color="var(--accent-orange)" /> : <Moon size={14} />}
-                <span style={{ marginLeft: '6px' }}>{isDarkMode ? 'ON' : 'OFF'}</span>
-              </NeumorphicButton>
-            </div>
-            
-            
-          </NeumorphicCard>
-
           <NeumorphicCard 
             className="nm-button"
             onClick={logoutUser}
-            style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer', marginTop: '8px' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
           >
             <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-red)' }}><Power size={20} /></div>
             <div style={{ flex: 1, textAlign: 'left' }}>
@@ -476,7 +149,7 @@ export const PengaturanView: React.FC = () => {
       
       {activeScreen === 'profil' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '600px' }}>
-          {renderHeader('Tampilan Struk', 'Ubah nama dan alamat')}
+          {renderHeader('Profil & Pajak Toko', 'Ubah nama, alamat, dan pajak')}
           
           <NeumorphicCard style={{ width: '100%' }}>
             <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '20px' }}>Pengaturan Toko & Struk</h3>
@@ -580,47 +253,10 @@ export const PengaturanView: React.FC = () => {
                     borderRadius: 'var(--radius-md)',
                     fontSize: '13px',
                     fontFamily: 'monospace',
-                  border: 'var(--border-width-hc) solid var(--border-high-contrast)'
-                  }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Promo QR Code</label>
-                <textarea
-                  value={qrPromoText}
-                  onChange={(e) => setQrPromoText(e.target.value)}
-                  placeholder="Misal: Mau pesan lagi tanpa antre? Pindai saya!"
-                  rows={2}
-                  className="nm-input"
-                  style={{
-                    padding: '12px',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: '13px',
-                    fontFamily: 'monospace',
                     border: 'var(--border-width-hc) solid var(--border-high-contrast)'
                   }}
                 />
               </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Teks Terima Kasih</label>
-                <textarea
-                  value={receiptThankYou}
-                  onChange={(e) => setReceiptThankYou(e.target.value)}
-                  placeholder="Misal: Thank you for your order!"
-                  rows={2}
-                  className="nm-input"
-                  style={{
-                    padding: '12px',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: '13px',
-                    fontFamily: 'monospace',
-                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
-                  }}
-                />
-              </div>
-
 
               {storeSuccess && (
                 <div style={{ color: 'var(--accent-green)', fontSize: '12px', fontWeight: 600 }}>
@@ -634,6 +270,57 @@ export const PengaturanView: React.FC = () => {
             </form>
           </NeumorphicCard>
 
+          <NeumorphicCard style={{ width: '100%' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '12px' }}>Ekspor & Impor Data Produk (CSV)</h3>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px', lineHeight: '1.4' }}>
+              Ekspor daftar produk saat ini ke file spreadsheet CSV, atau impor dari file CSV untuk menambahkan produk baru secara massal.
+            </p>
+            
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <NeumorphicButton size="sm" onClick={handleExportCSV} style={{ flex: 1, minWidth: '120px' }}>
+                <Download size={14} style={{ marginRight: '6px' }} /> Ekspor ke CSV
+              </NeumorphicButton>
+              
+              <label 
+                className="nm-button" 
+                style={{
+                  flex: 1,
+                  minWidth: '120px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '10px 16px',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  color: 'var(--text-primary)',
+                  boxShadow: '3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light)',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <Upload size={14} /> Impor dari CSV
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleImportCSV}
+                  style={{ display: 'none' }}
+                />
+              </label>
+            </div>
+
+            {csvError && (
+              <div style={{ color: 'var(--accent-red)', fontSize: '12px', fontWeight: 600, marginTop: '12px' }}>
+                ⚠️ {csvError}
+              </div>
+            )}
+            {csvSuccess && (
+              <div style={{ color: 'var(--accent-green)', fontSize: '12px', fontWeight: 600, marginTop: '12px' }}>
+                ✓ {csvSuccess}
+              </div>
+            )}
+          </NeumorphicCard>
         </div>
       )}
 
@@ -891,3 +578,10 @@ export const PengaturanView: React.FC = () => {
     </div>
   );
 };
+"""
+
+content = content[:main_return_start] + new_render_logic
+
+with open(filepath, 'w', encoding='utf-8') as f:
+    f.write(content)
+print("Successfully refactored PengaturanView.tsx")
