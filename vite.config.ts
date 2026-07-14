@@ -42,7 +42,7 @@ export default defineConfig({
         short_name: 'Mokundo POS',
         description: 'Sistem Kasir (POS) Offline-First untuk UMKM',
         theme_color: '#2B2F3A',
-        background_color: '#0B204D',
+        background_color: '#FAF7EE',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/Mokundo-Pos/',
