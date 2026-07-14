@@ -36,35 +36,30 @@ export const LaporanView: React.FC = () => {
   const [voidError, setVoidError] = useState(false);
   const [voidTxId, setVoidTxId] = useState<number | null>(null);
 
-  // --- Global History Back Logic for Popups ---
-  const hasPopup = isDetailOpen || isVoidModalOpen;
-  const prevHasPopup = React.useRef(false);
+  // --- Sequential Modal History Logic ---
+  useEffect(() => {
+    if (isDetailOpen) window.history.pushState({ modal: 'detail' }, '');
+  }, [isDetailOpen]);
 
   useEffect(() => {
-    if (hasPopup && !prevHasPopup.current) {
-      window.history.pushState({ popupOpen: true }, '');
-      prevHasPopup.current = true;
-    } else if (!hasPopup && prevHasPopup.current) {
-      prevHasPopup.current = false;
-      setTimeout(() => {
-        if (window.history.state?.popupOpen) {
-          window.history.back();
-        }
-      }, 50);
-    }
-  }, [hasPopup]);
+    if (isVoidModalOpen) window.history.pushState({ modal: 'void' }, '');
+  }, [isVoidModalOpen]);
 
   useEffect(() => {
-    const handlePopState = () => {
-      if (prevHasPopup.current) {
-        setIsDetailOpen(false);
+    const handlePopState = (e: PopStateEvent) => {
+      const stateModal = e.state?.modal;
+      if (!stateModal) {
         setIsVoidModalOpen(false);
+        setIsDetailOpen(false);
+      } else if (stateModal === 'detail') {
+        setIsVoidModalOpen(false);
+        setIsDetailOpen(true);
       }
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
-  // ----------------------------------------------
+  // ----------------------------------------
 
 
   useEffect(() => {
@@ -386,7 +381,7 @@ export const LaporanView: React.FC = () => {
       {/* TRANSACTION DETAIL MODAL */}
       <NeumorphicModal
         isOpen={isDetailOpen}
-        onClose={() => setIsDetailOpen(false)}
+        onClose={() => window.history.back()}
         title="Detail Transaksi"
       >
         {selectedTx && (
@@ -516,7 +511,7 @@ export const LaporanView: React.FC = () => {
       {/* Void Modal */}
       <NeumorphicModal
         isOpen={isVoidModalOpen}
-        onClose={() => setIsVoidModalOpen(false)}
+        onClose={() => window.history.back()}
         title="Batalkan Transaksi (Void)"
       >
         <div style={{ marginBottom: '20px' }}>
@@ -534,7 +529,7 @@ export const LaporanView: React.FC = () => {
         <div style={{ display: 'flex', gap: '12px' }}>
           <NeumorphicButton 
             variant="flat" 
-            onClick={() => setIsVoidModalOpen(false)}
+            onClick={() => window.history.back()}
             style={{ flex: 1 }}
           >
             Kembali
