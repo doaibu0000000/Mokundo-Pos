@@ -71,6 +71,7 @@ export const TransaksiView: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<'Tunai' | 'QRIS' | 'DANA' | 'GoPay' | 'OVO' | 'Bank'>('Tunai');
   const [cashPaid, setCashPaid] = useState('');
   const [checkoutError, setCheckoutError] = useState('');
+  const [paymentSubmitAttempted, setPaymentSubmitAttempted] = useState(false);
   
   // Receipt State
   const [completedTx, setCompletedTx] = useState<Transaction | null>(null);
@@ -254,12 +255,12 @@ export const TransaksiView: React.FC = () => {
   };
 
   const handleCheckoutSubmit = async () => {
+    setPaymentSubmitAttempted(true);
     setCheckoutError('');
 
     // Validations
     if (cart.length === 0) return;
     if (paymentMethod === 'Tunai' && (parseFloat(cashPaid) || 0) < cartTotals.total) {
-      setCheckoutError('Uang tunai dibayarkan kurang dari total belanja');
       return;
     }
 
@@ -840,6 +841,7 @@ export const TransaksiView: React.FC = () => {
                 value={cashPaid}
                 onChange={(e) => setCashPaid(e.target.value)}
                 autoFocus
+                error={paymentSubmitAttempted && (parseFloat(cashPaid) || 0) < cartTotals.total}
               />
               
               {/* Cash suggestion buttons */}
@@ -1135,6 +1137,7 @@ export const TransaksiView: React.FC = () => {
             disabled={cart.length === 0}
             onClick={() => {
               setIsCartOpen(false);
+              setPaymentSubmitAttempted(false);
               setIsPaymentOpen(true);
             }}
             style={{ width: '100%', marginTop: '8px', padding: '12px' }}
