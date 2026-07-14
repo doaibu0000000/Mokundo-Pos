@@ -50,9 +50,14 @@ export const PengaturanView: React.FC = () => {
 
   // Profil & Pajak States
   const [storeNama, setStoreNama] = useState(store?.nama || '');
+  const formatPhone = (phone?: string) => {
+    if (!phone) return '081234567890';
+    return phone.replace(/Telp:\s*/i, '').replace(/-/g, '').trim();
+  };
+
   const [storeAlamat, setStoreAlamat] = useState(store?.alamat || 'Kp. Surantaka, RT.02/RW.01, Desa Kalijati Timur, Kecamatan Kalijati, Kabupaten Subang, Jawa Barat, 41271');
   const [storeService, setStoreService] = useState(store?.service_charge?.toString() || '0');
-  const [receiptHeader, setReceiptHeader] = useState(store?.receipt_header || '081234567890');
+  const [receiptHeader, setReceiptHeader] = useState(formatPhone(store?.receipt_header));
   const [receiptFooter, setReceiptFooter] = useState(store?.receipt_footer || '');
   const [ukuranKertas, setUkuranKertas] = useState(store?.ukuran_kertas_struk || '80mm');
   const [qrBarcode, setQrBarcode] = useState(store?.qr_barcode || '');
@@ -96,7 +101,7 @@ export const PengaturanView: React.FC = () => {
       setStoreNama(store.nama);
       setStoreAlamat(store.alamat || 'Kp. Surantaka, RT.02/RW.01, Desa Kalijati Timur, Kecamatan Kalijati, Kabupaten Subang, Jawa Barat, 41271');
       setStoreService(store.service_charge?.toString() || '0');
-      setReceiptHeader(store.receipt_header || '081234567890');
+      setReceiptHeader(formatPhone(store.receipt_header));
       setReceiptFooter(store.receipt_footer);
       setSupabaseUrl(store.supabase_url);
       setSupabaseKey(store.supabase_anon_key);
