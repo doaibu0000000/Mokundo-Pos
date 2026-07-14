@@ -416,9 +416,6 @@ export const PengaturanView: React.FC = () => {
 
   const renderHeader = (title: string, subtitle: string) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-      <NeumorphicButton size="sm" onClick={() => { window.history.back(); }} style={{ padding: '8px 12px' }}>
-        ← Kembali
-      </NeumorphicButton>
       <div>
         <h1 style={{ fontSize: '20px', fontWeight: 800 }}>{title}</h1>
         <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{subtitle}</p>
