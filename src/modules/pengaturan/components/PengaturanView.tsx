@@ -170,7 +170,11 @@ export const PengaturanView: React.FC = () => {
         receipt_thankyou_text: receiptThankYou,
         receipt_footer_brand: receiptFooterBrand
       });
-      setStoreSuccess('Pengaturan profil toko berhasil diperbarui!');
+      if (profilTab === 'setting') {
+        setStoreSuccess('Pengaturan kertas thermal berhasil diperbarui!');
+      } else {
+        setStoreSuccess('Pengaturan profil struk berhasil diperbarui!');
+      }
       await refreshStore();
     } catch (e) {
       alert('Gagal menyimpan profil toko');
@@ -701,7 +705,7 @@ export const PengaturanView: React.FC = () => {
               )}
 
               <NeumorphicButton type="submit" variant="primary" style={{ marginTop: '8px' }}>
-                Simpan Perubahan
+                {profilTab === 'setting' ? 'Simpan Pengaturan Kertas' : 'Simpan Profil Struk'}
               </NeumorphicButton>
             </form>
           </NeumorphicCard>
