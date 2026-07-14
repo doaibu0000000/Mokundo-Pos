@@ -550,11 +550,13 @@ export const PengaturanView: React.FC = () => {
                   rows={3}
                   className="nm-input"
                   style={{
-                    padding: '12px',
+                    padding: '12px 12px 16px 12px',
+                    lineHeight: '1.5',
                     borderRadius: 'var(--radius-md)',
                     fontSize: '13px',
                     fontFamily: 'monospace',
-                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
+                    border: 'var(--border-width-hc) solid var(--border-high-contrast)',
+                    resize: 'vertical'
                   }}
                 />
               </div>
@@ -586,11 +588,13 @@ export const PengaturanView: React.FC = () => {
                   rows={2}
                   className="nm-input"
                   style={{
-                    padding: '12px',
+                    padding: '12px 12px 16px 12px',
+                    lineHeight: '1.5',
                     borderRadius: 'var(--radius-md)',
                     fontSize: '13px',
                     fontFamily: 'monospace',
-                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
+                    border: 'var(--border-width-hc) solid var(--border-high-contrast)',
+                    resize: 'vertical'
                   }}
                 />
               </div>
@@ -604,11 +608,13 @@ export const PengaturanView: React.FC = () => {
                   rows={2}
                   className="nm-input"
                   style={{
-                    padding: '12px',
+                    padding: '12px 12px 16px 12px',
+                    lineHeight: '1.5',
                     borderRadius: 'var(--radius-md)',
                     fontSize: '13px',
                     fontFamily: 'monospace',
-                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
+                    border: 'var(--border-width-hc) solid var(--border-high-contrast)',
+                    resize: 'vertical'
                   }}
                 />
               </div>
@@ -621,11 +627,13 @@ export const PengaturanView: React.FC = () => {
                   rows={3}
                   className="nm-input"
                   style={{
-                    padding: '12px',
+                    padding: '12px 12px 16px 12px',
+                    lineHeight: '1.5',
                     borderRadius: 'var(--radius-md)',
                     fontSize: '13px',
                     fontFamily: 'monospace',
-                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
+                    border: 'var(--border-width-hc) solid var(--border-high-contrast)',
+                    resize: 'vertical'
                   }}
                 />
               </div>
