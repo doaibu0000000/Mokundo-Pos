@@ -1003,74 +1003,63 @@ export const PengaturanView: React.FC = () => {
         </NeumorphicModal>
       )}
 
-      {storeSuccess && (
+      <NeumorphicModal
+        isOpen={!!storeSuccess}
+        onClose={() => setStoreSuccess('')}
+        hideCloseButton={true}
+        width="340px"
+      >
         <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          backdropFilter: 'blur(4px)',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          animation: 'fadeIn 0.2s ease-out'
+          padding: '24px 16px 8px 16px',
         }}>
           <div style={{
-            backgroundColor: 'var(--bg-primary)',
-            padding: '40px 48px',
-            borderRadius: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            boxShadow: '0px 10px 30px rgba(0,0,0,0.2)'
+            width: '80px', height: '80px',
+            borderRadius: '50%',
+            border: '4px solid rgba(165, 220, 134, 0.2)',
+            position: 'relative',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginBottom: '24px'
           }}>
-            <div style={{
-              width: '80px', height: '80px',
-              borderRadius: '50%',
-              border: '4px solid rgba(165, 220, 134, 0.2)',
-              position: 'relative',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: '20px'
-            }}>
-              <svg width="80" height="80" style={{ position: 'absolute', top: '-4px', left: '-4px' }}>
-                <circle cx="40" cy="40" r="38" fill="none" stroke="#a5dc86" strokeWidth="4" 
-                  style={{
-                    strokeDasharray: 240,
-                    strokeDashoffset: 240,
-                    animation: 'drawCircle 0.5s ease-in-out forwards',
-                    transform: 'rotate(-45deg)',
-                    transformOrigin: '50% 50%'
-                  }} />
-              </svg>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#a5dc86" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ zIndex: 10 }}>
-                <polyline points="20 6 9 17 4 12" style={{
-                  strokeDasharray: 50,
-                  strokeDashoffset: 50,
-                  animation: 'drawCheck 0.4s 0.3s ease-out forwards'
+            <svg width="80" height="80" style={{ position: 'absolute', top: '-4px', left: '-4px' }}>
+              <circle cx="40" cy="40" r="38" fill="none" stroke="#a5dc86" strokeWidth="4" 
+                style={{
+                  strokeDasharray: 240,
+                  strokeDashoffset: 240,
+                  animation: 'drawCircle 0.5s ease-in-out forwards',
+                  transform: 'rotate(-45deg)',
+                  transformOrigin: '50% 50%'
                 }} />
-              </svg>
-            </div>
-            
-            <h2 style={{ margin: '0 0 12px 0', fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)' }}>
-              Sukses!
-            </h2>
-            <p style={{ margin: 0, fontWeight: 500, fontSize: '14px', color: 'var(--text-secondary)', textAlign: 'center' }}>
-              {storeSuccess}
-            </p>
+            </svg>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#a5dc86" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ zIndex: 10 }}>
+              <polyline points="20 6 9 17 4 12" style={{
+                strokeDasharray: 50,
+                strokeDashoffset: 50,
+                animation: 'drawCheck 0.4s 0.3s ease-out forwards'
+              }} />
+            </svg>
           </div>
-          <style>{`
-            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-            @keyframes drawCircle { 
-              0% { stroke-dashoffset: 240; } 
-              100% { stroke-dashoffset: 0; } 
-            }
-            @keyframes drawCheck {
-              0% { stroke-dashoffset: 50; }
-              100% { stroke-dashoffset: 0; }
-            }
-          `}</style>
+          
+          <h2 style={{ margin: '0 0 12px 0', fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)' }}>
+            Sukses!
+          </h2>
+          <p style={{ margin: 0, fontWeight: 500, fontSize: '14px', color: 'var(--text-secondary)', textAlign: 'center' }}>
+            {storeSuccess}
+          </p>
         </div>
-      )}
+        <style>{`
+          @keyframes drawCircle { 
+            0% { stroke-dashoffset: 240; } 
+            100% { stroke-dashoffset: 0; } 
+          }
+          @keyframes drawCheck {
+            0% { stroke-dashoffset: 50; }
+            100% { stroke-dashoffset: 0; }
+          }
+        `}</style>
+      </NeumorphicModal>
 
     </div>
   );
