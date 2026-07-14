@@ -362,7 +362,7 @@ export const PengaturanView: React.FC = () => {
 
 
   const renderHeader = (title: string, subtitle: string) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '0px' }}>
       <div>
         <h1 style={{ fontSize: '20px', fontWeight: 800, margin: 0, marginBottom: '4px' }}>{title}</h1>
         <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: 0 }}>{subtitle}</p>
@@ -504,7 +504,7 @@ export const PengaturanView: React.FC = () => {
     <div style={{ padding: '20px', height: '100%', overflowY: 'auto' }}>
       
       {activeScreen === 'profil' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '600px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '600px' }}>
           {renderHeader('Tampilan Struk', 'Ubah nama dan alamat')}
           
           <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
@@ -717,7 +717,7 @@ export const PengaturanView: React.FC = () => {
       )}
 
       {activeScreen === 'printer' && (
-        <div style={{ maxWidth: '600px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ maxWidth: '600px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {renderHeader('Printer Bluetooth', 'Koneksi ke printer thermal')}
           
           <NeumorphicCard>
@@ -747,7 +747,7 @@ export const PengaturanView: React.FC = () => {
       )}
 
       {activeScreen === 'keamanan' && (
-        <div style={{ maxWidth: '480px' }}>
+        <div style={{ maxWidth: '480px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {renderHeader('Keamanan Sandi', 'Ganti kata sandi admin')}
           
           <NeumorphicCard>
@@ -801,7 +801,7 @@ export const PengaturanView: React.FC = () => {
       )}
 
       {activeScreen === 'sync' && (
-        <div style={{ maxWidth: '540px' }}>
+        <div style={{ maxWidth: '540px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {renderHeader('Sinkronisasi Cloud', 'Backup data ke Supabase')}
           
           <NeumorphicCard>
@@ -874,7 +874,7 @@ export const PengaturanView: React.FC = () => {
       )}
 
       {activeScreen === 'shift' && (
-        <div style={{ maxWidth: '500px' }}>
+        <div style={{ maxWidth: '500px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {renderHeader('Rekonsiliasi Shift', 'Tutup shift & hitung laci')}
           
           <NeumorphicCard>
