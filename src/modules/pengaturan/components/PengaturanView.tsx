@@ -72,6 +72,9 @@ export const PengaturanView: React.FC = () => {
   const [bluetoothError, setBluetoothError] = useState('');
   const [isBluetoothConnecting, setIsBluetoothConnecting] = useState(false);
 
+  // Profil Tab State
+  const [profilTab, setProfilTab] = useState<'struk' | 'setting'>('struk');
+
   // Password Security States
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -489,10 +492,29 @@ export const PengaturanView: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '600px' }}>
           {renderHeader('Tampilan Struk', 'Ubah nama dan alamat')}
           
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
+            <NeumorphicButton 
+              active={profilTab === 'struk'} 
+              onClick={() => setProfilTab('struk')}
+              style={{ flex: 1, padding: '12px' }}
+            >
+              Struk
+            </NeumorphicButton>
+            <NeumorphicButton 
+              active={profilTab === 'setting'} 
+              onClick={() => setProfilTab('setting')}
+              style={{ flex: 1, padding: '12px' }}
+            >
+              Setting
+            </NeumorphicButton>
+          </div>
+
           <NeumorphicCard style={{ width: '100%' }}>
             <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '20px' }}>Pengaturan Toko & Struk</h3>
             
             <form onSubmit={handleSaveStore} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {profilTab === 'struk' && (
+                <>
               <NeumorphicInput
                 label="Nama Toko"
                 value={storeNama}
@@ -505,6 +527,10 @@ export const PengaturanView: React.FC = () => {
                 onChange={(e) => setStoreAlamat(e.target.value)}
                 required
               />
+              </>
+              )}
+
+              {profilTab === 'setting' && (
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -536,6 +562,10 @@ export const PengaturanView: React.FC = () => {
                   </select>
                 </div>
               </div>
+              )}
+
+              {profilTab === 'struk' && (
+                <>
 
               <NeumorphicInput
                 label="NO TELP"
@@ -658,6 +688,8 @@ export const PengaturanView: React.FC = () => {
                   }}
                 />
               </div>
+              </>
+              )}
 
 
               {storeSuccess && (
