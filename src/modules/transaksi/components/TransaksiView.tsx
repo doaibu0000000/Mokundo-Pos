@@ -116,7 +116,7 @@ export const TransaksiView: React.FC = () => {
   }, [hasPopup]);
 
   useEffect(() => {
-    const handlePopState = (e: PopStateEvent) => {
+    const handlePopState = () => {
       if (prevHasPopup.current) {
         setIsPaymentOpen(false);
         setIsCartOpen(false);
