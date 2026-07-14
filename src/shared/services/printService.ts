@@ -191,7 +191,11 @@ export class PrintService {
 
     // Footer
     await sendCommand(CENTER);
-    await sendText(`${store.receipt_footer}\n`);
+    if (store.receipt_footer) {
+      await sendText(`${store.receipt_footer}\n`);
+    }
+    const brandText = store.receipt_footer_brand || `— ${store.nama || 'Surantaka Coffee'} —`;
+    await sendText(`${brandText}\n`);
     
     // Feed and cut
     await sendCommand(FEED_3);
@@ -277,7 +281,11 @@ export class PrintService {
     doc.text(`Metode: ${transaction.metode_bayar}`, 4, y); y += 6;
 
     // Footer
-    centerText(store.receipt_footer);
+    if (store.receipt_footer) {
+      centerText(store.receipt_footer);
+    }
+    const brandText = store.receipt_footer_brand || `— ${store.nama || 'Surantaka Coffee'} —`;
+    centerText(brandText);
 
     doc.save(`Struk_Mokundo_TRX-${transaction.id}.pdf`);
   }
@@ -318,7 +326,11 @@ export class PrintService {
     text += `Bayar     : ${formatRupiah(transaction.cash_paid)}\n`;
     text += `Kembali   : ${formatRupiah(transaction.cash_change)}\n`;
     text += `Metode    : ${transaction.metode_bayar}\n\n`;
-    text += `_${store.receipt_footer.replace(/\n/g, ' ')}_`;
+    if (store.receipt_footer) {
+      text += `_${store.receipt_footer.replace(/\n/g, ' ')}_\n`;
+    }
+    const brandText = store.receipt_footer_brand || `— ${store.nama || 'Surantaka Coffee'} —`;
+    text += `*${brandText}*`;
 
     const encodedText = encodeURIComponent(text);
     return `https://api.whatsapp.com/send?text=${encodedText}`;
@@ -634,7 +646,7 @@ export class PrintService {
 
   <div class="footer-msg">
     ${store.receipt_footer ? store.receipt_footer.replace(/\\n/g, '<br>') : 'Mengunjungi kami kembali adalah<br>kebahagiaan terbesar kami!'}
-    <div class="brand">— ${store.nama || 'Surantaka Coffee'} —</div>
+    <div class="brand">${store.receipt_footer_brand || `— ${store.nama || 'Surantaka Coffee'} —`}</div>
   </div>
 </div>
 

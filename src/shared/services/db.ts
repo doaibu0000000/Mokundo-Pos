@@ -34,6 +34,7 @@ export interface Store {
   qr_promo_text?: string;
   qr_scan_text?: string;
   receipt_thankyou_text?: string;
+  receipt_footer_brand?: string;
 }
 
 export interface Product {

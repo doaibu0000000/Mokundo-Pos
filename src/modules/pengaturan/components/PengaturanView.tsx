@@ -64,6 +64,7 @@ export const PengaturanView: React.FC = () => {
   const [qrPromoText, setQrPromoText] = useState(store?.qr_promo_text || 'Mau pesan lagi tanpa antre atau\ntertarik punya bisnis kopi sendiri?');
   const [qrScanText, setQrScanText] = useState(store?.qr_scan_text || 'Pindai saya!');
   const [receiptThankYou, setReceiptThankYou] = useState(store?.receipt_thankyou_text || 'Thank you for your order!');
+  const [receiptFooterBrand, setReceiptFooterBrand] = useState(store?.receipt_footer_brand || '');
   const [storeSuccess, setStoreSuccess] = useState('');
   
   // Bluetooth Print State
@@ -111,6 +112,7 @@ export const PengaturanView: React.FC = () => {
       setQrPromoText(store.qr_promo_text || 'Mau pesan lagi tanpa antre atau\ntertarik punya bisnis kopi sendiri?');
       setQrScanText(store.qr_scan_text || 'Pindai saya!');
       setReceiptThankYou(store.receipt_thankyou_text || 'Thank you for your order!');
+      setReceiptFooterBrand(store.receipt_footer_brand || '');
     }
   }, [store]);
 
@@ -152,7 +154,8 @@ export const PengaturanView: React.FC = () => {
         qr_barcode: qrBarcode,
         qr_promo_text: qrPromoText,
         qr_scan_text: qrScanText,
-        receipt_thankyou_text: receiptThankYou
+        receipt_thankyou_text: receiptThankYou,
+        receipt_footer_brand: receiptFooterBrand
       });
       setStoreSuccess('Pengaturan profil toko berhasil diperbarui!');
       await refreshStore();
@@ -634,6 +637,24 @@ export const PengaturanView: React.FC = () => {
                     fontFamily: 'monospace',
                     border: 'var(--border-width-hc) solid var(--border-high-contrast)',
                     resize: 'vertical'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>BRAND FOOTER (Opsional)</label>
+                <input
+                  type="text"
+                  value={receiptFooterBrand}
+                  onChange={(e) => setReceiptFooterBrand(e.target.value)}
+                  placeholder="Misal: — Surantaka Coffee —"
+                  className="nm-input"
+                  style={{
+                    padding: '12px',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '13px',
+                    fontFamily: 'monospace',
+                    border: 'var(--border-width-hc) solid var(--border-high-contrast)'
                   }}
                 />
               </div>
