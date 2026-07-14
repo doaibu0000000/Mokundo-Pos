@@ -162,10 +162,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     else html.classList.remove('dark');
   }, [isDarkMode]);
 
-  useEffect(() => {
-    const html = document.documentElement;
-  }, []);
-
   const refreshStore = async () => {
     try {
       const dbStore = await db.stores.toCollection().first();
