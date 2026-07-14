@@ -704,18 +704,7 @@ export const PengaturanView: React.FC = () => {
               )}
 
 
-              <div style={{ 
-                visibility: storeSuccess ? 'visible' : 'hidden',
-                opacity: storeSuccess ? 1 : 0,
-                transition: 'opacity 0.2s ease-in-out',
-                color: 'var(--accent-green)', 
-                fontSize: '12px', 
-                fontWeight: 600,
-                minHeight: '18px',
-                marginTop: '4px'
-              }}>
-                ✓ {storeSuccess || 'Berhasil diperbarui!'}
-              </div>
+
 
               <NeumorphicButton type="submit" variant="primary" style={{ marginTop: '8px' }}>
                 {profilTab === 'setting' ? 'Simpan Pengaturan Kertas' : 'Simpan Profil Struk'}
@@ -1011,6 +1000,58 @@ export const PengaturanView: React.FC = () => {
             ))}
           </div>
         </NeumorphicModal>
+      )}
+
+      {storeSuccess && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            backgroundColor: 'var(--bg-primary)',
+            padding: '32px 48px',
+            borderRadius: '24px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '16px',
+            boxShadow: '8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light)'
+          }}>
+            <div style={{
+              width: '64px', height: '64px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--accent-green)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              animation: 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+            }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" style={{
+                  strokeDasharray: 50,
+                  strokeDashoffset: 50,
+                  animation: 'drawCheck 0.4s 0.2s ease-out forwards'
+                }} />
+              </svg>
+            </div>
+            <p style={{ margin: 0, fontWeight: 700, fontSize: '15px', color: 'var(--text-primary)', textAlign: 'center' }}>
+              {storeSuccess}
+            </p>
+          </div>
+          <style>{`
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+            @keyframes drawCheck {
+              0% { stroke-dashoffset: 50; }
+              100% { stroke-dashoffset: 0; }
+            }
+          `}</style>
+        </div>
       )}
 
     </div>
