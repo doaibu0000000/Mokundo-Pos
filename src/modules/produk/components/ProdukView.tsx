@@ -94,8 +94,8 @@ export const ProdukView: React.FC = () => {
 
 
   // Validation States
-  const [productSubmitAttempted, setProductSubmitAttempted] = useState(false);
-  const [categorySubmitAttempted, setCategorySubmitAttempted] = useState(false);
+  const [focusedErrorField, setFocusedErrorField] = useState<string | null>(null);
+  const [focusedCatErrorField, setFocusedCatErrorField] = useState<string | null>(null);
 
   // --- Global History Back Logic for Popups ---
   const hasPopup = isProductModalOpen || isCropModalOpen || isCategoryModalOpen || confirmConfig.isOpen;
@@ -188,13 +188,12 @@ export const ProdukView: React.FC = () => {
       setProdThreshold('5');
       if (categories.length > 0) setProdKategoriId(categories[0].id!);
     }
-    setProductSubmitAttempted(false);
+    setFocusedErrorField(null);
     setIsProductModalOpen(true);
   };
 
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setProductSubmitAttempted(true);
     setProdError('');
 
     const harga = parseFloat(prodHarga);
@@ -202,9 +201,27 @@ export const ProdukView: React.FC = () => {
     const stok = parseInt(prodStok);
     const threshold = parseInt(prodThreshold);
 
-    if (!prodNama || isNaN(harga) || isNaN(HPP) || isNaN(stok) || isNaN(threshold) || !prodSku) {
+    if (!prodNama) {
+      setFocusedErrorField('nama');
       return;
     }
+    if (prodHPP === '' || isNaN(HPP)) {
+      setFocusedErrorField('hpp');
+      return;
+    }
+    if (prodHarga === '' || isNaN(harga)) {
+      setFocusedErrorField('harga');
+      return;
+    }
+    if (!prodSku) {
+      setFocusedErrorField('sku');
+      return;
+    }
+    if (prodStok === '' || isNaN(stok)) {
+      setFocusedErrorField('stok');
+      return;
+    }
+    setFocusedErrorField(null);
 
     const varian = prodVarianInput
       ? prodVarianInput.split(',').map(v => v.trim()).filter(v => v.length > 0)
@@ -317,19 +334,24 @@ export const ProdukView: React.FC = () => {
       setCatNama('');
       setCatUrutan((categories.length + 1).toString());
     }
-    setCategorySubmitAttempted(false);
+    setFocusedCatErrorField(null);
     setIsCategoryModalOpen(true);
   };
 
   const handleCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setCategorySubmitAttempted(true);
     setCatError('');
 
     const urutan = parseInt(catUrutan);
-    if (!catNama || isNaN(urutan)) {
+    if (!catNama) {
+      setFocusedCatErrorField('nama');
       return;
     }
+    if (catUrutan === '' || isNaN(urutan)) {
+      setFocusedCatErrorField('urutan');
+      return;
+    }
+    setFocusedCatErrorField(null);
 
     const payload: Category = {
       nama: catNama,
@@ -801,7 +823,7 @@ export const ProdukView: React.FC = () => {
                 placeholder="Masukkan nama"
                 value={prodNama}
                 onChange={(e) => setProdNama(e.target.value)}
-                error={productSubmitAttempted && !prodNama}
+                error={focusedErrorField === 'nama'}
               />
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', position: 'relative' }}>
@@ -893,7 +915,7 @@ export const ProdukView: React.FC = () => {
               placeholder="0"
               value={prodHPP}
               onChange={(e) => setProdHPP(e.target.value)}
-              error={productSubmitAttempted && (!prodHPP || isNaN(parseFloat(prodHPP)))}
+              error={focusedErrorField === 'hpp'}
             />
             <NeumorphicInput
               label="Harga Jual"
@@ -901,7 +923,7 @@ export const ProdukView: React.FC = () => {
               placeholder="0"
               value={prodHarga}
               onChange={(e) => setProdHarga(e.target.value)}
-              error={productSubmitAttempted && (!prodHarga || isNaN(parseFloat(prodHarga)))}
+              error={focusedErrorField === 'harga'}
             />
           </div>
 
@@ -911,7 +933,7 @@ export const ProdukView: React.FC = () => {
               placeholder="Misal: 888001"
               value={prodSku}
               onChange={(e) => setProdSku(e.target.value)}
-              error={productSubmitAttempted && !prodSku}
+              error={focusedErrorField === 'sku'}
             />
             <NeumorphicInput
               label="Jumlah Stok"
@@ -919,7 +941,7 @@ export const ProdukView: React.FC = () => {
               placeholder="0"
               value={prodStok}
               onChange={(e) => setProdStok(e.target.value)}
-              error={productSubmitAttempted && (!prodStok || isNaN(parseInt(prodStok)))}
+              error={focusedErrorField === 'stok'}
             />
           </div>
 
@@ -956,7 +978,7 @@ export const ProdukView: React.FC = () => {
             placeholder="Misal: Pasta, Dessert"
             value={catNama}
             onChange={(e) => setCatNama(e.target.value)}
-            error={categorySubmitAttempted && !catNama}
+            error={focusedCatErrorField === 'nama'}
           />
 
           <NeumorphicInput
@@ -965,7 +987,7 @@ export const ProdukView: React.FC = () => {
             placeholder="1"
             value={catUrutan}
             onChange={(e) => setCatUrutan(e.target.value)}
-            error={categorySubmitAttempted && (!catUrutan || isNaN(parseInt(catUrutan)))}
+            error={focusedCatErrorField === 'urutan'}
           />
 
           {catError && (
