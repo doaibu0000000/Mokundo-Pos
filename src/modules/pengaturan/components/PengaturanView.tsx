@@ -60,6 +60,16 @@ export const PengaturanView: React.FC = () => {
   const [receiptHeader, setReceiptHeader] = useState(formatPhone(store?.receipt_header));
   const [receiptFooter, setReceiptFooter] = useState(store?.receipt_footer || '');
   const [ukuranKertas, setUkuranKertas] = useState(store?.ukuran_kertas_struk || '58mm');
+  const [showPaperSizeModal, setShowPaperSizeModal] = useState(false);
+  const paperSizeLabels: Record<string, string> = {
+    '44mm': '44 mm (Mini EDC / Bluetooth)',
+    '48mm': '48 mm (Kasir Kecil)',
+    '57mm': '57 mm (Standar Bluetooth)',
+    '58mm': '58 mm (Printer Warung/GrabFood)',
+    '76mm': '76 mm (Medium POS)',
+    '80mm': '80 mm (Restoran/Supermarket - Standar)',
+    '112mm': '112 mm (Laporan / EDC Besar)'
+  };
   const [qrBarcode, setQrBarcode] = useState(store?.qr_barcode || '');
   const [qrPromoText, setQrPromoText] = useState(store?.qr_promo_text || 'Mau pesan lagi tanpa antre atau\ntertarik punya bisnis kopi sendiri?');
   const [qrScanText, setQrScanText] = useState(store?.qr_scan_text || 'Pindai saya!');
@@ -533,31 +543,25 @@ export const PengaturanView: React.FC = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Ukuran Kertas Thermal</label>
-                  <select
-                    value={ukuranKertas}
-                    onChange={(e) => setUkuranKertas(e.target.value)}
+                  <div
+                    onClick={() => setShowPaperSizeModal(true)}
                     className="nm-input"
                     style={{
                       padding: '12px',
                       borderRadius: '12px',
-                      border: 'none',
                       backgroundColor: 'var(--bg-primary)',
                       boxShadow: 'inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light)',
                       color: 'var(--text-primary)',
                       fontSize: '14px',
-                      fontFamily: 'inherit',
-                      outline: 'none',
-                      appearance: 'none'
+                      cursor: 'pointer',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
                     }}
                   >
-                    <option value="44mm">44 mm (Mini EDC / Bluetooth)</option>
-                    <option value="48mm">48 mm (Kasir Kecil)</option>
-                    <option value="57mm">57 mm (Standar Bluetooth)</option>
-                    <option value="58mm">58 mm (Printer Warung/GrabFood)</option>
-                    <option value="76mm">76 mm (Medium POS)</option>
-                    <option value="80mm">80 mm (Restoran/Supermarket - Standar)</option>
-                    <option value="112mm">112 mm (Laporan / EDC Besar)</option>
-                  </select>
+                    <span>{paperSizeLabels[ukuranKertas] || ukuranKertas}</span>
+                    <span style={{ fontSize: '10px', opacity: 0.5 }}>▼</span>
+                  </div>
                 </div>
               </div>
               )}
@@ -953,6 +957,72 @@ export const PengaturanView: React.FC = () => {
               </div>
             )}
           </NeumorphicCard>
+        </div>
+      )}
+
+      {showPaperSizeModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'flex-end'
+          }}
+          onClick={() => setShowPaperSizeModal(false)}
+        >
+          <div 
+            style={{
+              width: '100%',
+              backgroundColor: 'var(--bg-primary)',
+              borderTopLeftRadius: '24px',
+              borderTopRightRadius: '24px',
+              padding: '24px',
+              paddingBottom: '40px',
+              maxHeight: '70vh',
+              overflowY: 'auto',
+              boxShadow: '0 -10px 40px rgba(0,0,0,0.1)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '20px', textAlign: 'center' }}>Pilih Ukuran Kertas</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {Object.entries(paperSizeLabels).map(([val, label]) => (
+                <div
+                  key={val}
+                  onClick={() => {
+                    setUkuranKertas(val);
+                    setShowPaperSizeModal(false);
+                  }}
+                  className="nm-button"
+                  style={{
+                    padding: '16px',
+                    borderRadius: '16px',
+                    backgroundColor: ukuranKertas === val ? 'var(--accent-blue)' : 'var(--bg-primary)',
+                    color: ukuranKertas === val ? 'white' : 'var(--text-primary)',
+                    fontWeight: ukuranKertas === val ? 800 : 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    boxShadow: ukuranKertas === val ? 'none' : undefined
+                  }}
+                >
+                  <span>{label}</span>
+                  {ukuranKertas === val && <span style={{ color: 'white' }}>✓</span>}
+                </div>
+              ))}
+            </div>
+            
+            <NeumorphicButton
+              variant="danger"
+              style={{ width: '100%', marginTop: '24px', padding: '14px' }}
+              onClick={() => setShowPaperSizeModal(false)}
+            >
+              Batal
+            </NeumorphicButton>
+          </div>
         </div>
       )}
 
