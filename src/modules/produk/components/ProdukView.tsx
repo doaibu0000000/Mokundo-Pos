@@ -203,7 +203,6 @@ export const ProdukView: React.FC = () => {
     const threshold = parseInt(prodThreshold);
 
     if (!prodNama || isNaN(harga) || isNaN(HPP) || isNaN(stok) || isNaN(threshold) || !prodSku) {
-      setProdError('Harap lengkapi semua field numerik dengan benar');
       return;
     }
 
@@ -329,7 +328,6 @@ export const ProdukView: React.FC = () => {
 
     const urutan = parseInt(catUrutan);
     if (!catNama || isNaN(urutan)) {
-      setCatError('Harap isi nama dan urutan dengan benar');
       return;
     }
 
