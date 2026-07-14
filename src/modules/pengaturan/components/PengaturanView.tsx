@@ -699,7 +699,7 @@ export const PengaturanView: React.FC = () => {
               )}
 
               <NeumorphicButton type="submit" variant="primary" style={{ marginTop: '8px' }}>
-                Simpan Profil Toko
+                Simpan Perubahan
               </NeumorphicButton>
             </form>
           </NeumorphicCard>
