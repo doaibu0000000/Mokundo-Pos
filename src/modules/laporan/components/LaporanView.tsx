@@ -31,9 +31,13 @@ export const LaporanView: React.FC = () => {
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
   const [selectedItems, setSelectedItems] = useState<TransactionItem[]>([]);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
+  const [voidReason, setVoidReason] = useState('');
+  const [voidError, setVoidError] = useState(false);
+  const [voidTxId, setVoidTxId] = useState<number | null>(null);
 
   // --- Global History Back Logic for Popups ---
-  const hasPopup = isDetailOpen;
+  const hasPopup = isDetailOpen || isVoidModalOpen;
   const prevHasPopup = React.useRef(false);
 
   useEffect(() => {
@@ -54,6 +58,7 @@ export const LaporanView: React.FC = () => {
     const handlePopState = () => {
       if (prevHasPopup.current) {
         setIsDetailOpen(false);
+        setIsVoidModalOpen(false);
       }
     };
     window.addEventListener('popstate', handlePopState);
@@ -124,21 +129,27 @@ export const LaporanView: React.FC = () => {
   };
 
   // Void transaction control
-  const handleVoidTransaction = async (txId: number) => {
-    const reason = prompt('Masukkan alasan pembatalan (Void) transaksi ini:');
-    if (reason === null) return; // cancelled prompt
-    if (!reason.trim()) {
-      alert('Alasan pembatalan wajib diisi!');
+  const handleVoidTransactionClick = (txId: number) => {
+    setVoidTxId(txId);
+    setVoidReason('');
+    setVoidError(false);
+    setIsVoidModalOpen(true);
+  };
+
+  const confirmVoidTransaction = async () => {
+    if (!voidReason.trim()) {
+      setVoidError(true);
       return;
     }
+    if (voidTxId === null) return;
 
     try {
       await db.transaction('rw', [db.products, db.transactions, db.stock_logs, db.shifts], async () => {
-        const tx = await db.transactions.get(txId);
+        const tx = await db.transactions.get(voidTxId);
         if (!tx || tx.status === 'VOIDED') return;
 
         // Restore stocks
-        const items = await db.transaction_items.where('transaksi_id').equals(txId).toArray();
+        const items = await db.transaction_items.where('transaksi_id').equals(voidTxId).toArray();
         for (const item of items) {
           const prod = await db.products.get(item.produk_id);
           if (prod) {
@@ -492,7 +503,7 @@ export const LaporanView: React.FC = () => {
             {selectedTx.status === 'COMPLETED' && (
               <NeumorphicButton 
                 variant="danger" 
-                onClick={() => handleVoidTransaction(selectedTx.id!)}
+                onClick={() => handleVoidTransactionClick(selectedTx.id!)}
                 style={{ width: '100%' }}
               >
                 <AlertTriangle size={16} /> Batalkan Transaksi (Void)
@@ -502,6 +513,41 @@ export const LaporanView: React.FC = () => {
         )}
       </NeumorphicModal>
 
+      {/* Void Modal */}
+      <NeumorphicModal
+        isOpen={isVoidModalOpen}
+        onClose={() => setIsVoidModalOpen(false)}
+        title="Batalkan Transaksi (Void)"
+      >
+        <div style={{ marginBottom: '20px' }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+            Masukkan alasan pembatalan transaksi ini:
+          </p>
+          <NeumorphicInput
+            id="voidReasonInput"
+            placeholder="Contoh: Salah input pesanan"
+            value={voidReason}
+            onChange={(e) => setVoidReason(e.target.value)}
+            error={voidError && !voidReason.trim()}
+          />
+        </div>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <NeumorphicButton 
+            variant="secondary" 
+            onClick={() => setIsVoidModalOpen(false)}
+            style={{ flex: 1 }}
+          >
+            Kembali
+          </NeumorphicButton>
+          <NeumorphicButton 
+            variant="danger" 
+            onClick={confirmVoidTransaction}
+            style={{ flex: 1 }}
+          >
+            Konfirmasi
+          </NeumorphicButton>
+        </div>
+      </NeumorphicModal>
     </div>
   );
 };
