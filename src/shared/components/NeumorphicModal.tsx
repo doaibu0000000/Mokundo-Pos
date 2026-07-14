@@ -1,12 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-
-// Extend window object for global modal tracking
-declare global {
-  interface Window {
-    __modals: string[];
-  }
-}
 
 interface ModalProps {
   isOpen: boolean;
@@ -26,59 +19,18 @@ export const NeumorphicModal: React.FC<ModalProps> = ({
   hideCloseButton = false,
 }) => {
   const [animateShow, setAnimateShow] = useState(false);
-  const onCloseRef = useRef(onClose);
-  const modalIdRef = useRef('modal_' + Date.now() + Math.random().toString(36).substr(2, 5));
-  
-  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
       setTimeout(() => setAnimateShow(true), 20);
-      
-      const currentModalId = modalIdRef.current;
-      window.__modals = window.__modals || [];
-      
-      const currentHistoryModalId = window.history.state?.modalId;
-      const isDeadState = currentHistoryModalId && !window.__modals.includes(currentHistoryModalId);
-
-      window.__modals.push(currentModalId);
-
-      if (isDeadState) {
-        window.history.replaceState({ modalId: currentModalId }, '');
-      } else {
-        window.history.pushState({ modalId: currentModalId }, '');
-      }
-
-      const handlePopState = () => {
-        if (window.__modals[window.__modals.length - 1] === currentModalId) {
-          window.__modals.pop();
-          onCloseRef.current();
-        }
-      };
-      
-      window.addEventListener('popstate', handlePopState);
-      
-      return () => {
-        document.body.style.overflow = 'unset';
-        window.removeEventListener('popstate', handlePopState);
-        
-        const idx = window.__modals.indexOf(currentModalId);
-        if (idx !== -1) {
-          window.__modals.splice(idx, 1);
-          
-          // Use timeout to allow other modals to mount and replace state if navigating
-          setTimeout(() => {
-            if (window.history.state?.modalId === currentModalId) {
-              window.history.back();
-            }
-          }, 50);
-        }
-      };
     } else {
       document.body.style.overflow = 'unset';
       setAnimateShow(false);
     }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
