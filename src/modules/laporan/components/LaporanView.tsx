@@ -194,7 +194,8 @@ export const LaporanView: React.FC = () => {
   const handleExportCSV = () => {
     let csv = 'ID,Tanggal,Kasir,Subtotal,Diskon,Pajak,Total,MetodeBayar,Status,KeteranganVoid\n';
     transactions.forEach(t => {
-      csv += `${t.id},"${new Date(t.tanggal).toLocaleString('id-ID')}","${t.kasir_nama}",${t.subtotal},${t.diskon},${t.pajak},${t.total},"${t.metode_bayar}","${t.status}","${t.void_reason || ''}"\n`;
+      const displayStatus = t.status === 'COMPLETED' ? 'SUCCESS' : t.status;
+      csv += `${t.id},"${new Date(t.tanggal).toLocaleString('id-ID')}","${t.kasir_nama}",${t.subtotal},${t.diskon},${t.pajak},${t.total},"${t.metode_bayar}","${displayStatus}","${t.void_reason || ''}"\n`;
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
