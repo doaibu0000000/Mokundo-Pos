@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   Home, ShoppingCart, Coffee, BarChart2, Settings, 
-  Sun, Moon, LogOut, Coffee as ShopIcon, Download
+  LogOut, Coffee as ShopIcon, Download
 } from 'lucide-react';
 import { useApp } from '../../store/AppContext';
 import { NeumorphicButton } from '../../shared/components';
@@ -16,10 +16,6 @@ export const WebLayout: React.FC = () => {
     user,
     activeTab,
     setActiveTab,
-    isDarkMode,
-    toggleDarkMode,
-    isHighContrast,
-    toggleHighContrast,
     logoutUser,
     canInstall,
     installApp
@@ -159,25 +155,7 @@ export const WebLayout: React.FC = () => {
 
         {/* Sidebar Footer theme configurations */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px dashed var(--text-muted)', paddingTop: '16px' }}>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {/* Dark Mode toggle */}
-            <NeumorphicButton
-              onClick={toggleDarkMode}
-              style={{ flex: 1, padding: '8px 0' }}
-            >
-              {isDarkMode ? <Sun size={16} color="var(--accent-orange)" /> : <Moon size={16} />}
-              <span style={{ fontSize: '11px', marginLeft: '4px' }}>{isDarkMode ? 'Light' : 'Dark'}</span>
-            </NeumorphicButton>
 
-            {/* High Contrast toggle */}
-            <NeumorphicButton
-              active={isHighContrast}
-              onClick={toggleHighContrast}
-              style={{ flex: 1, padding: '8px 0', fontSize: '11px' }}
-            >
-              ♿ HC
-            </NeumorphicButton>
-          </div>
 
           {/* Logout button */}
           <NeumorphicButton
