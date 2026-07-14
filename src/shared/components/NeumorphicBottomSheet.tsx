@@ -18,6 +18,8 @@ export const NeumorphicBottomSheet: React.FC<BottomSheetProps> = ({
 }) => {
   const [animateShow, setAnimateShow] = useState(false);
   const onCloseRef = useRef(onClose);
+  const modalIdRef = useRef('sheet_' + Date.now() + Math.random().toString(36).substr(2, 5));
+  
   useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
 
   useEffect(() => {
@@ -26,12 +28,25 @@ export const NeumorphicBottomSheet: React.FC<BottomSheetProps> = ({
       // Trigger animation frame
       setTimeout(() => setAnimateShow(true), 20);
 
-      const currentModalId = 'sheet_' + Date.now().toString() + Math.random().toString(36).substr(2, 5);
-      window.history.pushState({ modalId: currentModalId }, '');
+      const currentModalId = modalIdRef.current;
+      window.__modals = window.__modals || [];
+      
+      const currentHistoryModalId = window.history.state?.modalId;
+      const isDeadState = currentHistoryModalId && !window.__modals.includes(currentHistoryModalId);
+
+      window.__modals.push(currentModalId);
+
+      if (isDeadState) {
+        window.history.replaceState({ modalId: currentModalId }, '');
+      } else {
+        window.history.pushState({ modalId: currentModalId }, '');
+      }
 
       const handlePopState = () => {
-        if (window.history.state?.modalId === currentModalId) return;
-        onCloseRef.current();
+        if (window.__modals[window.__modals.length - 1] === currentModalId) {
+          window.__modals.pop();
+          onCloseRef.current();
+        }
       };
       
       window.addEventListener('popstate', handlePopState);
@@ -39,8 +54,16 @@ export const NeumorphicBottomSheet: React.FC<BottomSheetProps> = ({
       return () => {
         document.body.style.overflow = 'unset';
         window.removeEventListener('popstate', handlePopState);
-        if (window.history.state?.modalId === currentModalId) {
-          window.history.back();
+        
+        const idx = window.__modals.indexOf(currentModalId);
+        if (idx !== -1) {
+          window.__modals.splice(idx, 1);
+          
+          setTimeout(() => {
+            if (window.history.state?.modalId === currentModalId) {
+              window.history.back();
+            }
+          }, 50);
         }
       };
     } else {

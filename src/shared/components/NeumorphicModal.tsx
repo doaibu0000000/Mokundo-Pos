@@ -1,6 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { X } from 'lucide-react';
 
+// Extend window object for global modal tracking
+declare global {
+  interface Window {
+    __modals: string[];
+  }
+}
+
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -20,6 +27,8 @@ export const NeumorphicModal: React.FC<ModalProps> = ({
 }) => {
   const [animateShow, setAnimateShow] = useState(false);
   const onCloseRef = useRef(onClose);
+  const modalIdRef = useRef('modal_' + Date.now() + Math.random().toString(36).substr(2, 5));
+  
   useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
 
   useEffect(() => {
@@ -27,12 +36,25 @@ export const NeumorphicModal: React.FC<ModalProps> = ({
       document.body.style.overflow = 'hidden';
       setTimeout(() => setAnimateShow(true), 20);
       
-      const currentModalId = 'modal_' + Date.now().toString() + Math.random().toString(36).substr(2, 5);
-      window.history.pushState({ modalId: currentModalId }, '');
+      const currentModalId = modalIdRef.current;
+      window.__modals = window.__modals || [];
+      
+      const currentHistoryModalId = window.history.state?.modalId;
+      const isDeadState = currentHistoryModalId && !window.__modals.includes(currentHistoryModalId);
+
+      window.__modals.push(currentModalId);
+
+      if (isDeadState) {
+        window.history.replaceState({ modalId: currentModalId }, '');
+      } else {
+        window.history.pushState({ modalId: currentModalId }, '');
+      }
 
       const handlePopState = () => {
-        if (window.history.state?.modalId === currentModalId) return;
-        onCloseRef.current();
+        if (window.__modals[window.__modals.length - 1] === currentModalId) {
+          window.__modals.pop();
+          onCloseRef.current();
+        }
       };
       
       window.addEventListener('popstate', handlePopState);
@@ -40,8 +62,17 @@ export const NeumorphicModal: React.FC<ModalProps> = ({
       return () => {
         document.body.style.overflow = 'unset';
         window.removeEventListener('popstate', handlePopState);
-        if (window.history.state?.modalId === currentModalId) {
-          window.history.back();
+        
+        const idx = window.__modals.indexOf(currentModalId);
+        if (idx !== -1) {
+          window.__modals.splice(idx, 1);
+          
+          // Use timeout to allow other modals to mount and replace state if navigating
+          setTimeout(() => {
+            if (window.history.state?.modalId === currentModalId) {
+              window.history.back();
+            }
+          }, 50);
         }
       };
     } else {
