@@ -50,9 +50,9 @@ export const PengaturanView: React.FC = () => {
 
   // Profil & Pajak States
   const [storeNama, setStoreNama] = useState(store?.nama || '');
-  const [storeAlamat, setStoreAlamat] = useState(store?.alamat || '');
-  const [storeService, setStoreService] = useState(store?.service_charge?.toString() || '');
-  const [receiptHeader, setReceiptHeader] = useState(store?.receipt_header || '');
+  const [storeAlamat, setStoreAlamat] = useState(store?.alamat || 'Kp. Surantaka, RT.02/RW.01, Desa Kalijati Timur, Kecamatan Kalijati, Kabupaten Subang, Jawa Barat, 41271');
+  const [storeService, setStoreService] = useState(store?.service_charge?.toString() || '0');
+  const [receiptHeader, setReceiptHeader] = useState(store?.receipt_header || '081234567890');
   const [receiptFooter, setReceiptFooter] = useState(store?.receipt_footer || '');
   const [ukuranKertas, setUkuranKertas] = useState(store?.ukuran_kertas_struk || '80mm');
   const [qrBarcode, setQrBarcode] = useState(store?.qr_barcode || '');
@@ -94,9 +94,9 @@ export const PengaturanView: React.FC = () => {
     
     if (store) {
       setStoreNama(store.nama);
-      setStoreAlamat(store.alamat);
-      setStoreService(store.service_charge.toString());
-      setReceiptHeader(store.receipt_header);
+      setStoreAlamat(store.alamat || 'Kp. Surantaka, RT.02/RW.01, Desa Kalijati Timur, Kecamatan Kalijati, Kabupaten Subang, Jawa Barat, 41271');
+      setStoreService(store.service_charge?.toString() || '0');
+      setReceiptHeader(store.receipt_header || '081234567890');
       setReceiptFooter(store.receipt_footer);
       setSupabaseUrl(store.supabase_url);
       setSupabaseKey(store.supabase_anon_key);
@@ -499,13 +499,6 @@ export const PengaturanView: React.FC = () => {
               />
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <NeumorphicInput
-                  label="Service Charge (%)"
-                  type="number"
-                  value={storeService}
-                  onChange={(e) => setStoreService(e.target.value)}
-                  required
-                />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Ukuran Kertas Thermal</label>
                   <select
