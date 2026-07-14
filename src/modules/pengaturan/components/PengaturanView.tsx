@@ -509,14 +509,20 @@ export const PengaturanView: React.FC = () => {
           <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
             <NeumorphicButton 
               active={profilTab === 'struk'} 
-              onClick={() => setProfilTab('struk')}
+              onClick={() => {
+                setProfilTab('struk');
+                setStoreSuccess('');
+              }}
               style={{ flex: 1, padding: '12px' }}
             >
               Struk
             </NeumorphicButton>
             <NeumorphicButton 
               active={profilTab === 'setting'} 
-              onClick={() => setProfilTab('setting')}
+              onClick={() => {
+                setProfilTab('setting');
+                setStoreSuccess('');
+              }}
               style={{ flex: 1, padding: '12px' }}
             >
               Setting
