@@ -622,7 +622,8 @@ export class PrintService {
 
   ${qrCodeImg ? `
   <div class="promo">
-    ${store.qr_promo_text ? store.qr_promo_text.replace(/\n/g, '<br>') : 'Mau pesan lagi tanpa antre atau<br>tertarik punya bisnis kopi sendiri?<br><div style="margin-top: 4px;">Pindai saya!</div>'}
+    ${store.qr_promo_text ? store.qr_promo_text.replace(/\n/g, '<br>') : 'Mau pesan lagi tanpa antre atau<br>tertarik punya bisnis kopi sendiri?'}
+    <div style="margin-top: 4px;">${store.qr_scan_text || 'Pindai saya!'}</div>
   </div>
   <div class="qr-box">${qrCodeImg}</div>
   ` : ''}

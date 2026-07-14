@@ -32,6 +32,7 @@ export interface Store {
   ukuran_kertas_struk?: string; // e.g. "80mm", "58mm"
   qr_barcode?: string; // Teks atau URL untuk QR Code di struk
   qr_promo_text?: string;
+  qr_scan_text?: string;
   receipt_thankyou_text?: string;
 }
 
