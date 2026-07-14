@@ -27,8 +27,6 @@ interface AppContextType {
   
   isDarkMode: boolean;
   toggleDarkMode: () => void;
-  isHighContrast: boolean;
-  toggleHighContrast: () => void;
   
   cart: CartItem[];
   addToCart: (product: Product, varian: string, notes: string) => void;
@@ -73,7 +71,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     return localStorage.getItem('mokundo_isDarkMode') === 'true';
   });
-  const [isHighContrast, setIsHighContrast] = useState<boolean>(false);
   
   const [cart, setCart] = useState<CartItem[]>(() => {
     const cached = localStorage.getItem('mokundo_cart');
@@ -127,9 +124,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const html = document.documentElement;
     if (isDarkMode) html.classList.add('dark');
     else html.classList.remove('dark');
-    
-    if (isHighContrast) html.classList.add('high-contrast');
-    else html.classList.remove('high-contrast');
 
     // 3. Load database configs and finish initializing
     const initApp = async () => {
@@ -170,9 +164,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     const html = document.documentElement;
-    if (isHighContrast) html.classList.add('high-contrast');
-    else html.classList.remove('high-contrast');
-  }, [isHighContrast]);
+  }, []);
 
   const refreshStore = async () => {
     try {
@@ -252,7 +244,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return newValue;
     });
   };
-  const toggleHighContrast = () => setIsHighContrast(prev => !prev);
 
   // Cart operations
   const addToCart = (product: Product, varian: string, notes: string) => {
@@ -327,8 +318,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setActiveTab,
         isDarkMode,
         toggleDarkMode,
-        isHighContrast,
-        toggleHighContrast,
         cart,
         addToCart,
         updateCartQty,

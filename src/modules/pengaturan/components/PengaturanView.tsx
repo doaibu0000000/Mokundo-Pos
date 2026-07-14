@@ -22,8 +22,6 @@ export const PengaturanView: React.FC = () => {
     currentShift,
     refreshStore,
     refreshShift,
-    isHighContrast,
-    toggleHighContrast,
     logoutUser,
     canInstall,
     installApp,
@@ -377,7 +375,7 @@ export const PengaturanView: React.FC = () => {
           <NeumorphicCard style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px' }}>
             <h3 style={{ fontSize: '15px', fontWeight: 800 }}>Akses & Tampilan</h3>
             
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px dashed var(--text-muted)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
               <span style={{ fontSize: '13px' }}>Mode Gelap (Dark Mode)</span>
               <NeumorphicButton 
                 size="sm"
@@ -390,16 +388,7 @@ export const PengaturanView: React.FC = () => {
               </NeumorphicButton>
             </div>
             
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px dashed var(--text-muted)' }}>
-              <span style={{ fontSize: '13px' }}>Mode Kontras Tinggi</span>
-              <NeumorphicButton 
-                size="sm"
-                active={isHighContrast}
-                onClick={toggleHighContrast}
-              >
-                {isHighContrast ? 'ON' : 'OFF'}
-              </NeumorphicButton>
-            </div>
+            
             
             {canInstall && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '8px' }}>
@@ -536,7 +525,7 @@ export const PengaturanView: React.FC = () => {
           <NeumorphicCard style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px' }}>
             <h3 style={{ fontSize: '15px', fontWeight: 800 }}>Akses & Tampilan</h3>
             
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px dashed var(--text-muted)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
               <span style={{ fontSize: '13px' }}>Mode Gelap (Dark Mode)</span>
               <NeumorphicButton 
                 size="sm"
@@ -549,16 +538,7 @@ export const PengaturanView: React.FC = () => {
               </NeumorphicButton>
             </div>
             
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
-              <span style={{ fontSize: '13px' }}>Mode Kontras Tinggi</span>
-              <NeumorphicButton 
-                size="sm"
-                active={isHighContrast}
-                onClick={toggleHighContrast}
-              >
-                {isHighContrast ? 'ON' : 'OFF'}
-              </NeumorphicButton>
-            </div>
+            
           </NeumorphicCard>
 
           <NeumorphicCard 
