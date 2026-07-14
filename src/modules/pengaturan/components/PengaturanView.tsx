@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Settings, Key, Cloud, FolderLock, Power, AlertTriangle, Download, Upload, Sun, Moon, Printer, Receipt } from 'lucide-react';
+import { Settings, Key, Cloud, FolderLock, Power, AlertTriangle, Download, Upload, Sun, Moon, Printer, ReceiptText } from 'lucide-react';
 import { useApp } from '../../../store/AppContext';
 import { db, hashPassword } from '../../../shared/services/db';
 import { SyncService } from '../../../shared/services/syncService';
@@ -467,7 +467,7 @@ export const PengaturanView: React.FC = () => {
             onClick={() => navigateTo('profil')}
             style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
           >
-            <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-blue)' }}><Receipt size={20} /></div>
+            <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-blue)' }}><ReceiptText size={20} /></div>
             <div style={{ flex: 1, textAlign: 'left' }}>
               <div style={{ fontWeight: 800, fontSize: '15px' }}>Tampilan Struk</div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Ubah nama, alamat, pajak pada struk</div>
