@@ -97,6 +97,39 @@ export const TransaksiView: React.FC = () => {
   const [wakeLock, setWakeLock] = useState<any>(null);
   const [wakeLockStatus, setWakeLockStatus] = useState<'Active' | 'Inactive' | 'Unsupported'>('Inactive');
 
+  // --- Global History Back Logic for Popups ---
+  const hasPopup = isCartOpen || isPaymentOpen || !!variantProduct || !!completedTx;
+  const prevHasPopup = React.useRef(false);
+
+  useEffect(() => {
+    if (hasPopup && !prevHasPopup.current) {
+      window.history.pushState({ popupOpen: true }, '');
+      prevHasPopup.current = true;
+    } else if (!hasPopup && prevHasPopup.current) {
+      prevHasPopup.current = false;
+      setTimeout(() => {
+        if (window.history.state?.popupOpen) {
+          window.history.back();
+        }
+      }, 50);
+    }
+  }, [hasPopup]);
+
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      if (prevHasPopup.current) {
+        setIsPaymentOpen(false);
+        setIsCartOpen(false);
+        setVariantProduct(null);
+        setCompletedTx(null);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+  // ----------------------------------------------
+
+
   // Track window resizing
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
