@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   Home, ShoppingCart, Coffee, BarChart2, Settings, 
-  LogOut, Coffee as ShopIcon, Download
+  LogOut, Download
 } from 'lucide-react';
 import { useApp } from '../../store/AppContext';
 import { NeumorphicButton } from '../../shared/components';
@@ -80,9 +80,10 @@ export const WebLayout: React.FC = () => {
               alignItems: 'center',
               justifyContent: 'center',
               color: 'var(--accent-blue)',
+              padding: '4px'
             }}
           >
-            <ShopIcon size={20} />
+            <img src="/Mokundo-Pos/brand-icon.png" alt="Logo" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
           </div>
           <div>
             <h2 style={{ fontSize: '15px', fontWeight: 900, lineHeight: 1.1 }}>Mokundo POS</h2>
