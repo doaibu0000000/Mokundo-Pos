@@ -322,22 +322,24 @@ export const PengaturanView: React.FC = () => {
       
       {activeScreen === 'menu' ? (
         <div style={{ animation: 'fadeIn 0.2s ease-in-out' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-          <div
-            className="nm-inset"
-            style={{
-              width: '56px', height: '56px', borderRadius: '50%',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'var(--accent-blue)', padding: '6px'
-            }}
-          >
-            <Settings size={28} />
+        {isMobile && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+            <div
+              className="nm-inset"
+              style={{
+                width: '56px', height: '56px', borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--accent-blue)', padding: '6px'
+              }}
+            >
+              <Settings size={28} />
+            </div>
+            <div>
+              <h1 style={{ fontSize: '24px', fontWeight: 800 }}>Profil & Pengaturan</h1>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{user?.nama_lengkap} ({user?.role})</p>
+            </div>
           </div>
-          <div>
-            <h1 style={{ fontSize: '24px', fontWeight: 800 }}>Profil & Pengaturan</h1>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{user?.nama_lengkap} ({user?.role})</p>
-          </div>
-        </div>
+        )}
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '500px' }}>
           {canInstall && (
