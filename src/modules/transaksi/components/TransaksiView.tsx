@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Search, Trash2, Plus, Minus, Tag, CreditCard, 
-  Smartphone, Share2, Printer, CheckCircle, FileText, ShoppingBag, ShoppingCart 
+  Share2, Printer, CheckCircle, ShoppingBag, ShoppingCart 
 } from 'lucide-react';
 import { useApp } from '../../../store/AppContext';
 import { db, type Product, type Category, type Transaction, type TransactionItem } from '../../../shared/services/db';
@@ -73,9 +73,7 @@ export const TransaksiView: React.FC = () => {
   // Receipt State
   const [completedTx, setCompletedTx] = useState<Transaction | null>(null);
   const [completedItems, setCompletedItems] = useState<TransactionItem[]>([]);
-  const [bluetoothName, setBluetoothName] = useState('');
-  const [isBluetoothConnecting, setIsBluetoothConnecting] = useState(false);
-  const [bluetoothError, setBluetoothError] = useState('');
+
   
   // Discount State
   const [discountType, setDiscountType] = useState<'Rp' | '%'>('Rp');
@@ -351,18 +349,7 @@ export const TransaksiView: React.FC = () => {
     }
   };
 
-  const handlePairBluetooth = async () => {
-    setBluetoothError('');
-    setIsBluetoothConnecting(true);
-    try {
-      const name = await PrintService.connectBluetoothPrinter();
-      setBluetoothName(name);
-    } catch (e: any) {
-      setBluetoothError(e.message);
-    } finally {
-      setIsBluetoothConnecting(false);
-    }
-  };
+
 
   // Render components
   return (
@@ -871,17 +858,7 @@ export const TransaksiView: React.FC = () => {
 
             </div>
 
-            {bluetoothName && (
-              <div style={{ fontSize: '11px', color: 'var(--accent-green)', fontWeight: 600, marginBottom: '16px' }}>
-                ✓ Connected to: {bluetoothName}
-              </div>
-            )}
-            
-            {bluetoothError && (
-              <div style={{ fontSize: '11px', color: 'var(--accent-red)', fontWeight: 600, marginBottom: '0' }}>
-                {bluetoothError}
-              </div>
-            )}
+
           </div>
         )}
       </NeumorphicModal>
