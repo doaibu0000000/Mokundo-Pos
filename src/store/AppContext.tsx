@@ -225,8 +225,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const setActiveTab = (tab: string) => {
-    // Restrict Kasir role from accessing Admin-only tabs
-    if (user?.role === 'Kasir' && tab !== 'transaksi' && tab !== 'produk' && tab !== 'pengaturan') {
+    // Restrict Kasir role — only POS (transaksi) and Profil (pengaturan) are allowed
+    if (user?.role === 'Kasir' && tab !== 'transaksi' && tab !== 'pengaturan') {
       return;
     }
     setActiveTabState(tab);

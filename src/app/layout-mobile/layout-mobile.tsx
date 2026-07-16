@@ -66,11 +66,10 @@ export const MobileLayout: React.FC = () => {
   // Nav menus matching roles
   const navItems = [
     { id: 'dashboard', label: 'Home', icon: <Home size={20} />, roles: ['Admin', 'Manajer'] },
-    { id: 'produk', label: 'Produk', icon: <Coffee size={20} />, roles: ['Admin', 'Kasir', 'Manajer'] },
+    { id: 'produk', label: 'Produk', icon: <Coffee size={20} />, roles: ['Admin', 'Manajer'] },
     { id: 'transaksi', label: 'POS', icon: <ShoppingCart size={20} />, roles: ['Admin', 'Kasir', 'Manajer'] },
     { id: 'laporan', label: 'Laporan', icon: <BarChart2 size={20} />, roles: ['Admin', 'Manajer'] },
     { id: 'pengaturan', label: 'Profil', icon: <Settings size={20} />, roles: ['Admin', 'Kasir', 'Manajer'] },
-    { id: 'logout', label: 'Keluar', icon: <LogOut size={20} />, roles: ['Kasir'] }
   ];
 
   const filteredNavItems = navItems.filter(item => item.roles.includes(user?.role || ''));
