@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  Search, Scan, Trash2, Plus, Minus, Tag, CreditCard, 
-  Smartphone, Share2, Printer, CheckCircle, FileText, Sun, ShoppingBag, ShoppingCart 
+  Search, Trash2, Plus, Minus, Tag, CreditCard, 
+  Smartphone, Share2, Printer, CheckCircle, FileText, ShoppingBag, ShoppingCart 
 } from 'lucide-react';
 import { useApp } from '../../../store/AppContext';
 import { db, type Product, type Category, type Transaction, type TransactionItem } from '../../../shared/services/db';
@@ -50,10 +50,7 @@ export const TransaksiView: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<number | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Barcode / Scanner States
-  const [barcodeInput, setBarcodeInput] = useState('');
-  const [showScannerMock, setShowScannerMock] = useState(false);
-  const [scanMessage, setScanMessage] = useState('');
+
 
   // Variant Modal
   const [variantProduct, setVariantProduct] = useState<Product | null>(null);
@@ -96,7 +93,6 @@ export const TransaksiView: React.FC = () => {
   
   // Wake Lock State
   const [wakeLock, setWakeLock] = useState<any>(null);
-  const [wakeLockStatus, setWakeLockStatus] = useState<'Active' | 'Inactive' | 'Unsupported'>('Inactive');
 
   // --- Global History Back Logic for Popups ---
   const hasPopup = isCartOpen || isPaymentOpen || !!variantProduct || !!completedTx;
@@ -157,16 +153,9 @@ export const TransaksiView: React.FC = () => {
       try {
         const lock = await (navigator as any).wakeLock.request('screen');
         setWakeLock(lock);
-        setWakeLockStatus('Active');
-        lock.addEventListener('release', () => {
-          setWakeLockStatus('Inactive');
-        });
       } catch (err) {
         console.error('Failed to acquire wake lock:', err);
-        setWakeLockStatus('Inactive');
       }
-    } else {
-      setWakeLockStatus('Unsupported');
     }
   };
 
@@ -174,7 +163,6 @@ export const TransaksiView: React.FC = () => {
     if (wakeLock) {
       wakeLock.release().then(() => {
         setWakeLock(null);
-        setWakeLockStatus('Inactive');
       });
     }
   };
@@ -230,22 +218,7 @@ export const TransaksiView: React.FC = () => {
     }
   };
 
-  // Barcode Scanning Simulation
-  const handleBarcodeSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!barcodeInput) return;
 
-    setScanMessage('');
-    const product = await db.products.where('sku').equals(barcodeInput).first();
-    
-    if (product) {
-      handleProductClick(product);
-      setScanMessage(`✅ Scanned: ${product.nama}`);
-      setBarcodeInput('');
-    } else {
-      setScanMessage('❌ Barcode tidak ditemukan');
-    }
-  };
 
   // Cash Payments calculators
   const changeValue = Math.max(0, (parseFloat(cashPaid) || 0) - cartTotals.total);
@@ -420,57 +393,10 @@ export const TransaksiView: React.FC = () => {
             />
           </div>
 
-          {/* Barcode scanner triggers */}
-          {!isMobile && (
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <NeumorphicButton onClick={() => setShowScannerMock(!showScannerMock)}>
-                <Scan size={18} />
-                <span className="hidden sm:inline">Scan Barcode</span>
-              </NeumorphicButton>
-              
-              {/* Wake Lock Status Badge */}
-              <div
-                className="nm-inset"
-                title="Status Wake Lock (Screen Keep-Alive)"
-                style={{
-                  borderRadius: 'var(--radius-md)',
-                  padding: '0 12px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  color: wakeLockStatus === 'Active' ? 'var(--accent-green)' : 'var(--text-secondary)'
-                }}
-              >
-                <Sun size={14} className={wakeLockStatus === 'Active' ? 'animate-pulse' : ''} />
-                <span className="hidden sm:inline">
-                  {wakeLockStatus === 'Active' ? 'Stay-Awake: ON' : 'Stay-Awake: OFF'}
-                </span>
-              </div>
-            </div>
-          )}
+
         </div>
 
-        {/* Scan input mockup block if triggered */}
-        {showScannerMock && (
-          <NeumorphicCard style={{ padding: '12px', marginBottom: '16px' }}>
-            <form onSubmit={handleBarcodeSubmit} style={{ display: 'flex', gap: '12px' }}>
-              <div style={{ flex: 1 }}>
-                <NeumorphicInput
-                  placeholder="Simulasikan Scan Barcode (Misal: 888001)"
-                  value={barcodeInput}
-                  onChange={(e) => setBarcodeInput(e.target.value)}
-                  autoFocus
-                />
-              </div>
-              <NeumorphicButton type="submit">Scan</NeumorphicButton>
-            </form>
-            {scanMessage && (
-              <div style={{ fontSize: '12px', marginTop: '6px', fontWeight: 600 }}>{scanMessage}</div>
-            )}
-          </NeumorphicCard>
-        )}
+
 
         {/* Categories Horizontal Tabs */}
         <div 
