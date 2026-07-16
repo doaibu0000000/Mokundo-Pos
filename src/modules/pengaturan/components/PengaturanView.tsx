@@ -514,12 +514,7 @@ export const PengaturanView: React.FC = () => {
         <>
       {activeScreen === 'profil' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '600px', animation: 'fadeIn 0.2s ease-in-out' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-             <NeumorphicButton size="sm" onClick={() => navigateTo('menu')} style={{ padding: '8px' }}>
-               <span style={{ fontSize: '16px', fontWeight: 'bold' }}>←</span>
-             </NeumorphicButton>
-             {renderHeader('Tampilan Struk', 'Ubah nama dan alamat')}
-          </div>
+          {renderHeader('Tampilan Struk', 'Ubah nama dan alamat')}
           
           <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
             <NeumorphicButton 
