@@ -51,6 +51,13 @@ export const PengaturanView: React.FC = () => {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [activeScreen]);
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Profil & Pajak States
   const [storeNama, setStoreNama] = useState(store?.nama || '');
   const formatPhone = (phone?: string) => {
@@ -426,17 +433,19 @@ export const PengaturanView: React.FC = () => {
             
           </NeumorphicCard>
 
-          <NeumorphicCard 
-            className="nm-button"
-            onClick={logoutUser}
-            style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer', marginTop: '8px' }}
-          >
-            <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-red)' }}><Power size={20} /></div>
-            <div style={{ flex: 1, textAlign: 'left' }}>
-              <div style={{ fontWeight: 800, fontSize: '15px', color: 'var(--accent-red)' }}>Keluar (Logout)</div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Akhiri sesi Anda saat ini</div>
-            </div>
-          </NeumorphicCard>
+          {isMobile && (
+            <NeumorphicCard 
+              className="nm-button"
+              onClick={logoutUser}
+              style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer', marginTop: '8px' }}
+            >
+              <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-red)' }}><Power size={20} /></div>
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <div style={{ fontWeight: 800, fontSize: '15px', color: 'var(--accent-red)' }}>Keluar (Logout)</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Akhiri sesi Anda saat ini</div>
+              </div>
+            </NeumorphicCard>
+          )}
         </div>
         </div>
       ) : (
