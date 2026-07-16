@@ -561,18 +561,18 @@ export const ProdukView: React.FC = () => {
           )}
 
           {activeSubTab === 'produk' && (
-            <NeumorphicButton variant="success" onClick={() => openProductForm(null)} style={{ flex: isMobile ? 1 : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: isMobile ? 0 : undefined, padding: isMobile ? '10px 8px' : undefined }}>
+            <NeumorphicButton variant="success" onClick={() => openProductForm(null)} style={{ flex: isMobile ? 1 : 'none', whiteSpace: 'nowrap', minWidth: isMobile ? 0 : undefined, padding: isMobile ? '10px 8px' : undefined }}>
               <Plus size={16} style={{ flexShrink: 0 }} /> 
-              <span style={{ whiteSpace: 'nowrap', overflow: isMobile ? 'hidden' : 'visible', textOverflow: isMobile ? 'ellipsis' : 'clip', fontSize: isMobile ? '13px' : 'inherit', marginLeft: '6px' }}>
+              <span style={{ overflow: isMobile ? 'hidden' : 'visible', textOverflow: isMobile ? 'ellipsis' : 'clip', fontSize: isMobile ? '13px' : 'inherit' }}>
                 Tambah Produk
               </span>
             </NeumorphicButton>
           )}
 
           {activeSubTab === 'kategori' && (
-            <NeumorphicButton variant="success" onClick={() => openCategoryForm(null)} style={{ flex: isMobile ? 1 : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: isMobile ? 0 : undefined, padding: isMobile ? '10px 8px' : undefined }}>
+            <NeumorphicButton variant="success" onClick={() => openCategoryForm(null)} style={{ flex: isMobile ? 1 : 'none', whiteSpace: 'nowrap', minWidth: isMobile ? 0 : undefined, padding: isMobile ? '10px 8px' : undefined }}>
               <Plus size={16} style={{ flexShrink: 0 }} /> 
-              <span style={{ whiteSpace: 'nowrap', overflow: isMobile ? 'hidden' : 'visible', textOverflow: isMobile ? 'ellipsis' : 'clip', fontSize: isMobile ? '13px' : 'inherit', marginLeft: '6px' }}>
+              <span style={{ overflow: isMobile ? 'hidden' : 'visible', textOverflow: isMobile ? 'ellipsis' : 'clip', fontSize: isMobile ? '13px' : 'inherit' }}>
                 Tambah Kategori
               </span>
             </NeumorphicButton>
