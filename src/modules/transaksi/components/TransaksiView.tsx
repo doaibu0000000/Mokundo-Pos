@@ -404,16 +404,17 @@ export const TransaksiView: React.FC = () => {
             display: 'flex', 
             gap: '8px', 
             overflowX: 'auto', 
-            paddingBottom: '12px',
             marginBottom: '16px',
-            scrollSnapType: 'x mandatory'
+            paddingBottom: '4px',
+            scrollbarWidth: 'none'
           }}
         >
           <NeumorphicButton
             size="sm"
-            active={selectedCategory === 'all'}
+            variant={selectedCategory === 'all' ? 'primary' : 'flat'}
             onClick={() => setSelectedCategory('all')}
             borderRadius="pill"
+            style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
           >
             Semua Menu
           </NeumorphicButton>
@@ -422,9 +423,10 @@ export const TransaksiView: React.FC = () => {
             <NeumorphicButton
               key={cat.id}
               size="sm"
-              active={selectedCategory === cat.id}
+              variant={selectedCategory === cat.id ? 'primary' : 'flat'}
               onClick={() => setSelectedCategory(cat.id!)}
               borderRadius="pill"
+              style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
             >
               {cat.nama}
             </NeumorphicButton>
