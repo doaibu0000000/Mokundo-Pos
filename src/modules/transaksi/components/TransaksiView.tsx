@@ -378,7 +378,8 @@ export const TransaksiView: React.FC = () => {
           display: 'flex', 
           flexDirection: 'column', 
           overflow: 'hidden', 
-          padding: '20px' 
+          padding: '20px',
+          backgroundColor: 'var(--bg-surface)'
         }}
       >
         {/* Search header & Barcode section */}
@@ -439,10 +440,11 @@ export const TransaksiView: React.FC = () => {
             flex: 1,
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-            gap: '16px',
+            gap: '12px',
             overflowY: 'auto',
-            paddingRight: '6px',
-            alignContent: 'start'
+            paddingRight: '4px',
+            alignContent: 'start',
+            backgroundColor: 'var(--bg-surface)'
           }}
         >
           {products.map(prod => {
