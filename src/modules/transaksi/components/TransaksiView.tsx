@@ -382,7 +382,7 @@ export const TransaksiView: React.FC = () => {
         }}
       >
         {/* Search header & Barcode section */}
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '4px', flexWrap: 'wrap' }}>
           
           <div style={{ flex: 1, position: 'relative' }}>
             <NeumorphicInput
