@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Plus, Edit2, Trash2, Download, Upload, AlertCircle, Search, ChevronDown, Check } from 'lucide-react';
+import { Plus, Edit2, Trash2, Download, Upload, Search, ChevronDown, Check } from 'lucide-react';
 import { db, type Product, type Category } from '../../../shared/services/db';
 import { NeumorphicCard, NeumorphicButton, NeumorphicInput, NeumorphicModal } from '../../../shared/components';
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
