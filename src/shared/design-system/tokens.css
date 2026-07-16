@@ -38,30 +38,33 @@
 }
 
 :root.dark {
-  /* Dark Mode Tokens */
-  --bg-base: #1E2128;
-  --bg-surface: #242730;
-  --bg-inset: #181A20;
+  /* Dark Mode Tokens - True Neumorphism */
+  /* Base background must be a medium dark, not pure black,
+     so both lighter and darker shadows can be perceived */
+  --bg-base: #1f2235;
+  --bg-surface: #252a3d;
+  --bg-inset: #191d2e;
   
-  --shadow-light: rgba(255, 255, 255, 0.08);
-  --shadow-dark: rgba(0, 0, 0, 0.55);
+  /* True Neumorphism: solid colors derived from base, NOT rgba white/black */
+  --shadow-light: #2e3453;     /* ~20% lighter than surface for raised highlight */
+  --shadow-dark: #131624;      /* ~20% darker than surface for raised depth */
   
-  --shadow-light-inset: rgba(255, 255, 255, 0.06);
-  --shadow-dark-inset: rgba(0, 0, 0, 0.7);
+  --shadow-light-inset: #2b3050; /* inset highlight (slightly lighter than surface) */
+  --shadow-dark-inset: #111422;  /* inset depth (darker than inset bg) */
   
-  --text-primary: #F3F4F6;
-  --text-secondary: #D1D5DB;
-  --text-muted: #9CA3AF;
+  --text-primary: #E8ECFF;
+  --text-secondary: #9BA3C8;
+  --text-muted: #6B7299;
   
-  --accent-blue: #93C5FD;
-  --accent-blue-gradient: linear-gradient(135deg, #818CF8, #60A5FA);
-  --accent-green: #6EE7B7;
-  --accent-green-gradient: linear-gradient(135deg, #34D399, #10B981);
-  --accent-red: #FCA5A5;
-  --accent-red-gradient: linear-gradient(135deg, #F87171, #EF4444);
+  --accent-blue: #7C9EFF;
+  --accent-blue-gradient: linear-gradient(135deg, #6C63FF, #7C9EFF);
+  --accent-green: #5EEAD4;
+  --accent-green-gradient: linear-gradient(135deg, #2DD4BF, #5EEAD4);
+  --accent-red: #FF8FA3;
+  --accent-red-gradient: linear-gradient(135deg, #FB7185, #FF8FA3);
   --accent-orange: #FCD34D;
   
-  --border-focus: rgba(147, 197, 253, 0.6);
+  --border-focus: rgba(124, 158, 255, 0.5);
 }
 
 :root.high-contrast {

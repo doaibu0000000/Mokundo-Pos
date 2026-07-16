@@ -4,14 +4,14 @@
 /* Neumorphic UI Utility classes */
 .nm-flat {
   background-color: var(--bg-surface);
-  box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+  box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
   border: var(--border-width-hc) solid var(--border-high-contrast);
   transition: all 0.2s ease;
 }
 
 .nm-inset {
   background-color: var(--bg-inset);
-  box-shadow: inset 4px 4px 8px var(--shadow-dark-inset), inset -4px -4px 8px var(--shadow-light-inset);
+  box-shadow: inset 5px 5px 10px var(--shadow-dark-inset), inset -5px -5px 10px var(--shadow-light-inset);
   border: var(--border-width-hc) solid var(--border-high-contrast);
   transition: all 0.2s ease;
 }
@@ -19,7 +19,7 @@
 /* Elevated hover/active behaviors */
 .nm-button {
   background-color: var(--bg-surface);
-  box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+  box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
   border: var(--border-width-hc) solid var(--border-high-contrast);
   color: var(--text-primary);
   cursor: pointer;
@@ -29,11 +29,11 @@
 }
 
 .nm-button:hover {
-  box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+  box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
 }
 
 .nm-button:active, .nm-button.active {
-  box-shadow: inset 3px 3px 6px var(--shadow-dark-inset), inset -3px -3px 6px var(--shadow-light-inset);
+  box-shadow: inset 4px 4px 8px var(--shadow-dark-inset), inset -4px -4px 8px var(--shadow-light-inset);
   transform: scale(0.98);
 }
 
