@@ -405,8 +405,8 @@ export const TransaksiView: React.FC = () => {
             display: 'flex', 
             gap: '8px', 
             overflowX: 'auto', 
-            marginBottom: '8px',
-            padding: '8px 4px 16px 4px', /* padding adjusted to prevent clipping but not too much */
+            marginBottom: '-8px', /* Negative margin to pull up the content below and save space */
+            padding: '8px 4px 24px 4px', /* 24px bottom padding is required to not clip the neumorphic shadow */
             scrollbarWidth: 'none',
             margin: '0 -4px' 
           }}
