@@ -69,7 +69,7 @@ export const MobileLayout: React.FC = () => {
     { id: 'produk', label: 'Produk', icon: <Coffee size={20} />, roles: ['Admin', 'Kasir', 'Manajer'] },
     { id: 'transaksi', label: 'POS', icon: <ShoppingCart size={20} />, roles: ['Admin', 'Kasir', 'Manajer'] },
     { id: 'laporan', label: 'Laporan', icon: <BarChart2 size={20} />, roles: ['Admin', 'Manajer'] },
-    { id: 'pengaturan', label: 'Profil', icon: <Settings size={20} />, roles: ['Admin', 'Manajer'] },
+    { id: 'pengaturan', label: 'Profil', icon: <Settings size={20} />, roles: ['Admin', 'Kasir', 'Manajer'] },
     { id: 'logout', label: 'Keluar', icon: <LogOut size={20} />, roles: ['Kasir'] }
   ];
 

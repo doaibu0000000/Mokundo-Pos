@@ -26,7 +26,7 @@ export const WebLayout: React.FC = () => {
     { id: 'transaksi', label: 'Transaksi (POS)', icon: <ShoppingCart size={18} />, roles: ['Admin', 'Kasir', 'Manajer'] },
     { id: 'produk', label: 'Produk & Stok', icon: <Coffee size={18} />, roles: ['Admin', 'Kasir', 'Manajer'] },
     { id: 'laporan', label: 'Laporan Keuangan', icon: <BarChart2 size={18} />, roles: ['Admin', 'Manajer'] },
-    { id: 'pengaturan', label: 'Pengaturan', icon: <Settings size={18} />, roles: ['Admin', 'Manajer'] }
+    { id: 'pengaturan', label: 'Pengaturan', icon: <Settings size={18} />, roles: ['Admin', 'Kasir', 'Manajer'] }
   ];
 
   const filteredMenuItems = menuItems.filter(item => item.roles.includes(user?.role || ''));
