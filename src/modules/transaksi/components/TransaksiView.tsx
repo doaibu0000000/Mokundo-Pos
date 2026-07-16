@@ -451,7 +451,9 @@ export const TransaksiView: React.FC = () => {
             gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
             gap: '12px',
             overflowY: 'auto',
-            paddingRight: '4px',
+            padding: '16px', /* Add padding all around so shadows aren't clipped */
+            margin: '-16px', /* Compensate margin to align with parent */
+            paddingBottom: '32px',
             alignContent: 'start',
             backgroundColor: 'var(--bg-surface)'
           }}
