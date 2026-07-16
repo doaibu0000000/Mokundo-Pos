@@ -86,7 +86,7 @@ export const WebLayout: React.FC = () => {
           </div>
           <div>
             <h2 style={{ fontSize: '15px', fontWeight: 900, lineHeight: 1.1 }}>Mokundo POS</h2>
-            <span style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: 600 }}>Sistem Kasir UMKM</span>
+            <span style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: 600 }}>Version 5.7.1</span>
           </div>
         </div>
 
