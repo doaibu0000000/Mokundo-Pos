@@ -864,36 +864,11 @@ export const TransaksiView: React.FC = () => {
               <NeumorphicButton size="sm" onClick={() => PrintService.printViaBrowser(completedTx, completedItems, store!)}>
                 <Printer size={16} /> Print Browser
               </NeumorphicButton>
-              
-              <NeumorphicButton 
-                size="sm" 
-                active={PrintService.isBluetoothConnected()}
-                disabled={isBluetoothConnecting}
-                style={{ opacity: isBluetoothConnecting ? 0.7 : 1 }}
-                onClick={async () => {
-                  setBluetoothError('');
-                  if (!PrintService.isBluetoothConnected()) {
-                    await handlePairBluetooth();
-                  } else {
-                    try {
-                      await PrintService.printViaBluetooth(completedTx, completedItems, store!);
-                    } catch (e: any) {
-                      setBluetoothError(e.message);
-                    }
-                  }
-                }}
-              >
-                <Smartphone size={16} /> 
-                {isBluetoothConnecting ? 'Menyandingkan...' : (PrintService.isBluetoothConnected() ? 'Print Bluetooth' : 'Pair Bluetooth')}
-              </NeumorphicButton>
 
               <NeumorphicButton size="sm" onClick={() => window.open(PrintService.shareWhatsAppReceipt(completedTx, completedItems, store!), '_blank')}>
                 <Share2 size={16} /> Kirim WhatsApp
               </NeumorphicButton>
 
-              <NeumorphicButton size="sm" onClick={() => PrintService.exportPDFReceipt(completedTx, completedItems, store!)}>
-                <FileText size={16} /> Unduh PDF
-              </NeumorphicButton>
             </div>
 
             {bluetoothName && (
