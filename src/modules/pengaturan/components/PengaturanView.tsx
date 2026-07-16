@@ -980,6 +980,8 @@ export const PengaturanView: React.FC = () => {
           </NeumorphicCard>
         </div>
       )}
+        </>
+      )}
 
       {showPaperSizeModal && (
         <NeumorphicModal
