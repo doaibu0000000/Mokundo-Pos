@@ -639,9 +639,11 @@ export const ProdukView: React.FC = () => {
             gap: '16px', 
             overflowY: 'auto', 
             flex: 1, 
-            paddingBottom: '20px', 
-            paddingRight: '6px', 
-            alignContent: 'start' 
+            padding: '16px', /* Add padding all around so shadows aren't clipped */
+            margin: '-16px', /* Compensate margin to align with parent if needed, or leave it inside */
+            paddingBottom: '32px', 
+            alignContent: 'start',
+            backgroundColor: 'var(--bg-surface)' /* Ensure background matches cards for full Neumorphism */
           }}>
             {isLoadingData ? (
               <></>
