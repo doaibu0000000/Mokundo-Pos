@@ -463,30 +463,7 @@ export const ProdukView: React.FC = () => {
   return (
     <div style={{ padding: '20px', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       
-      {/* Seeding Warning Alert */}
-      {!isMobile && (
-        <div 
-          className="nm-inset"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '12px 16px',
-            borderRadius: 'var(--radius-md)',
-            backgroundColor: 'rgba(245, 158, 11, 0.1)',
-            border: '1px solid var(--accent-orange)',
-            color: 'var(--accent-orange)',
-            marginBottom: '20px',
-            fontSize: '13px',
-            fontWeight: 600
-          }}
-        >
-          <AlertCircle size={20} />
-          <div>
-            <span>Pemberitahuan Keamanan:</span> Akun default <code>admin</code> dan <code>kasir</code> aktif. Silakan ubah password bawaan Anda di menu <b>Pengaturan</b>.
-          </div>
-        </div>
-      )}
+
 
       {/* Navigation tabs */}
       <div
