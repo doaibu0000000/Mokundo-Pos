@@ -403,12 +403,12 @@ export const TransaksiView: React.FC = () => {
         <div 
           style={{ 
             display: 'flex', 
-            gap: '12px', 
+            gap: '8px', 
             overflowX: 'auto', 
             marginBottom: '8px',
-            padding: '8px 8px 20px 8px', /* Adequate padding to prevent shadow clipping */
+            padding: '8px 4px 16px 4px', /* padding adjusted to prevent clipping but not too much */
             scrollbarWidth: 'none',
-            margin: '0 -8px' /* Compensate for padding so it aligns with other elements */
+            margin: '0 -4px' 
           }}
         >
           <NeumorphicButton
