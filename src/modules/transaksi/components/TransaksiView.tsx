@@ -378,8 +378,7 @@ export const TransaksiView: React.FC = () => {
           display: 'flex', 
           flexDirection: 'column', 
           overflow: 'hidden', 
-          padding: '20px',
-          backgroundColor: 'var(--bg-surface)'
+          padding: '20px' 
         }}
       >
         {/* Search header & Barcode section */}
@@ -405,22 +404,17 @@ export const TransaksiView: React.FC = () => {
             display: 'flex', 
             gap: '8px', 
             overflowX: 'auto', 
-            marginBottom: '-8px', /* Negative margin to pull up the content below and save space */
-            padding: '8px 4px 24px 4px', /* 24px bottom padding is required to not clip the neumorphic shadow */
-            scrollbarWidth: 'none',
-            margin: '0 -4px' 
+            marginBottom: '16px',
+            paddingBottom: '4px',
+            scrollbarWidth: 'none'
           }}
         >
           <NeumorphicButton
             size="sm"
-            variant={selectedCategory === 'all' ? 'inset' : 'flat'}
+            variant={selectedCategory === 'all' ? 'primary' : 'flat'}
             onClick={() => setSelectedCategory('all')}
             borderRadius="pill"
-            style={{ 
-              whiteSpace: 'nowrap', 
-              flexShrink: 0,
-              color: selectedCategory === 'all' ? 'var(--accent-blue)' : 'inherit'
-            }}
+            style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
           >
             Semua Menu
           </NeumorphicButton>
@@ -429,14 +423,10 @@ export const TransaksiView: React.FC = () => {
             <NeumorphicButton
               key={cat.id}
               size="sm"
-              variant={selectedCategory === cat.id ? 'inset' : 'flat'}
+              variant={selectedCategory === cat.id ? 'primary' : 'flat'}
               onClick={() => setSelectedCategory(cat.id!)}
               borderRadius="pill"
-              style={{ 
-                whiteSpace: 'nowrap', 
-                flexShrink: 0,
-                color: selectedCategory === cat.id ? 'var(--accent-blue)' : 'inherit'
-              }}
+              style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
             >
               {cat.nama}
             </NeumorphicButton>
@@ -449,13 +439,10 @@ export const TransaksiView: React.FC = () => {
             flex: 1,
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-            gap: '12px',
+            gap: '16px',
             overflowY: 'auto',
-            padding: '16px', /* Add padding all around so shadows aren't clipped */
-            margin: '-16px', /* Compensate margin to align with parent */
-            paddingBottom: '32px',
-            alignContent: 'start',
-            backgroundColor: 'var(--bg-surface)'
+            paddingRight: '6px',
+            alignContent: 'start'
           }}
         >
           {products.map(prod => {
