@@ -370,9 +370,22 @@ export const PengaturanView: React.FC = () => {
     </div>
   );
 
-  if (activeScreen === 'menu') {
-    return (
-      <div style={{ padding: '20px', height: '100%', overflowY: 'auto' }}>
+  return (
+    <div 
+      key="pengaturan-container"
+      style={{ padding: '20px', height: '100%', overflowY: 'auto', animation: 'fadeIn 0.2s ease-in-out' }}
+    >
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}
+      </style>
+      
+      {activeScreen === 'menu' ? (
+        <>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
           <div
             className="nm-inset"
@@ -496,16 +509,17 @@ export const PengaturanView: React.FC = () => {
             </div>
           </NeumorphicCard>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ padding: '20px', height: '100%', overflowY: 'auto' }}>
-      
+        </>
+      ) : (
+        <>
       {activeScreen === 'profil' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '600px' }}>
-          {renderHeader('Tampilan Struk', 'Ubah nama dan alamat')}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '600px', animation: 'fadeIn 0.2s ease-in-out' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+             <NeumorphicButton size="sm" onClick={() => navigateTo('menu')} style={{ padding: '8px' }}>
+               <span style={{ fontSize: '16px', fontWeight: 'bold' }}>←</span>
+             </NeumorphicButton>
+             {renderHeader('Tampilan Struk', 'Ubah nama dan alamat')}
+          </div>
           
           <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
             <NeumorphicButton 
