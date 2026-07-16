@@ -43,11 +43,11 @@
   --bg-surface: #242730;
   --bg-inset: #181A20;
   
-  --shadow-light: rgba(255, 255, 255, 0.05);
-  --shadow-dark: rgba(0, 0, 0, 0.4);
+  --shadow-light: rgba(255, 255, 255, 0.08);
+  --shadow-dark: rgba(0, 0, 0, 0.55);
   
-  --shadow-light-inset: rgba(255, 255, 255, 0.04);
-  --shadow-dark-inset: rgba(0, 0, 0, 0.5);
+  --shadow-light-inset: rgba(255, 255, 255, 0.06);
+  --shadow-dark-inset: rgba(0, 0, 0, 0.7);
   
   --text-primary: #F3F4F6;
   --text-secondary: #D1D5DB;
