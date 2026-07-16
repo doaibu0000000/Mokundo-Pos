@@ -561,20 +561,36 @@ export const ProdukView: React.FC = () => {
           )}
 
           {activeSubTab === 'produk' && (
-            <NeumorphicButton variant="success" onClick={() => openProductForm(null)} style={{ flex: isMobile ? 1 : undefined, flexShrink: 0, width: isMobile ? undefined : 'max-content', whiteSpace: 'nowrap', minWidth: isMobile ? 0 : undefined, padding: isMobile ? '10px 8px' : undefined }}>
-              <Plus size={16} style={{ flexShrink: 0 }} /> 
-              <span style={{ overflow: isMobile ? 'hidden' : 'visible', textOverflow: isMobile ? 'ellipsis' : 'clip', fontSize: isMobile ? '13px' : 'inherit' }}>
-                Tambah Produk
-              </span>
+            <NeumorphicButton 
+              variant="success" 
+              onClick={() => openProductForm(null)} 
+              style={isMobile ? { flex: 1, padding: '10px 8px', minWidth: 0 } : { whiteSpace: 'nowrap', flexShrink: 0 }}
+            >
+              <Plus size={isMobile ? 16 : 18} style={{ flexShrink: 0 }} /> 
+              {isMobile ? (
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '13px' }}>
+                  Tambah Produk
+                </span>
+              ) : (
+                <span>Tambah Produk</span>
+              )}
             </NeumorphicButton>
           )}
 
           {activeSubTab === 'kategori' && (
-            <NeumorphicButton variant="success" onClick={() => openCategoryForm(null)} style={{ flex: isMobile ? 1 : undefined, flexShrink: 0, width: isMobile ? undefined : 'max-content', whiteSpace: 'nowrap', minWidth: isMobile ? 0 : undefined, padding: isMobile ? '10px 8px' : undefined }}>
-              <Plus size={16} style={{ flexShrink: 0 }} /> 
-              <span style={{ overflow: isMobile ? 'hidden' : 'visible', textOverflow: isMobile ? 'ellipsis' : 'clip', fontSize: isMobile ? '13px' : 'inherit' }}>
-                Tambah Kategori
-              </span>
+            <NeumorphicButton 
+              variant="success" 
+              onClick={() => openCategoryForm(null)} 
+              style={isMobile ? { flex: 1, padding: '10px 8px', minWidth: 0 } : { whiteSpace: 'nowrap', flexShrink: 0 }}
+            >
+              <Plus size={isMobile ? 16 : 18} style={{ flexShrink: 0 }} /> 
+              {isMobile ? (
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '13px' }}>
+                  Tambah Kategori
+                </span>
+              ) : (
+                <span>Tambah Kategori</span>
+              )}
             </NeumorphicButton>
           )}
         </div>
