@@ -23,8 +23,8 @@ export const WebLayout: React.FC = () => {
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <Home size={18} />, roles: ['Admin', 'Manajer'] },
-    { id: 'transaksi', label: 'Transaksi (POS)', icon: <ShoppingCart size={18} />, roles: ['Admin', 'Kasir', 'Manajer'] },
     { id: 'produk', label: 'Produk & Stok', icon: <Coffee size={18} />, roles: ['Admin', 'Manajer'] },
+    { id: 'transaksi', label: 'Transaksi (POS)', icon: <ShoppingCart size={18} />, roles: ['Admin', 'Kasir', 'Manajer'] },
     { id: 'laporan', label: 'Laporan Keuangan', icon: <BarChart2 size={18} />, roles: ['Admin', 'Manajer'] },
     { id: 'pengaturan', label: 'Pengaturan', icon: <Settings size={18} />, roles: ['Admin', 'Kasir', 'Manajer'] }
   ];
