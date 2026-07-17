@@ -196,26 +196,22 @@ export class SyncService {
       // 2. Sync Transactions
       const pendingTx = await db.transactions.where('sync_status').equals('PENDING').toArray();
       for (const tx of pendingTx) {
-        // Also fetch items for this transaction
-        const items = await db.transaction_items.where('transaksi_id').equals(tx.id!).toArray();
+        // Sync the transaction itself (without embedded items)
+        const success = await this.syncRecord(url, key, 'transactions', tx);
         
-        // Payload combines transaction + its items
-        const payload = {
-          ...tx,
-          items: items.map(item => ({
-            produk_id: item.produk_id,
-            nama_produk: item.nama_produk,
-            qty: item.qty,
-            harga_satuan: item.harga_satuan,
-            varian: item.varian,
-            catatan: item.catatan
-          }))
-        };
-
-        const success = await this.syncRecord(url, key, 'transactions', payload);
         if (success) {
-          await db.transactions.update(tx.id!, { sync_status: 'SYNCED' });
-          totalSynced++;
+          // Sync its items to transaction_items table
+          const items = await db.transaction_items.where('transaksi_id').equals(tx.id!).toArray();
+          let allItemsSuccess = true;
+          for (const item of items) {
+             const itemSuccess = await this.syncRecord(url, key, 'transaction_items', item);
+             if (!itemSuccess) allItemsSuccess = false;
+          }
+
+          if (allItemsSuccess) {
+             await db.transactions.update(tx.id!, { sync_status: 'SYNCED' });
+             totalSynced++;
+          }
         }
       }
 
