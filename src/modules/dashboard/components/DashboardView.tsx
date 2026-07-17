@@ -99,18 +99,16 @@ export const DashboardView: React.FC = () => {
     try {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const todayStr = today.toISOString();
+      const todayTime = today.getTime();
 
       const filterDate = new Date();
       filterDate.setDate(filterDate.getDate() - filterDays);
       filterDate.setHours(0, 0, 0, 0);
-      const startFilterStr = filterDate.toISOString();
+      const startFilterTime = filterDate.getTime();
 
-      // Only fetch from local DB
-      const allTx = await db.transactions
-        .where('tanggal')
-        .aboveOrEqual(startFilterStr)
-        .toArray();
+      // Only fetch from local DB, using filter to guarantee safe parsing
+      const allTxRaw = await db.transactions.toArray();
+      const allTx = allTxRaw.filter(tx => new Date(tx.tanggal).getTime() >= startFilterTime);
 
       // 2. Fetch Transaction Items from local DB
       const allItems = await db.transaction_items.toArray(); 
@@ -124,7 +122,7 @@ export const DashboardView: React.FC = () => {
       }
 
       // 3. Calculate Today's Stats
-      const todayTx = allTx.filter(tx => tx.tanggal >= todayStr);
+      const todayTx = allTx.filter(tx => new Date(tx.tanggal).getTime() >= todayTime);
       let omsetToday = 0;
       let costToday = 0;
       let completedCount = 0;
@@ -166,13 +164,16 @@ export const DashboardView: React.FC = () => {
         const d = new Date();
         d.setDate(d.getDate() - i);
         d.setHours(0, 0, 0, 0);
-        const start = d.toISOString();
+        const startTime = d.getTime();
         
         const endD = new Date(d);
         endD.setHours(23, 59, 59, 999);
-        const end = endD.toISOString();
+        const endTime = endD.getTime();
 
-        const dayTx = allTx.filter(tx => tx.tanggal >= start && tx.tanggal <= end);
+        const dayTx = allTx.filter(tx => {
+          const t = new Date(tx.tanggal).getTime();
+          return t >= startTime && t <= endTime;
+        });
 
         let dayOmset = 0;
         let dayCost = 0;
