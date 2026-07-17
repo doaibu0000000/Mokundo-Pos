@@ -898,16 +898,17 @@ export const PengaturanView: React.FC = () => {
                   {isSyncingNow ? 'Menarik...' : 'Tarik Data Terbaru'}
                 </NeumorphicButton>
               </div>
-
-              <NeumorphicButton
-                type="button"
-                variant="success"
-                disabled={isSyncingNow || !syncEnabled}
-                onClick={handlePushAllData}
-                style={{ width: '100%', marginTop: '4px' }}
-              >
-                {isSyncingNow ? 'Mengupload...' : '☁️ Upload Semua Produk ke Server'}
-              </NeumorphicButton>
+              {user?.role === 'Admin' && (
+                <NeumorphicButton
+                  type="button"
+                  variant="success"
+                  disabled={isSyncingNow || !syncEnabled}
+                  onClick={handlePushAllData}
+                  style={{ width: '100%', marginTop: '4px' }}
+                >
+                  {isSyncingNow ? 'Mengupload...' : '☁️ Upload Semua Produk ke Server'}
+                </NeumorphicButton>
+              )}
             </form>
           </NeumorphicCard>
         </div>
