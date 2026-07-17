@@ -125,6 +125,12 @@ export class SyncService {
         });
         return res.ok;
       } else {
+        const cleanPayload = { ...payload };
+        delete cleanPayload.sync_status;
+        if (tableName === 'transactions') {
+          delete cleanPayload.items;
+        }
+
         const res = await fetch(`${url}/rest/v1/${tableName}`, {
           method: 'POST',
           headers: {
@@ -133,8 +139,14 @@ export class SyncService {
             'Authorization': `Bearer ${key}`,
             'Prefer': 'resolution=merge-duplicates'
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(cleanPayload)
         });
+        
+        if (!res.ok) {
+           const errText = await res.text();
+           console.error(`directPush error for ${tableName}:`, errText);
+        }
+        
         return res.ok || res.status === 201;
       }
     } catch (err) {
@@ -364,6 +376,13 @@ export class SyncService {
   // Push single record to Supabase via REST API
   private static async syncRecord(url: string, anonKey: string, tableName: string, payload: any): Promise<boolean> {
     try {
+      const cleanPayload = { ...payload };
+      delete cleanPayload.sync_status;
+      // ensure we don't send nested arrays that might break Postgres if not jsonb
+      if (tableName === 'transactions') {
+        delete cleanPayload.items;
+      }
+
       const response = await fetch(`${url}/rest/v1/${tableName}`, {
         method: 'POST',
         headers: {
@@ -372,10 +391,16 @@ export class SyncService {
           'Authorization': `Bearer ${anonKey}`,
           'Prefer': 'resolution=merge-duplicates' // UPSERT behavior if primary keys match
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(cleanPayload)
       });
 
-      return response.ok || response.status === 201;
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error(`SyncRecord failed for ${tableName}:`, errText);
+        return false;
+      }
+
+      return true;
     } catch (e) {
       console.error(`Network error syncing ${tableName}:`, e);
       return false;
