@@ -257,7 +257,7 @@ export const TransaksiView: React.FC = () => {
       }
 
       // 2. Perform DB transaction updates
-      const tId = await db.transaction('rw', [db.products, db.transactions, db.transaction_items, db.shifts, db.stock_logs, db.sync_queue], async () => {
+      const tId = await db.transaction('rw', [db.products, db.transactions, db.transaction_items, db.shifts, db.stock_logs], async () => {
         // Create transaction row first so we have the txId
         const txId = await db.transactions.add({
           kasir_id: user?.id || 0,
@@ -283,16 +283,8 @@ export const TransaksiView: React.FC = () => {
           if (prod) {
             const newStock = prod.stok - item.qty;
             await db.products.update(item.product.id!, { stok: newStock });
-            
-            // Queue sync update for master product table
-            await db.sync_queue.add({
-              table_name: 'products',
-              record_id: item.product.id!,
-              action: 'UPDATE',
-              payload: JSON.stringify({ ...prod, stok: newStock }),
-              timestamp: new Date().toISOString(),
-              is_stock_update: true
-            });
+            // Direct push = instant Supabase Realtime, no queue delay
+            SyncService.directPush('products', 'UPDATE', item.product.id!, { ...prod, stok: newStock }).catch(console.error);
           }
           
           await db.stock_logs.add({
@@ -366,9 +358,6 @@ export const TransaksiView: React.FC = () => {
       
       // Refresh products to show updated stock
       await loadProducts();
-      
-      // Push stock updates to server
-      SyncService.syncAll().catch(console.error);
     } catch (err: any) {
       console.error(err);
       alert('Error Checkout: ' + (err.message || JSON.stringify(err)));

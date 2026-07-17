@@ -285,22 +285,10 @@ export const ProdukView: React.FC = () => {
           });
         }
         await db.products.update(editingProduct.id!, payload as any);
-        await db.sync_queue.add({
-          table_name: 'products',
-          record_id: editingProduct.id!,
-          action: 'UPDATE',
-          payload: JSON.stringify({ id: editingProduct.id, ...payload }),
-          timestamp: new Date().toISOString()
-        });
+        // Direct push = instant Supabase Realtime trigger, no queue delay
+        SyncService.directPush('products', 'UPDATE', editingProduct.id!, { id: editingProduct.id, ...payload }).catch(console.error);
       } else {
         const newId = await db.products.add(payload);
-        await db.sync_queue.add({
-          table_name: 'products',
-          record_id: newId as number,
-          action: 'INSERT',
-          payload: JSON.stringify({ id: newId, ...payload }),
-          timestamp: new Date().toISOString()
-        });
         // Write initial stock log
         await db.stock_logs.add({
           produk_id: newId as number,
@@ -310,10 +298,11 @@ export const ProdukView: React.FC = () => {
           tanggal: new Date().toISOString(),
           sync_status: 'PENDING'
         });
+        // Direct push = instant Supabase Realtime trigger, no queue delay
+        SyncService.directPush('products', 'INSERT', newId as number, { id: newId, ...payload }).catch(console.error);
       }
       setIsProductModalOpen(false);
       loadData();
-      SyncService.syncAll().catch(console.error);
     } catch (err: any) {
       setProdError(err.message || 'Gagal menyimpan produk. Periksa duplikasi Barcode.');
     }
@@ -362,15 +351,9 @@ export const ProdukView: React.FC = () => {
       message: 'Apakah Anda yakin ingin menghapus produk ini?',
       onConfirm: async () => {
         await db.products.delete(id);
-        await db.sync_queue.add({
-          table_name: 'products',
-          record_id: id,
-          action: 'DELETE',
-          payload: '{}',
-          timestamp: new Date().toISOString()
-        });
         loadData();
-        SyncService.syncAll().catch(console.error);
+        // Direct push = instant Supabase Realtime trigger, no queue delay
+        SyncService.directPush('products', 'DELETE', id).catch(console.error);
       }
     });
   };
@@ -413,26 +396,15 @@ export const ProdukView: React.FC = () => {
     try {
       if (editingCategory) {
         await db.categories.update(editingCategory.id!, payload);
-        await db.sync_queue.add({
-          table_name: 'categories',
-          record_id: editingCategory.id!,
-          action: 'UPDATE',
-          payload: JSON.stringify({ id: editingCategory.id, ...payload }),
-          timestamp: new Date().toISOString()
-        });
+        // Direct push = instant Supabase Realtime trigger, no queue delay
+        SyncService.directPush('categories', 'UPDATE', editingCategory.id!, { id: editingCategory.id, ...payload }).catch(console.error);
       } else {
         const newId = await db.categories.add(payload);
-        await db.sync_queue.add({
-          table_name: 'categories',
-          record_id: newId as number,
-          action: 'INSERT',
-          payload: JSON.stringify({ id: newId, ...payload }),
-          timestamp: new Date().toISOString()
-        });
+        // Direct push = instant Supabase Realtime trigger, no queue delay
+        SyncService.directPush('categories', 'INSERT', newId as number, { id: newId, ...payload }).catch(console.error);
       }
       setIsCategoryModalOpen(false);
       loadData();
-      SyncService.syncAll().catch(console.error);
     } catch (err: any) {
       setCatError('Gagal menyimpan kategori');
     }
@@ -444,15 +416,9 @@ export const ProdukView: React.FC = () => {
       message: 'Apakah Anda yakin ingin menghapus kategori ini? Semua produk di dalamnya tidak akan terhapus namun kehilangan kategori.',
       onConfirm: async () => {
         await db.categories.delete(id);
-        await db.sync_queue.add({
-          table_name: 'categories',
-          record_id: id,
-          action: 'DELETE',
-          payload: '{}',
-          timestamp: new Date().toISOString()
-        });
         loadData();
-        SyncService.syncAll().catch(console.error);
+        // Direct push = instant Supabase Realtime trigger, no queue delay
+        SyncService.directPush('categories', 'DELETE', id).catch(console.error);
       }
     });
   };
@@ -520,29 +486,16 @@ export const ProdukView: React.FC = () => {
 
           if (existing) {
             await db.products.update(existing.id!, payload);
-            await db.sync_queue.add({
-              table_name: 'products',
-              record_id: existing.id!,
-              action: 'UPDATE',
-              payload: JSON.stringify({ id: existing.id, ...payload }),
-              timestamp: new Date().toISOString()
-            });
+            SyncService.directPush('products', 'UPDATE', existing.id!, { id: existing.id, ...payload }).catch(console.error);
           } else {
             const newId = await db.products.add(payload);
-            await db.sync_queue.add({
-              table_name: 'products',
-              record_id: newId as number,
-              action: 'INSERT',
-              payload: JSON.stringify({ id: newId, ...payload }),
-              timestamp: new Date().toISOString()
-            });
+            SyncService.directPush('products', 'INSERT', newId as number, { id: newId, ...payload }).catch(console.error);
           }
           addedCount++;
         }
 
         alert(`Berhasil mengimpor/memperbarui ${addedCount} produk.`);
         loadData();
-        SyncService.syncAll().catch(console.error);
       } catch (err) {
         alert('Gagal memproses file CSV. Pastikan format kolom sesuai.');
       }

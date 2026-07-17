@@ -84,6 +84,53 @@ export class SyncService {
   }
 
 
+  /**
+   * Instantly push a single record directly to Supabase with NO delay.
+   * Use this for Admin operations (add/edit/delete product, category) so that
+   * Supabase Realtime fires immediately and all devices update in real-time.
+   */
+  public static async directPush(
+    tableName: string,
+    action: 'INSERT' | 'UPDATE' | 'DELETE',
+    recordId: number,
+    payload?: any
+  ): Promise<boolean> {
+    if (!navigator.onLine) return false;
+
+    const storeConfig = await db.stores.toCollection().first();
+    if (!storeConfig?.sync_enabled || !storeConfig?.supabase_url || !storeConfig?.supabase_anon_key) {
+      return false;
+    }
+
+    const url = storeConfig.supabase_url.replace(/\/$/, '');
+    const key = storeConfig.supabase_anon_key;
+
+    try {
+      if (action === 'DELETE') {
+        const res = await fetch(`${url}/rest/v1/${tableName}?id=eq.${recordId}`, {
+          method: 'DELETE',
+          headers: { 'apikey': key, 'Authorization': `Bearer ${key}` }
+        });
+        return res.ok;
+      } else {
+        const res = await fetch(`${url}/rest/v1/${tableName}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': key,
+            'Authorization': `Bearer ${key}`,
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify(payload)
+        });
+        return res.ok || res.status === 201;
+      }
+    } catch (err) {
+      console.error(`directPush error for ${tableName}:`, err);
+      return false;
+    }
+  }
+
   // General check and sync trigger
   public static async syncAll(): Promise<{ success: boolean; syncedCount: number }> {
     if (this.isSyncing) return { success: false, syncedCount: 0 };
