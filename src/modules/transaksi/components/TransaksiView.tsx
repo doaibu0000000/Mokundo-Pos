@@ -6,6 +6,7 @@ import {
 import { useApp } from '../../../store/AppContext';
 import { db, type Product, type Category, type Transaction, type TransactionItem } from '../../../shared/services/db';
 import { PrintService } from '../../../shared/services/printService';
+import { SyncService } from '../../../shared/services/syncService';
 import { 
   NeumorphicCard, NeumorphicButton, NeumorphicInput, 
   NeumorphicBottomSheet, NeumorphicModal 
@@ -282,6 +283,15 @@ export const TransaksiView: React.FC = () => {
           if (prod) {
             const newStock = prod.stok - item.qty;
             await db.products.update(item.product.id!, { stok: newStock });
+            
+            // Queue sync update for master product table
+            await db.sync_queue.add({
+              table_name: 'products',
+              record_id: item.product.id!,
+              action: 'UPDATE',
+              payload: JSON.stringify({ ...prod, stok: newStock }),
+              timestamp: new Date().toISOString()
+            });
           }
           
           await db.stock_logs.add({
@@ -352,6 +362,12 @@ export const TransaksiView: React.FC = () => {
       clearCart();
       setIsPaymentOpen(false);
       setCashPaid('');
+      
+      // Refresh products to show updated stock
+      await loadProducts();
+      
+      // Push stock updates to server
+      SyncService.syncAll().catch(console.error);
     } catch (err: any) {
       console.error(err);
       alert('Error Checkout: ' + (err.message || JSON.stringify(err)));
