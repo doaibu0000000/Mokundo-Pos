@@ -119,6 +119,7 @@ export interface SyncQueue {
   action: 'INSERT' | 'UPDATE' | 'DELETE';
   payload: string; // JSON stringified
   timestamp: string; // ISO String
+  is_stock_update?: boolean;
 }
 
 class MokundoDatabase extends Dexie {

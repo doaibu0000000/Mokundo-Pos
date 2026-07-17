@@ -257,7 +257,7 @@ export const TransaksiView: React.FC = () => {
       }
 
       // 2. Perform DB transaction updates
-      const tId = await db.transaction('rw', [db.products, db.transactions, db.transaction_items, db.shifts, db.stock_logs], async () => {
+      const tId = await db.transaction('rw', [db.products, db.transactions, db.transaction_items, db.shifts, db.stock_logs, db.sync_queue], async () => {
         // Create transaction row first so we have the txId
         const txId = await db.transactions.add({
           kasir_id: user?.id || 0,
@@ -290,7 +290,8 @@ export const TransaksiView: React.FC = () => {
               record_id: item.product.id!,
               action: 'UPDATE',
               payload: JSON.stringify({ ...prod, stok: newStock }),
-              timestamp: new Date().toISOString()
+              timestamp: new Date().toISOString(),
+              is_stock_update: true
             });
           }
           

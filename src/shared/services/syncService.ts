@@ -68,7 +68,7 @@ export class SyncService {
 
 
   // General check and sync trigger
-  public static async syncAll(): Promise<{ success: boolean; syncedCount: number }> {
+  public static async syncAll(syncMasterData: boolean = false): Promise<{ success: boolean; syncedCount: number }> {
     if (this.isSyncing) return { success: false, syncedCount: 0 };
     
     // Check if network is available
@@ -77,8 +77,8 @@ export class SyncService {
     }
 
     const storeConfig = await db.stores.toCollection().first();
+    // If not enabled or no keys, abort sync
     if (!storeConfig || !storeConfig.sync_enabled || !storeConfig.supabase_url || !storeConfig.supabase_anon_key) {
-      // Sync is not enabled or credentials are not filled
       return { success: false, syncedCount: 0 };
     }
 
@@ -135,8 +135,12 @@ export class SyncService {
         }
       }
 
-      // 4. Sync Master Data Queue
-      const syncQueue = await db.sync_queue.orderBy('timestamp').toArray();
+      // 4. Sync Master Data Queue (Filter based on syncMasterData parameter)
+      let syncQueue = await db.sync_queue.orderBy('timestamp').toArray();
+      if (!syncMasterData) {
+        syncQueue = syncQueue.filter(item => item.is_stock_update === true);
+      }
+
       for (const item of syncQueue) {
         let success = false;
         if (item.action === 'DELETE') {
@@ -187,26 +191,48 @@ export class SyncService {
         return await response.json();
       };
 
-      // Fetch Categories - fully replace local data so deletes propagate
+      // Fetch Categories - safely merge keeping drafted data
       const categories = await fetchData('categories');
-      if (Array.isArray(categories) && categories.length > 0) {
-        await db.categories.clear();
-        await db.categories.bulkAdd(categories);
+      if (Array.isArray(categories)) {
+        const pendingCats = await db.sync_queue.where('table_name').equals('categories').toArray();
+        const pendingIds = new Set(pendingCats.map(p => p.record_id));
+        const serverIds = new Set(categories.map((c: any) => c.id));
+        
+        const localCats = await db.categories.toArray();
+        for (const lc of localCats) {
+          if (!pendingIds.has(lc.id!) && !serverIds.has(lc.id!)) {
+            await db.categories.delete(lc.id!);
+          }
+        }
+        for (const sc of categories) {
+          if (!pendingIds.has(sc.id)) {
+            await db.categories.put(sc);
+          }
+        }
       }
 
-      // Fetch Products - fully replace local data so deletes propagate
+      // Fetch Products - safely merge keeping drafted data
       const products = await fetchData('products');
       if (Array.isArray(products)) {
-        await db.products.clear();
-        if (products.length > 0) {
-          // Ensure varian field is always a JS array (Supabase may return JSON string)
-          const normalized = products.map((p: any) => ({
-            ...p,
-            varian: Array.isArray(p.varian)
-              ? p.varian
-              : (typeof p.varian === 'string' ? JSON.parse(p.varian) : ['Normal'])
-          }));
-          await db.products.bulkAdd(normalized);
+        const pendingProds = await db.sync_queue.where('table_name').equals('products').toArray();
+        const pendingIds = new Set(pendingProds.map(p => p.record_id));
+        const serverIds = new Set(products.map((p: any) => p.id));
+        
+        const localProds = await db.products.toArray();
+        for (const lp of localProds) {
+          if (!pendingIds.has(lp.id!) && !serverIds.has(lp.id!)) {
+            await db.products.delete(lp.id!);
+          }
+        }
+        
+        for (const sp of products) {
+          if (!pendingIds.has(sp.id)) {
+            const normalized = {
+              ...sp,
+              varian: Array.isArray(sp.varian) ? sp.varian : (typeof sp.varian === 'string' ? JSON.parse(sp.varian) : ['Normal'])
+            };
+            await db.products.put(normalized);
+          }
         }
       }
 

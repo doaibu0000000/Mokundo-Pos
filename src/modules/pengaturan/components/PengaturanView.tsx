@@ -322,6 +322,9 @@ export const PengaturanView: React.FC = () => {
         if (await upsert('products', prod)) count++;
       }
 
+      // Clear sync queue for products and categories since everything is uploaded
+      await db.sync_queue.where('table_name').anyOf(['products', 'categories']).delete();
+
       setSyncSuccess(`Berhasil mengupload ${count} data (produk + kategori) ke server!`);
     } catch (err) {
       setSyncError('Gagal mengupload data. Periksa koneksi internet.');

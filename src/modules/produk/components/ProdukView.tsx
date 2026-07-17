@@ -292,7 +292,6 @@ export const ProdukView: React.FC = () => {
       }
       setIsProductModalOpen(false);
       loadData();
-      SyncService.syncAll().catch(console.error);
     } catch (err: any) {
       setProdError(err.message || 'Gagal menyimpan produk. Periksa duplikasi Barcode.');
     }
@@ -349,7 +348,6 @@ export const ProdukView: React.FC = () => {
           timestamp: new Date().toISOString()
         });
         loadData();
-        SyncService.syncAll().catch(console.error);
       }
     });
   };
@@ -411,7 +409,6 @@ export const ProdukView: React.FC = () => {
       }
       setIsCategoryModalOpen(false);
       loadData();
-      SyncService.syncAll().catch(console.error);
     } catch (err: any) {
       setCatError('Gagal menyimpan kategori');
     }
@@ -431,7 +428,6 @@ export const ProdukView: React.FC = () => {
           timestamp: new Date().toISOString()
         });
         loadData();
-        SyncService.syncAll().catch(console.error);
       }
     });
   };
@@ -521,7 +517,6 @@ export const ProdukView: React.FC = () => {
 
         alert(`Berhasil mengimpor/memperbarui ${addedCount} produk.`);
         loadData();
-        SyncService.syncAll().catch(console.error);
       } catch (err) {
         alert('Gagal memproses file CSV. Pastikan format kolom sesuai.');
       }
