@@ -133,7 +133,8 @@ export class SyncService {
         
         // Inject store_id for tables that require it
         if (['categories', 'products', 'shifts', 'transactions', 'stock_logs'].includes(tableName)) {
-           cleanPayload.store_id = storeConfig.id;
+           // We must use the UUID from Supabase, not the local integer ID
+           cleanPayload.store_id = storeConfig.supabase_store_id || storeConfig.id;
         }
 
         const res = await fetch(`${url}/rest/v1/${tableName}`, {
@@ -367,7 +368,8 @@ export class SyncService {
           ...serverStore,
           sync_enabled: storeConfig.sync_enabled, // preserve local sync settings
           supabase_url: storeConfig.supabase_url,
-          supabase_anon_key: storeConfig.supabase_anon_key
+          supabase_anon_key: storeConfig.supabase_anon_key,
+          supabase_store_id: serverStore.id // Save the UUID for payloads!
         });
       }
 
@@ -391,7 +393,8 @@ export class SyncService {
       
       // Inject store_id for tables that require it
       if (['categories', 'products', 'shifts', 'transactions', 'stock_logs'].includes(tableName) && storeConfig) {
-         cleanPayload.store_id = storeConfig.id;
+         // We must use the UUID from Supabase, not the local integer ID
+         cleanPayload.store_id = storeConfig.supabase_store_id || storeConfig.id;
       }
 
       const response = await fetch(`${url}/rest/v1/${tableName}`, {

@@ -25,9 +25,10 @@ export interface Store {
   PPN: number; // default 11
   service_charge: number; // default 0
   receipt_header: string;
-  receipt_footer: string;
-  supabase_url: string;
-  supabase_anon_key: string;
+  receipt_footer?: string;
+  supabase_url?: string;
+  supabase_anon_key?: string;
+  supabase_store_id?: string;
   sync_enabled: number; // 0 = false, 1 = true
   ukuran_kertas_struk?: string; // e.g. "80mm", "58mm"
   qr_barcode?: string; // Teks atau URL untuk QR Code di struk

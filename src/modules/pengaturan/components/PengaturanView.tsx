@@ -126,9 +126,9 @@ export const PengaturanView: React.FC = () => {
       setStoreAlamat(store.alamat || 'Kp. Surantaka, RT.02/RW.01, Desa Kalijati Timur, Kecamatan Kalijati, Kabupaten Subang, Jawa Barat, 41271');
       setStoreService(store.service_charge?.toString() || '0');
       setReceiptHeader(formatPhone(store.receipt_header));
-      setReceiptFooter(store.receipt_footer);
-      setSupabaseUrl(store.supabase_url);
-      setSupabaseKey(store.supabase_anon_key);
+      setReceiptFooter(store.receipt_footer || '');
+      setSupabaseUrl(store.supabase_url || '');
+      setSupabaseKey(store.supabase_anon_key || '');
       setSyncEnabled(store.sync_enabled === 1);
       setUkuranKertas(store.ukuran_kertas_struk || '58mm');
       setQrBarcode(store.qr_barcode || '');
