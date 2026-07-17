@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { TrendingUp, ShoppingBag, Box, AlertTriangle, RefreshCw } from 'lucide-react';
-import { db, type TransactionItem } from '../../../shared/services/db';
+import { db, type TransactionItem, type Transaction } from '../../../shared/services/db';
+import { SyncService } from '../../../shared/services/syncService';
 import { NeumorphicCard, NeumorphicButton } from '../../../shared/components';
 import {
   ResponsiveContainer,
@@ -61,8 +62,9 @@ export const DashboardView: React.FC = () => {
     };
     window.addEventListener('masterdata-updated', handleRealtimeUpdate);
     
-    // Fallback polling: Refresh data every 15 seconds in case Supabase Realtime is not enabled on the tables
+    // Fallback polling: Fetch from REST API every 15s to guarantee data if Realtime disconnects
     const interval = setInterval(() => {
+      // Refresh by calling loadDashboardData which now also syncs from server
       loadDashboardData();
     }, 15000);
 
@@ -84,10 +86,20 @@ export const DashboardView: React.FC = () => {
       filterDate.setHours(0, 0, 0, 0);
       const startFilterStr = filterDate.toISOString();
 
-      let allTx = await db.transactions
+      const allTx = await db.transactions
         .where('tanggal')
         .aboveOrEqual(startFilterStr)
         .toArray();
+
+      // Fire a background fetch to ensure local DB gets updated from server if Realtime failed
+      SyncService.directFetch<Transaction>(
+        'transactions',
+        `tanggal=gte.${encodeURIComponent(startFilterStr)}`
+      ).then(serverTx => {
+         if (serverTx && serverTx.length > 0) {
+            db.transactions.bulkPut(serverTx).catch(console.error);
+         }
+      }).catch(console.error);
 
       // 2. Fetch Transaction Items from local DB
       const allItems = await db.transaction_items.toArray(); 
