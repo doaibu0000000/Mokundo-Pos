@@ -43,8 +43,14 @@ export const MobileLayout: React.FC = () => {
     };
     window.addEventListener('masterdata-updated', handleRealtimeUpdate);
 
+    // Polling every 5 seconds to guarantee banner is always up-to-date
+    const interval = setInterval(() => {
+      loadHomeStats();
+    }, 5000);
+
     return () => {
       window.removeEventListener('masterdata-updated', handleRealtimeUpdate);
+      clearInterval(interval);
     };
   }, [activeTab]);
 
