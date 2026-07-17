@@ -60,6 +60,15 @@ export const LaporanView: React.FC = () => {
     loadReportData();
   }, [filterRange]);
 
+  // Listen for realtime Supabase updates to reload reports instantly
+  useEffect(() => {
+    const handleRealtimeUpdate = () => {
+      loadReportData();
+    };
+    window.addEventListener('masterdata-updated', handleRealtimeUpdate);
+    return () => window.removeEventListener('masterdata-updated', handleRealtimeUpdate);
+  }, [filterRange]); // Depend on filterRange so it uses current filter
+
   const loadReportData = async () => {
     const start = new Date();
     start.setHours(0, 0, 0, 0);

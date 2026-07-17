@@ -55,6 +55,15 @@ export const DashboardView: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Listen for realtime Supabase updates to reload dashboard instantly
+  useEffect(() => {
+    const handleRealtimeUpdate = () => {
+      loadDashboardData();
+    };
+    window.addEventListener('masterdata-updated', handleRealtimeUpdate);
+    return () => window.removeEventListener('masterdata-updated', handleRealtimeUpdate);
+  }, [filterDays]); // Depend on filterDays so it uses current filter
+
   const loadDashboardData = async () => {
     setLoading(true);
     try {

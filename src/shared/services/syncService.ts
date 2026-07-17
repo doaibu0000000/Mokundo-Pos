@@ -68,8 +68,20 @@ export class SyncService {
               } else if (newRecord?.id) {
                 await db.categories.put(newRecord);
               }
+            } else if (table === 'transactions') {
+              if (eventType === 'DELETE') {
+                await db.transactions.delete(oldRecord.id);
+              } else if (newRecord?.id) {
+                await db.transactions.put(newRecord);
+              }
+            } else if (table === 'transaction_items') {
+              if (eventType === 'DELETE') {
+                await db.transaction_items.delete(oldRecord.id);
+              } else if (newRecord?.id) {
+                await db.transaction_items.put(newRecord);
+              }
             }
-            // Notify views to re-read from IndexedDB silently
+            // Notify views to re-read from IndexedDB or refetch
             window.dispatchEvent(new CustomEvent('masterdata-updated'));
           } catch (err) {
             console.error('Realtime update error:', err);
