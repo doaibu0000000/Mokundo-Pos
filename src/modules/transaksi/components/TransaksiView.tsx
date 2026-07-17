@@ -277,14 +277,15 @@ export const TransaksiView: React.FC = () => {
           shift_id: currentShift!.id!
         });
 
+        const updatedProducts: any[] = [];
+        
         // Decrease stocks & write logs
         for (const item of cart) {
           const prod = await db.products.get(item.product.id!);
           if (prod) {
             const newStock = prod.stok - item.qty;
             await db.products.update(item.product.id!, { stok: newStock });
-            // Direct push = instant Supabase Realtime, no queue delay
-            SyncService.directPush('products', 'UPDATE', item.product.id!, { ...prod, stok: newStock }).catch(console.error);
+            updatedProducts.push({ ...prod, stok: newStock });
           }
           
           await db.stock_logs.add({
@@ -324,15 +325,26 @@ export const TransaksiView: React.FC = () => {
           });
         }
 
-        return txId;
+        return { txId, updatedProducts };
       });
+
+      const actualTxId = (tId as any).txId as number;
+      const actualUpdatedProducts = (tId as any).updatedProducts as any[];
+
+      // Push real-time stock updates instantly OUTSIDE of the Dexie transaction scope
+      for (const prod of actualUpdatedProducts) {
+         SyncService.directPush('products', 'UPDATE', prod.id!, prod).catch(console.error);
+      }
+
+      // Sync the new transaction and stock logs to Supabase
+      SyncService.syncAll().catch(console.error);
 
       // Refetch latest shift updates
       await refreshShift();
 
       // Retrieve written transaction for printing services
-      const txWritten = await db.transactions.get(tId as number);
-      const itemsWritten = await db.transaction_items.where('transaksi_id').equals(tId as number).toArray();
+      const txWritten = await db.transactions.get(actualTxId);
+      const itemsWritten = await db.transaction_items.where('transaksi_id').equals(actualTxId).toArray();
       
       if (txWritten) {
         if (store) {
