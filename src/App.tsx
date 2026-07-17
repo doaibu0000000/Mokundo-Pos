@@ -31,16 +31,20 @@ const LayoutSelector: React.FC = () => {
 
 function App() {
   useEffect(() => {
-    // Initial pull of master data if online
-    SyncService.pullMasterData()
-      .then((ok) => {
+    // Initial sync and pull on load
+    if (navigator.onLine) {
+      SyncService.syncAll().then(() => {
+        return SyncService.pullMasterData();
+      }).then((ok) => {
         if (ok) window.dispatchEvent(new CustomEvent('masterdata-updated'));
-      })
-      .catch(err => console.error('Initial data pull failed:', err));
+      }).catch(err => console.error('Initial sync failed:', err));
+    }
 
     // Auto-poll every 30 seconds to keep all browsers in sync
     const interval = setInterval(async () => {
       if (navigator.onLine) {
+        // Push any local queue first, then pull
+        await SyncService.syncAll().catch(() => {});
         const ok = await SyncService.pullMasterData().catch(() => false);
         if (ok) window.dispatchEvent(new CustomEvent('masterdata-updated'));
       }
