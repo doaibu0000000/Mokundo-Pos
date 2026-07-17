@@ -68,7 +68,7 @@ export class SyncService {
 
 
   // General check and sync trigger
-  public static async syncAll(syncMasterData: boolean = false): Promise<{ success: boolean; syncedCount: number }> {
+  public static async syncAll(): Promise<{ success: boolean; syncedCount: number }> {
     if (this.isSyncing) return { success: false, syncedCount: 0 };
     
     // Check if network is available
@@ -135,11 +135,8 @@ export class SyncService {
         }
       }
 
-      // 4. Sync Master Data Queue (Filter based on syncMasterData parameter)
-      let syncQueue = await db.sync_queue.orderBy('timestamp').toArray();
-      if (!syncMasterData) {
-        syncQueue = syncQueue.filter(item => item.is_stock_update === true);
-      }
+      // 4. Sync Master Data Queue
+      const syncQueue = await db.sync_queue.orderBy('timestamp').toArray();
 
       for (const item of syncQueue) {
         let success = false;

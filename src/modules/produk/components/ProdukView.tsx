@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Plus, Edit2, Trash2, Download, Upload, Search, ChevronDown, Check } from 'lucide-react';
 import { db, type Product, type Category } from '../../../shared/services/db';
+import { SyncService } from '../../../shared/services/syncService';
 import { NeumorphicCard, NeumorphicButton, NeumorphicInput, NeumorphicModal } from '../../../shared/components';
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -291,6 +292,7 @@ export const ProdukView: React.FC = () => {
       }
       setIsProductModalOpen(false);
       loadData();
+      SyncService.syncAll().catch(console.error);
     } catch (err: any) {
       setProdError(err.message || 'Gagal menyimpan produk. Periksa duplikasi Barcode.');
     }
@@ -347,6 +349,7 @@ export const ProdukView: React.FC = () => {
           timestamp: new Date().toISOString()
         });
         loadData();
+        SyncService.syncAll().catch(console.error);
       }
     });
   };
@@ -408,6 +411,7 @@ export const ProdukView: React.FC = () => {
       }
       setIsCategoryModalOpen(false);
       loadData();
+      SyncService.syncAll().catch(console.error);
     } catch (err: any) {
       setCatError('Gagal menyimpan kategori');
     }
@@ -427,6 +431,7 @@ export const ProdukView: React.FC = () => {
           timestamp: new Date().toISOString()
         });
         loadData();
+        SyncService.syncAll().catch(console.error);
       }
     });
   };
@@ -516,6 +521,7 @@ export const ProdukView: React.FC = () => {
 
         alert(`Berhasil mengimpor/memperbarui ${addedCount} produk.`);
         loadData();
+        SyncService.syncAll().catch(console.error);
       } catch (err) {
         alert('Gagal memproses file CSV. Pastikan format kolom sesuai.');
       }
