@@ -135,6 +135,13 @@ export const ProdukView: React.FC = () => {
     loadData();
   }, [productSearch]);
 
+  // Auto-refresh when master data is pulled from Supabase
+  useEffect(() => {
+    const handleMasterDataUpdated = () => loadData();
+    window.addEventListener('masterdata-updated', handleMasterDataUpdated);
+    return () => window.removeEventListener('masterdata-updated', handleMasterDataUpdated);
+  }, [productSearch]);
+
   const loadData = async () => {
     setIsLoadingData(true);
     try {

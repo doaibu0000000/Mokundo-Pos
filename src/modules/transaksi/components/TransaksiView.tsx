@@ -138,6 +138,16 @@ export const TransaksiView: React.FC = () => {
     loadProducts();
   }, [selectedCategory, searchQuery]);
 
+  // Auto-refresh when master data is pulled from Supabase
+  useEffect(() => {
+    const handleMasterDataUpdated = () => {
+      loadCategories();
+      loadProducts();
+    };
+    window.addEventListener('masterdata-updated', handleMasterDataUpdated);
+    return () => window.removeEventListener('masterdata-updated', handleMasterDataUpdated);
+  }, [selectedCategory, searchQuery]);
+
   // Wake Lock API Activation
   useEffect(() => {
     requestWakeLock();

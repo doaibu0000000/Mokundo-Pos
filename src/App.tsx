@@ -32,7 +32,21 @@ const LayoutSelector: React.FC = () => {
 function App() {
   useEffect(() => {
     // Initial pull of master data if online
-    SyncService.pullMasterData().catch(err => console.error('Initial data pull failed:', err));
+    SyncService.pullMasterData()
+      .then((ok) => {
+        if (ok) window.dispatchEvent(new CustomEvent('masterdata-updated'));
+      })
+      .catch(err => console.error('Initial data pull failed:', err));
+
+    // Auto-poll every 30 seconds to keep all browsers in sync
+    const interval = setInterval(async () => {
+      if (navigator.onLine) {
+        const ok = await SyncService.pullMasterData().catch(() => false);
+        if (ok) window.dispatchEvent(new CustomEvent('masterdata-updated'));
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
