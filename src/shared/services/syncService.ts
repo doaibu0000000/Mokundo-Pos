@@ -8,6 +8,7 @@ export class SyncService {
     window.addEventListener('online', () => {
       console.log('Device is online, triggering sync...');
       this.syncAll().catch(err => console.error('Sync error on network return:', err));
+      this.pullMasterData().catch(err => console.error('Pull master data error on network return:', err));
     });
   }
 
@@ -85,6 +86,70 @@ export class SyncService {
       return { success: false, syncedCount: totalSynced };
     } finally {
       this.isSyncing = false;
+    }
+  }
+
+  // Pull Master Data from Supabase
+  public static async pullMasterData(): Promise<boolean> {
+    if (!navigator.onLine) return false;
+
+    const storeConfig = await db.stores.toCollection().first();
+    if (!storeConfig || !storeConfig.sync_enabled || !storeConfig.supabase_url || !storeConfig.supabase_anon_key) {
+      return false;
+    }
+
+    try {
+      const url = storeConfig.supabase_url.replace(/\/$/, '');
+      const key = storeConfig.supabase_anon_key;
+
+      // Helper to fetch data
+      const fetchData = async (tableName: string) => {
+        const response = await fetch(`${url}/rest/v1/${tableName}?select=*`, {
+          method: 'GET',
+          headers: {
+            'apikey': key,
+            'Authorization': `Bearer ${key}`
+          }
+        });
+        if (!response.ok) throw new Error(`Failed to fetch ${tableName}`);
+        return await response.json();
+      };
+
+      // Fetch and update Categories
+      const categories = await fetchData('categories');
+      if (categories && categories.length > 0) {
+        await db.categories.bulkPut(categories);
+      }
+
+      // Fetch and update Products
+      const products = await fetchData('products');
+      if (products && products.length > 0) {
+        await db.products.bulkPut(products);
+      }
+
+      // Fetch and update Users
+      const users = await fetchData('users');
+      if (users && users.length > 0) {
+        await db.users.bulkPut(users);
+      }
+      
+      // Fetch and update Store settings (if any exist on server)
+      const stores = await fetchData('stores');
+      if (stores && stores.length > 0) {
+        // Only update local store if the server has data
+        const serverStore = stores[0];
+        await db.stores.update(storeConfig.id!, {
+          ...serverStore,
+          sync_enabled: storeConfig.sync_enabled, // preserve local sync settings
+          supabase_url: storeConfig.supabase_url,
+          supabase_anon_key: storeConfig.supabase_anon_key
+        });
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Data pull failed:', error);
+      return false;
     }
   }
 

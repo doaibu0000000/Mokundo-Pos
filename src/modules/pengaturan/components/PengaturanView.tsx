@@ -260,6 +260,25 @@ export const PengaturanView: React.FC = () => {
     }
   };
 
+  const handleManualPullSync = async () => {
+    setSyncError('');
+    setSyncSuccess('');
+    setIsSyncingNow(true);
+    
+    try {
+      const success = await SyncService.pullMasterData();
+      if (success) {
+        setSyncSuccess('Berhasil menarik data master terbaru dari server!');
+      } else {
+        setSyncError('Gagal menarik data. Pastikan internet aktif dan konfigurasi benar.');
+      }
+    } catch (err) {
+      setSyncError('Terjadi kesalahan saat menarik data.');
+    } finally {
+      setIsSyncingNow(false);
+    }
+  };
+
   // Close shift cashier and reconcile balance
   const handleCloseShift = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -814,9 +833,20 @@ export const PengaturanView: React.FC = () => {
                 </div>
               )}
 
-              <NeumorphicButton type="submit" variant="primary" disabled={isSyncingNow} style={{ marginTop: '8px' }}>
-                {isSyncingNow ? 'Sinkronisasi Uji Coba...' : 'Simpan & Hubungkan'}
-              </NeumorphicButton>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                <NeumorphicButton type="submit" variant="primary" disabled={isSyncingNow} style={{ flex: 1 }}>
+                  {isSyncingNow ? 'Menyimpan...' : 'Simpan & Hubungkan'}
+                </NeumorphicButton>
+                
+                <NeumorphicButton 
+                  type="button" 
+                  disabled={isSyncingNow || !syncEnabled} 
+                  onClick={handleManualPullSync}
+                  style={{ flex: 1 }}
+                >
+                  {isSyncingNow ? 'Menarik...' : 'Tarik Data Terbaru'}
+                </NeumorphicButton>
+              </div>
             </form>
           </NeumorphicCard>
         </div>

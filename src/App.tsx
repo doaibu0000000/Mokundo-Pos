@@ -3,6 +3,7 @@ import { AppProvider, useApp } from './store/AppContext';
 import { LoginView } from './modules/auth';
 import { MobileLayout } from './app/layout-mobile/layout-mobile';
 import { WebLayout } from './app/layout-web/layout-web';
+import { SyncService } from './shared/services/syncService';
 // Layout switcher based on viewport width
 const LayoutSelector: React.FC = () => {
   const { user, isInitializing } = useApp();
@@ -29,6 +30,11 @@ const LayoutSelector: React.FC = () => {
 };
 
 function App() {
+  useEffect(() => {
+    // Initial pull of master data if online
+    SyncService.pullMasterData().catch(err => console.error('Initial data pull failed:', err));
+  }, []);
+
   return (
     <AppProvider>
       <LayoutSelector />
