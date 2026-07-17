@@ -19,87 +19,82 @@ export class SyncService {
     });
   }
 
-  // Subscribe to Supabase Realtime for instant Kasir updates
+  // Get configured Supabase URL and key
+  private static async getConfig() {
+    const storeConfig = await db.stores.toCollection().first();
+    if (!storeConfig?.sync_enabled || !storeConfig?.supabase_url || !storeConfig?.supabase_anon_key) {
+      return null;
+    }
+    return {
+      url: storeConfig.supabase_url.replace(/\/$/, ''),
+      key: storeConfig.supabase_anon_key,
+    };
+  }
+
+  // Subscribe to Supabase Realtime for instant cross-device updates
   public static async subscribeToRealtime() {
     if (this.realtimeChannel) return; // already subscribed
 
-    const storeConfig = await db.stores.toCollection().first();
-    if (!storeConfig || !storeConfig.sync_enabled || !storeConfig.supabase_url || !storeConfig.supabase_anon_key) {
-      return;
-    }
-
-    const url = storeConfig.supabase_url.replace(/\/$/, '');
-    const key = storeConfig.supabase_anon_key;
+    const cfg = await this.getConfig();
+    if (!cfg) return;
 
     if (!this.supabase) {
-      this.supabase = createClient(url, key);
+      this.supabase = createClient(cfg.url, cfg.key);
     }
 
-    console.log('Connecting to Supabase Realtime...');
-    
-    this.realtimeChannel = this.supabase
-      .channel('schema-db-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-        },
-        async (payload: any) => {
-          const { table, eventType, new: newRecord, old: oldRecord } = payload;
+    console.log('[Realtime] Connecting to Supabase Realtime...');
 
-          // Apply targeted update to local IndexedDB - no full reload needed
-          try {
-            if (table === 'products') {
-              if (eventType === 'DELETE') {
-                await db.products.delete(oldRecord.id);
-              } else if (newRecord?.id) {
-                const normalized = {
-                  ...newRecord,
-                  varian: Array.isArray(newRecord.varian)
-                    ? newRecord.varian
-                    : (typeof newRecord.varian === 'string' ? JSON.parse(newRecord.varian) : ['Normal'])
-                };
-                await db.products.put(normalized);
-              }
-            } else if (table === 'categories') {
-              if (eventType === 'DELETE') {
-                await db.categories.delete(oldRecord.id);
-              } else if (newRecord?.id) {
-                await db.categories.put(newRecord);
-              }
-            } else if (table === 'transactions') {
-              if (eventType === 'DELETE') {
-                await db.transactions.delete(oldRecord.id);
-              } else if (newRecord?.id) {
-                await db.transactions.put(newRecord);
-              }
-            } else if (table === 'transaction_items') {
-              if (eventType === 'DELETE') {
-                await db.transaction_items.delete(oldRecord.id);
-              } else if (newRecord?.id) {
-                await db.transaction_items.put(newRecord);
-              }
+    this.realtimeChannel = this.supabase
+      .channel('db-changes')
+      .on('postgres_changes', { event: '*', schema: 'public' }, async (payload: any) => {
+        const { table, eventType, new: newRecord, old: oldRecord } = payload;
+        console.log(`[Realtime] ${eventType} on ${table}`, newRecord || oldRecord);
+
+        try {
+          if (table === 'products') {
+            if (eventType === 'DELETE') {
+              await db.products.delete(oldRecord.id);
+            } else if (newRecord?.id) {
+              await db.products.put({
+                ...newRecord,
+                varian: Array.isArray(newRecord.varian)
+                  ? newRecord.varian
+                  : (typeof newRecord.varian === 'string' ? JSON.parse(newRecord.varian) : ['Normal'])
+              });
             }
-            // Notify views to re-read from IndexedDB or refetch
-            window.dispatchEvent(new CustomEvent('masterdata-updated'));
-          } catch (err) {
-            console.error('Realtime update error:', err);
+          } else if (table === 'categories') {
+            if (eventType === 'DELETE') {
+              await db.categories.delete(oldRecord.id);
+            } else if (newRecord?.id) {
+              await db.categories.put(newRecord);
+            }
+          } else if (table === 'transactions') {
+            if (eventType === 'DELETE') {
+              await db.transactions.delete(oldRecord.id);
+            } else if (newRecord?.id) {
+              await db.transactions.put(newRecord);
+            }
+          } else if (table === 'transaction_items') {
+            if (eventType === 'DELETE') {
+              await db.transaction_items.delete(oldRecord.id);
+            } else if (newRecord?.id) {
+              await db.transaction_items.put(newRecord);
+            }
           }
+          // Fire event so all open views refresh instantly
+          window.dispatchEvent(new CustomEvent('masterdata-updated'));
+        } catch (err) {
+          console.error('[Realtime] Update error:', err);
         }
-      )
+      })
       .subscribe((status: string) => {
-        if (status === 'SUBSCRIBED') {
-          console.log('Successfully subscribed to Supabase Realtime!');
-        }
+        console.log('[Realtime] Status:', status);
       });
   }
 
-
   /**
-   * Instantly push a single record directly to Supabase with NO delay.
-   * Use this for Admin operations (add/edit/delete product, category) so that
-   * Supabase Realtime fires immediately and all devices update in real-time.
+   * Instantly push a single record directly to Supabase.
+   * Triggers Supabase Realtime so all connected devices update immediately.
    */
   public static async directPush(
     tableName: string,
@@ -109,138 +104,105 @@ export class SyncService {
   ): Promise<boolean> {
     if (!navigator.onLine) return false;
 
-    const storeConfig = await db.stores.toCollection().first();
-    if (!storeConfig?.sync_enabled || !storeConfig?.supabase_url || !storeConfig?.supabase_anon_key) {
-      return false;
-    }
-
-    const url = storeConfig.supabase_url.replace(/\/$/, '');
-    const key = storeConfig.supabase_anon_key;
+    const cfg = await this.getConfig();
+    if (!cfg) return false;
 
     try {
       if (action === 'DELETE') {
-        const res = await fetch(`${url}/rest/v1/${tableName}?id=eq.${recordId}`, {
+        const res = await fetch(`${cfg.url}/rest/v1/${tableName}?id=eq.${recordId}`, {
           method: 'DELETE',
-          headers: { 'apikey': key, 'Authorization': `Bearer ${key}` }
+          headers: { 'apikey': cfg.key, 'Authorization': `Bearer ${cfg.key}` }
         });
         return res.ok;
       } else {
-        const cleanPayload = { ...payload };
-        delete cleanPayload.sync_status;
-        if (tableName === 'transactions') {
-          delete cleanPayload.items;
-        }
-        
-        // Inject store_id for tables that require it
-        if (['categories', 'products', 'shifts', 'transactions', 'stock_logs'].includes(tableName)) {
-           // We must use the UUID from Supabase, not the local integer ID
-           cleanPayload.store_id = storeConfig.supabase_store_id || storeConfig.id;
-        }
-
-        const res = await fetch(`${url}/rest/v1/${tableName}`, {
+        // Strip local-only fields before sending
+        const clean = this.cleanPayload(tableName, payload);
+        const res = await fetch(`${cfg.url}/rest/v1/${tableName}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'apikey': key,
-            'Authorization': `Bearer ${key}`,
+            'apikey': cfg.key,
+            'Authorization': `Bearer ${cfg.key}`,
             'Prefer': 'resolution=merge-duplicates'
           },
-          body: JSON.stringify(cleanPayload)
+          body: JSON.stringify(clean)
         });
-        
         if (!res.ok) {
-           const errText = await res.text();
-           console.error(`directPush error for ${tableName}:`, errText);
+          const err = await res.text();
+          console.error(`[directPush] ${tableName} failed:`, err);
         }
-        
         return res.ok || res.status === 201;
       }
     } catch (err) {
-      console.error(`directPush error for ${tableName}:`, err);
+      console.error(`[directPush] error for ${tableName}:`, err);
       return false;
     }
   }
 
   /**
    * Fetch records directly from Supabase REST API.
-   * Used by Dashboard and Laporan so they always show live server data.
-   * @param tableName - Supabase table name
-   * @param query - optional query params e.g. "tanggal=gte.2024-01-01&order=tanggal.desc"
    */
   public static async directFetch<T = any>(tableName: string, query?: string): Promise<T[] | null> {
-    const storeConfig = await db.stores.toCollection().first();
-    if (!storeConfig?.supabase_url || !storeConfig?.supabase_anon_key) return null;
+    const cfg = await this.getConfig();
+    if (!cfg) return null;
 
-    const url = storeConfig.supabase_url.replace(/\/$/, '');
-    const key = storeConfig.supabase_anon_key;
     const qs = query ? `?${query}` : '?select=*';
-
     try {
-      const res = await fetch(`${url}/rest/v1/${tableName}${qs}`, {
+      const res = await fetch(`${cfg.url}/rest/v1/${tableName}${qs}`, {
         headers: {
-          'apikey': key,
-          'Authorization': `Bearer ${key}`,
+          'apikey': cfg.key,
+          'Authorization': `Bearer ${cfg.key}`,
           'Prefer': 'return=representation'
         }
       });
-      if (!res.ok) return null;
+      if (!res.ok) {
+        const err = await res.text();
+        console.error(`[directFetch] ${tableName} failed:`, err);
+        return null;
+      }
       return await res.json() as T[];
     } catch (err) {
-      console.error(`directFetch error for ${tableName}:`, err);
+      console.error(`[directFetch] error for ${tableName}:`, err);
       return null;
     }
   }
 
-  // General check and sync trigger
+  // Sync all pending local records to Supabase
   public static async syncAll(): Promise<{ success: boolean; syncedCount: number }> {
     if (this.isSyncing) return { success: false, syncedCount: 0 };
-    
-    // Check if network is available
-    if (!navigator.onLine) {
-      return { success: false, syncedCount: 0 };
-    }
+    if (!navigator.onLine) return { success: false, syncedCount: 0 };
 
-    const storeConfig = await db.stores.toCollection().first();
-    // If not enabled or no keys, abort sync
-    if (!storeConfig || !storeConfig.sync_enabled || !storeConfig.supabase_url || !storeConfig.supabase_anon_key) {
-      return { success: false, syncedCount: 0 };
-    }
+    const cfg = await this.getConfig();
+    if (!cfg) return { success: false, syncedCount: 0 };
 
     this.isSyncing = true;
     let totalSynced = 0;
 
     try {
-      const url = storeConfig.supabase_url.replace(/\/$/, '');
-      const key = storeConfig.supabase_anon_key;
-
       // 1. Sync Shifts
       const pendingShifts = await db.shifts.where('sync_status').equals('PENDING').toArray();
       for (const shift of pendingShifts) {
-        const success = await this.syncRecord(url, key, 'shifts', shift);
-        if (success) {
+        const ok = await this.upsert(cfg, 'shifts', shift);
+        if (ok) {
           await db.shifts.update(shift.id!, { sync_status: 'SYNCED' });
           totalSynced++;
         }
       }
 
-      // 2. Sync Transactions
+      // 2. Sync Transactions + Items
       const pendingTx = await db.transactions.where('sync_status').equals('PENDING').toArray();
       for (const tx of pendingTx) {
-        // Sync the transaction itself (without embedded items)
-        const success = await this.syncRecord(url, key, 'transactions', tx);
-        
-        if (success) {
-          // Sync its items to transaction_items table
+        const ok = await this.upsert(cfg, 'transactions', tx);
+        if (ok) {
           const items = await db.transaction_items.where('transaksi_id').equals(tx.id!).toArray();
-          let allItemsSuccess = true;
+          let allOk = true;
           for (const item of items) {
-             const itemSuccess = await this.syncRecord(url, key, 'transaction_items', item);
-             if (!itemSuccess) allItemsSuccess = false;
+            const itemOk = await this.upsert(cfg, 'transaction_items', item);
+            if (!itemOk) allOk = false;
           }
-
-          if (allItemsSuccess) {
-             await db.transactions.update(tx.id!, { sync_status: 'SYNCED' });
-             totalSynced++;
+          if (allOk) {
+            await db.transactions.update(tx.id!, { sync_status: 'SYNCED' });
+            totalSynced++;
           }
         }
       }
@@ -248,26 +210,24 @@ export class SyncService {
       // 3. Sync Stock Logs
       const pendingLogs = await db.stock_logs.where('sync_status').equals('PENDING').toArray();
       for (const log of pendingLogs) {
-        const success = await this.syncRecord(url, key, 'stock_logs', log);
-        if (success) {
+        const ok = await this.upsert(cfg, 'stock_logs', log);
+        if (ok) {
           await db.stock_logs.update(log.id!, { sync_status: 'SYNCED' });
           totalSynced++;
         }
       }
 
-      // 4. Sync Master Data Queue
+      // 4. Sync Master Data Queue (product/category adds, edits, deletes)
       const syncQueue = await db.sync_queue.orderBy('timestamp').toArray();
-
       for (const item of syncQueue) {
-        let success = false;
+        let ok = false;
         if (item.action === 'DELETE') {
-          success = await this.deleteRecord(url, key, item.table_name, item.record_id);
+          ok = await this.delete(cfg, item.table_name, item.record_id);
         } else {
           const payload = JSON.parse(item.payload);
-          success = await this.syncRecord(url, key, item.table_name, payload);
+          ok = await this.upsert(cfg, item.table_name, payload);
         }
-
-        if (success) {
+        if (ok) {
           await db.sync_queue.delete(item.id!);
           totalSynced++;
         }
@@ -275,165 +235,125 @@ export class SyncService {
 
       return { success: true, syncedCount: totalSynced };
     } catch (error) {
-      console.error('Data synchronization failed:', error);
+      console.error('[syncAll] failed:', error);
       return { success: false, syncedCount: totalSynced };
     } finally {
       this.isSyncing = false;
     }
   }
 
-  // Pull Master Data from Supabase
+  // Pull fresh master data from Supabase to local IndexedDB
   public static async pullMasterData(): Promise<boolean> {
     if (!navigator.onLine) return false;
 
-    const storeConfig = await db.stores.toCollection().first();
-    if (!storeConfig || !storeConfig.sync_enabled || !storeConfig.supabase_url || !storeConfig.supabase_anon_key) {
-      return false;
-    }
+    const cfg = await this.getConfig();
+    if (!cfg) return false;
 
     try {
-      const url = storeConfig.supabase_url.replace(/\/$/, '');
-      const key = storeConfig.supabase_anon_key;
-
-      // Helper to fetch data
-      const fetchData = async (tableName: string) => {
-        const response = await fetch(`${url}/rest/v1/${tableName}?select=*`, {
-          method: 'GET',
-          headers: {
-            'apikey': key,
-            'Authorization': `Bearer ${key}`
-          }
+      const fetchTable = async (name: string) => {
+        const res = await fetch(`${cfg.url}/rest/v1/${name}?select=*`, {
+          headers: { 'apikey': cfg.key, 'Authorization': `Bearer ${cfg.key}` }
         });
-        if (!response.ok) throw new Error(`Failed to fetch ${tableName}: ${response.status}`);
-        return await response.json();
+        if (!res.ok) {
+          console.warn(`[pullMasterData] fetch ${name} failed: ${res.status} ${await res.text()}`);
+          return null;
+        }
+        return res.json();
       };
 
-      // Fetch Categories - safely merge keeping drafted data
-      const categories = await fetchData('categories');
+      // Fetch categories
+      const categories = await fetchTable('categories');
       if (Array.isArray(categories)) {
         const pendingCats = await db.sync_queue.where('table_name').equals('categories').toArray();
         const pendingIds = new Set(pendingCats.map(p => p.record_id));
         const serverIds = new Set(categories.map((c: any) => c.id));
-        
         const localCats = await db.categories.toArray();
         for (const lc of localCats) {
-          if (!pendingIds.has(lc.id!) && !serverIds.has(lc.id!)) {
-            await db.categories.delete(lc.id!);
-          }
+          if (!pendingIds.has(lc.id!) && !serverIds.has(lc.id!)) await db.categories.delete(lc.id!);
         }
         for (const sc of categories) {
-          if (!pendingIds.has(sc.id)) {
-            await db.categories.put(sc);
-          }
+          if (!pendingIds.has(sc.id)) await db.categories.put(sc);
         }
       }
 
-      // Fetch Products - safely merge keeping drafted data
-      const products = await fetchData('products');
+      // Fetch products
+      const products = await fetchTable('products');
       if (Array.isArray(products)) {
         const pendingProds = await db.sync_queue.where('table_name').equals('products').toArray();
         const pendingIds = new Set(pendingProds.map(p => p.record_id));
         const serverIds = new Set(products.map((p: any) => p.id));
-        
         const localProds = await db.products.toArray();
         for (const lp of localProds) {
-          if (!pendingIds.has(lp.id!) && !serverIds.has(lp.id!)) {
-            await db.products.delete(lp.id!);
-          }
+          if (!pendingIds.has(lp.id!) && !serverIds.has(lp.id!)) await db.products.delete(lp.id!);
         }
-        
         for (const sp of products) {
           if (!pendingIds.has(sp.id)) {
-            const normalized = {
+            await db.products.put({
               ...sp,
               varian: Array.isArray(sp.varian) ? sp.varian : (typeof sp.varian === 'string' ? JSON.parse(sp.varian) : ['Normal'])
-            };
-            await db.products.put(normalized);
+            });
           }
         }
       }
 
-      // Fetch and update Users
-      const users = await fetchData('users');
+      // Fetch users
+      const users = await fetchTable('users');
       if (Array.isArray(users) && users.length > 0) {
         await db.users.bulkPut(users);
-      }
-      
-      // Fetch and update Store settings (if any exist on server)
-      const stores = await fetchData('stores');
-      if (Array.isArray(stores) && stores.length > 0) {
-        // Only update local store if the server has data
-        const serverStore = stores[0];
-        await db.stores.update(storeConfig.id!, {
-          ...serverStore,
-          sync_enabled: storeConfig.sync_enabled, // preserve local sync settings
-          supabase_url: storeConfig.supabase_url,
-          supabase_anon_key: storeConfig.supabase_anon_key,
-          supabase_store_id: serverStore.id // Save the UUID for payloads!
-        });
       }
 
       return true;
     } catch (error) {
-      console.error('Data pull failed:', error);
+      console.error('[pullMasterData] failed:', error);
       return false;
     }
   }
 
-  // Push single record to Supabase via REST API
-  private static async syncRecord(url: string, anonKey: string, tableName: string, payload: any): Promise<boolean> {
-    try {
-      const storeConfig = await db.stores.toCollection().first();
-      const cleanPayload = { ...payload };
-      delete cleanPayload.sync_status;
-      // ensure we don't send nested arrays that might break Postgres if not jsonb
-      if (tableName === 'transactions') {
-        delete cleanPayload.items;
-      }
-      
-      // Inject store_id for tables that require it
-      if (['categories', 'products', 'shifts', 'transactions', 'stock_logs'].includes(tableName) && storeConfig) {
-         // We must use the UUID from Supabase, not the local integer ID
-         cleanPayload.store_id = storeConfig.supabase_store_id || storeConfig.id;
-      }
+  // --- Private Helpers ---
 
-      const response = await fetch(`${url}/rest/v1/${tableName}`, {
+  private static cleanPayload(_tableName: string, payload: any): any {
+    const clean = { ...payload };
+    // Remove local-only fields that Supabase doesn't know about
+    delete clean.sync_status;
+    delete clean.store_id;   // Don't send store_id - schema now allows NULL
+    delete clean.items;      // Remove nested items if accidentally included
+    return clean;
+  }
+
+  private static async upsert(cfg: { url: string; key: string }, tableName: string, payload: any): Promise<boolean> {
+    try {
+      const clean = this.cleanPayload(tableName, payload);
+      const res = await fetch(`${cfg.url}/rest/v1/${tableName}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'apikey': anonKey,
-          'Authorization': `Bearer ${anonKey}`,
-          'Prefer': 'resolution=merge-duplicates' // UPSERT behavior if primary keys match
+          'apikey': cfg.key,
+          'Authorization': `Bearer ${cfg.key}`,
+          'Prefer': 'resolution=merge-duplicates'
         },
-        body: JSON.stringify(cleanPayload)
+        body: JSON.stringify(clean)
       });
-
-      if (!response.ok) {
-        const errText = await response.text();
-        console.error(`SyncRecord failed for ${tableName}:`, errText);
+      if (!res.ok) {
+        const err = await res.text();
+        console.error(`[upsert] ${tableName} failed:`, err);
         return false;
       }
-
       return true;
     } catch (e) {
-      console.error(`Network error syncing ${tableName}:`, e);
+      console.error(`[upsert] error for ${tableName}:`, e);
       return false;
     }
   }
 
-  // Delete single record from Supabase via REST API
-  private static async deleteRecord(url: string, anonKey: string, tableName: string, id: number): Promise<boolean> {
+  private static async delete(cfg: { url: string; key: string }, tableName: string, id: number): Promise<boolean> {
     try {
-      const response = await fetch(`${url}/rest/v1/${tableName}?id=eq.${id}`, {
+      const res = await fetch(`${cfg.url}/rest/v1/${tableName}?id=eq.${id}`, {
         method: 'DELETE',
-        headers: {
-          'apikey': anonKey,
-          'Authorization': `Bearer ${anonKey}`
-        }
+        headers: { 'apikey': cfg.key, 'Authorization': `Bearer ${cfg.key}` }
       });
-      return response.ok;
+      return res.ok;
     } catch (e) {
-      console.error(`Network error deleting from ${tableName}:`, e);
+      console.error(`[delete] error for ${tableName}:`, e);
       return false;
     }
   }
