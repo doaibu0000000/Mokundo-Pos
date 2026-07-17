@@ -280,6 +280,56 @@ export const PengaturanView: React.FC = () => {
     }
   };
 
+  // Push ALL local products & categories to Supabase (initial full sync)
+  const handlePushAllData = async () => {
+    setSyncError('');
+    setSyncSuccess('');
+    setIsSyncingNow(true);
+
+    try {
+      const storeConfig = await db.stores.toCollection().first();
+      if (!storeConfig?.supabase_url || !storeConfig?.supabase_anon_key) {
+        setSyncError('Isi URL dan Key Supabase terlebih dahulu.');
+        setIsSyncingNow(false);
+        return;
+      }
+
+      const url = storeConfig.supabase_url.replace(/\/$/, '');
+      const key = storeConfig.supabase_anon_key;
+
+      const upsert = async (tableName: string, payload: any) => {
+        const res = await fetch(`${url}/rest/v1/${tableName}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': key,
+            'Authorization': `Bearer ${key}`,
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify(payload)
+        });
+        return res.ok || res.status === 201;
+      };
+
+      const categories = await db.categories.toArray();
+      const products = await db.products.toArray();
+
+      let count = 0;
+      for (const cat of categories) {
+        if (await upsert('categories', cat)) count++;
+      }
+      for (const prod of products) {
+        if (await upsert('products', prod)) count++;
+      }
+
+      setSyncSuccess(`Berhasil mengupload ${count} data (produk + kategori) ke server!`);
+    } catch (err) {
+      setSyncError('Gagal mengupload data. Periksa koneksi internet.');
+    } finally {
+      setIsSyncingNow(false);
+    }
+  };
+
   // Close shift cashier and reconcile balance
   const handleCloseShift = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -848,6 +898,16 @@ export const PengaturanView: React.FC = () => {
                   {isSyncingNow ? 'Menarik...' : 'Tarik Data Terbaru'}
                 </NeumorphicButton>
               </div>
+
+              <NeumorphicButton
+                type="button"
+                variant="success"
+                disabled={isSyncingNow || !syncEnabled}
+                onClick={handlePushAllData}
+                style={{ width: '100%', marginTop: '4px' }}
+              >
+                {isSyncingNow ? 'Mengupload...' : '☁️ Upload Semua Produk ke Server'}
+              </NeumorphicButton>
             </form>
           </NeumorphicCard>
         </div>
