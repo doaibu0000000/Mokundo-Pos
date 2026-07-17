@@ -347,16 +347,29 @@ export const TransaksiView: React.FC = () => {
          SyncService.directPush('products', 'UPDATE', prod.id!, prod).catch(console.error);
       }
 
-      // Sync the new transaction and stock logs to Supabase
+      // Retrieve written transaction for real-time push and printing
+      const txWritten = await db.transactions.get(actualTxId);
+      const itemsWritten = await db.transaction_items.where('transaksi_id').equals(actualTxId).toArray();
+      
+      // Instantly push the transaction to Supabase to trigger realtime events immediately
+      if (txWritten) {
+          SyncService.directPush('transactions', 'INSERT', actualTxId, txWritten).then(async ok => {
+              if (ok) {
+                 await db.transactions.update(actualTxId, { sync_status: 'SYNCED' });
+                 for (const itm of itemsWritten) {
+                    SyncService.directPush('transaction_items', 'INSERT', itm.id!, itm).catch(console.error);
+                 }
+              }
+          }).catch(console.error);
+      }
+
+      // Fallback sync for anything else (like stock logs)
       SyncService.syncAll().catch(console.error);
 
       // Refetch latest shift updates
       await refreshShift();
 
-      // Retrieve written transaction for printing services
-      const txWritten = await db.transactions.get(actualTxId);
-      const itemsWritten = await db.transaction_items.where('transaksi_id').equals(actualTxId).toArray();
-      
+      // Retrieve written transaction for printing services (Already retrieved above)
       if (txWritten) {
         if (store) {
           if (PrintService.isBluetoothConnected()) {

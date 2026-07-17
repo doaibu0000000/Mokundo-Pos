@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TrendingUp, ShoppingBag, Box, AlertTriangle, RefreshCw } from 'lucide-react';
-import { db, type Transaction, type TransactionItem } from '../../../shared/services/db';
-import { SyncService } from '../../../shared/services/syncService';
+import { db, type TransactionItem } from '../../../shared/services/db';
 import { NeumorphicCard, NeumorphicButton } from '../../../shared/components';
 import {
   ResponsiveContainer,
@@ -85,51 +84,13 @@ export const DashboardView: React.FC = () => {
       filterDate.setHours(0, 0, 0, 0);
       const startFilterStr = filterDate.toISOString();
 
-      // 1. Fetch ALL transactions in filter period from Supabase to ensure realtime
-      const serverTx = await SyncService.directFetch<Transaction>(
-        'transactions',
-        `tanggal=gte.${encodeURIComponent(startFilterStr)}`
-      );
+      let allTx = await db.transactions
+        .where('tanggal')
+        .aboveOrEqual(startFilterStr)
+        .toArray();
 
-      let allTx: Transaction[] = [];
-      if (serverTx !== null) {
-        allTx = serverTx;
-        // Optimistically cache locally
-        for (const tx of serverTx) {
-           await db.transactions.put(tx);
-        }
-      } else {
-        allTx = await db.transactions
-          .where('tanggal')
-          .aboveOrEqual(startFilterStr)
-          .toArray();
-      }
-
-      // 2. Fetch Transaction Items in bulk to avoid N+1 problem
-      const completedTx = allTx.filter(tx => tx.status === 'COMPLETED');
-      let allItems: TransactionItem[] = [];
-      
-      if (serverTx !== null && completedTx.length > 0) {
-         const chunkSize = 50;
-         for (let i = 0; i < completedTx.length; i += chunkSize) {
-            const chunk = completedTx.slice(i, i + chunkSize);
-            const ids = chunk.map(tx => tx.id).join(',');
-            const itemsChunk = await SyncService.directFetch<TransactionItem>(
-               'transaction_items',
-               `transaksi_id=in.(${ids})`
-            );
-            if (itemsChunk) {
-               allItems.push(...itemsChunk);
-            }
-         }
-         // Cache items locally
-         for (const item of allItems) {
-             await db.transaction_items.put(item);
-         }
-      } else {
-         // Fallback to local items if offline
-         allItems = await db.transaction_items.toArray(); 
-      }
+      // 2. Fetch Transaction Items from local DB
+      const allItems = await db.transaction_items.toArray(); 
       
       // Group items by transaksi_id
       const itemsByTx = new Map<number, TransactionItem[]>();
