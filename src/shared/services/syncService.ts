@@ -381,11 +381,17 @@ export class SyncService {
   // Push single record to Supabase via REST API
   private static async syncRecord(url: string, anonKey: string, tableName: string, payload: any): Promise<boolean> {
     try {
+      const storeConfig = await db.stores.toCollection().first();
       const cleanPayload = { ...payload };
       delete cleanPayload.sync_status;
       // ensure we don't send nested arrays that might break Postgres if not jsonb
       if (tableName === 'transactions') {
         delete cleanPayload.items;
+      }
+      
+      // Inject store_id for tables that require it
+      if (['categories', 'products', 'shifts', 'transactions', 'stock_logs'].includes(tableName) && storeConfig) {
+         cleanPayload.store_id = storeConfig.id;
       }
 
       const response = await fetch(`${url}/rest/v1/${tableName}`, {
