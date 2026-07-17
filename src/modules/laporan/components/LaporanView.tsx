@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Download, Eye } from 'lucide-react';
 import { db, type Transaction, type TransactionItem } from '../../../shared/services/db';
+import { SyncService } from '../../../shared/services/syncService';
 import { NeumorphicCard, NeumorphicButton, NeumorphicModal } from '../../../shared/components';
 
 // Format currency helper
@@ -70,22 +71,44 @@ export const LaporanView: React.FC = () => {
     }
     const startStr = start.toISOString();
 
-    // Query active transactions
-    const txList = await db.transactions
-      .where('tanggal')
-      .aboveOrEqual(startStr)
-      .reverse()
-      .toArray();
+    // Try to fetch directly from Supabase for realtime data
+    const serverTx = await SyncService.directFetch<Transaction>(
+      'transactions',
+      `tanggal=gte.${encodeURIComponent(startStr)}&order=tanggal.desc`
+    );
+
+    let txList: Transaction[];
+
+    if (serverTx !== null) {
+      // Got live data from Supabase — also save to local IndexedDB for offline fallback
+      txList = serverTx;
+      for (const tx of serverTx) {
+        await db.transactions.put(tx);
+      }
+    } else {
+      // Offline fallback: read from local IndexedDB
+      txList = await db.transactions
+        .where('tanggal')
+        .aboveOrEqual(startStr)
+        .reverse()
+        .toArray();
+    }
 
     setTransactions(txList);
 
+    // Compute best sellers from transaction items
     const itemsMap = new Map<string, { qty: number, revenue: number }>();
 
     for (const tx of txList) {
       if (tx.status === 'COMPLETED') {
-        const items = await db.transaction_items.where('transaksi_id').equals(tx.id!).toArray();
+        // Try server first, fallback to local
+        const serverItems = await SyncService.directFetch<TransactionItem>(
+          'transaction_items',
+          `transaksi_id=eq.${tx.id}`
+        );
+        const items = serverItems ?? await db.transaction_items.where('transaksi_id').equals(tx.id!).toArray();
+
         for (const item of items) {
-          // Group by name for best seller computation
           const existing = itemsMap.get(item.nama_produk) || { qty: 0, revenue: 0 };
           itemsMap.set(item.nama_produk, {
             qty: existing.qty + item.qty,
@@ -99,7 +122,7 @@ export const LaporanView: React.FC = () => {
     const sortedBest = Array.from(itemsMap.entries())
       .map(([name, val]) => ({ name, qty: val.qty, revenue: val.revenue }))
       .sort((a, b) => b.qty - a.qty)
-      .slice(0, 5);
+      .slice(0, 10);
       
     setBestSellers(sortedBest);
     sessionStorage.setItem('mokundo_cached_laporan_bestsellers', JSON.stringify(sortedBest));
@@ -110,7 +133,12 @@ export const LaporanView: React.FC = () => {
   };
 
   const viewTransactionDetails = async (tx: Transaction) => {
-    const items = await db.transaction_items.where('transaksi_id').equals(tx.id!).toArray();
+    // Fetch items from server directly for realtime accuracy
+    const serverItems = await SyncService.directFetch<TransactionItem>(
+      'transaction_items',
+      `transaksi_id=eq.${tx.id}`
+    );
+    const items = serverItems ?? await db.transaction_items.where('transaksi_id').equals(tx.id!).toArray();
     setSelectedTx(tx);
     setSelectedItems(items);
     setIsDetailOpen(true);

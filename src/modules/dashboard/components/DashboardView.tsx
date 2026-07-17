@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { TrendingUp, ShoppingBag, Box, AlertTriangle, RefreshCw } from 'lucide-react';
-import { db } from '../../../shared/services/db';
+import { db, type Transaction, type TransactionItem } from '../../../shared/services/db';
+import { SyncService } from '../../../shared/services/syncService';
 import { NeumorphicCard, NeumorphicButton } from '../../../shared/components';
 import {
   ResponsiveContainer,
@@ -61,33 +62,90 @@ export const DashboardView: React.FC = () => {
       today.setHours(0, 0, 0, 0);
       const todayStr = today.toISOString();
 
-      // 1. Get transactions for today
-      const todayTx = await db.transactions
-        .where('tanggal')
-        .aboveOrEqual(todayStr)
-        .toArray();
+      const filterDate = new Date();
+      filterDate.setDate(filterDate.getDate() - filterDays);
+      filterDate.setHours(0, 0, 0, 0);
+      const startFilterStr = filterDate.toISOString();
 
+      // 1. Fetch ALL transactions in filter period from Supabase to ensure realtime
+      const serverTx = await SyncService.directFetch<Transaction>(
+        'transactions',
+        `tanggal=gte.${encodeURIComponent(startFilterStr)}`
+      );
+
+      let allTx: Transaction[] = [];
+      if (serverTx !== null) {
+        allTx = serverTx;
+        // Optimistically cache locally
+        for (const tx of serverTx) {
+           await db.transactions.put(tx);
+        }
+      } else {
+        allTx = await db.transactions
+          .where('tanggal')
+          .aboveOrEqual(startFilterStr)
+          .toArray();
+      }
+
+      // 2. Fetch Transaction Items in bulk to avoid N+1 problem
+      const completedTx = allTx.filter(tx => tx.status === 'COMPLETED');
+      let allItems: TransactionItem[] = [];
+      
+      if (serverTx !== null && completedTx.length > 0) {
+         const chunkSize = 50;
+         for (let i = 0; i < completedTx.length; i += chunkSize) {
+            const chunk = completedTx.slice(i, i + chunkSize);
+            const ids = chunk.map(tx => tx.id).join(',');
+            const itemsChunk = await SyncService.directFetch<TransactionItem>(
+               'transaction_items',
+               `transaksi_id=in.(${ids})`
+            );
+            if (itemsChunk) {
+               allItems.push(...itemsChunk);
+            }
+         }
+         // Cache items locally
+         for (const item of allItems) {
+             await db.transaction_items.put(item);
+         }
+      } else {
+         // Fallback to local items if offline
+         allItems = await db.transaction_items.toArray(); 
+      }
+      
+      // Group items by transaksi_id
+      const itemsByTx = new Map<number, TransactionItem[]>();
+      for (const item of allItems) {
+         const arr = itemsByTx.get(item.transaksi_id) || [];
+         arr.push(item);
+         itemsByTx.set(item.transaksi_id, arr);
+      }
+
+      // 3. Calculate Today's Stats
+      const todayTx = allTx.filter(tx => tx.tanggal >= todayStr);
       let omsetToday = 0;
       let costToday = 0;
       let completedCount = 0;
+      
+      // We need products for HPP (COGS)
+      const products = await db.products.toArray();
+      const productMap = new Map();
+      products.forEach(p => productMap.set(p.id, p.HPP));
 
       for (const tx of todayTx) {
         if (tx.status === 'COMPLETED') {
           omsetToday += tx.total;
           completedCount++;
-
-          // Fetch items to calculate COGS/HPP
-          const items = await db.transaction_items.where('transaksi_id').equals(tx.id!).toArray();
+          
+          const items = itemsByTx.get(tx.id!) || [];
           for (const item of items) {
-            const product = await db.products.get(item.produk_id);
-            const hpp = product?.HPP || 0;
+            const hpp = productMap.get(item.produk_id) || 0;
             costToday += hpp * item.qty;
           }
         }
       }
 
-      // 2. Count low-stock items
-      const products = await db.products.toArray();
+      // Count low-stock items
       const lowStockCount = products.filter(p => p.stok <= p.threshold_stok).length;
 
       const newStats = {
@@ -99,10 +157,8 @@ export const DashboardView: React.FC = () => {
       setStats(newStats);
       sessionStorage.setItem('mokundo_cached_dashboard_stats', JSON.stringify(newStats));
 
-      // 3. Generate chart data for last 7/30 days
+      // 4. Generate chart data for last 7/30 days
       const daysArray = [];
-      const productMap = new Map();
-      products.forEach(p => productMap.set(p.id, p.HPP));
 
       for (let i = filterDays - 1; i >= 0; i--) {
         const d = new Date();
@@ -114,10 +170,7 @@ export const DashboardView: React.FC = () => {
         endD.setHours(23, 59, 59, 999);
         const end = endD.toISOString();
 
-        const dayTx = await db.transactions
-          .where('tanggal')
-          .between(start, end, true, true)
-          .toArray();
+        const dayTx = allTx.filter(tx => tx.tanggal >= start && tx.tanggal <= end);
 
         let dayOmset = 0;
         let dayCost = 0;
@@ -125,7 +178,7 @@ export const DashboardView: React.FC = () => {
         for (const tx of dayTx) {
           if (tx.status === 'COMPLETED') {
             dayOmset += tx.total;
-            const items = await db.transaction_items.where('transaksi_id').equals(tx.id!).toArray();
+            const items = itemsByTx.get(tx.id!) || [];
             items.forEach(item => {
               const hpp = productMap.get(item.produk_id) || 0;
               dayCost += hpp * item.qty;
@@ -140,7 +193,7 @@ export const DashboardView: React.FC = () => {
         });
       }
 
-      setChartData(daysArray.reverse());
+      setChartData(daysArray);
       sessionStorage.setItem('mokundo_cached_dashboard_chart', JSON.stringify(daysArray));
     } catch (error) {
       console.error('Failed loading dashboard data:', error);

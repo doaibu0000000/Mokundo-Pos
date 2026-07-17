@@ -131,6 +131,36 @@ export class SyncService {
     }
   }
 
+  /**
+   * Fetch records directly from Supabase REST API.
+   * Used by Dashboard and Laporan so they always show live server data.
+   * @param tableName - Supabase table name
+   * @param query - optional query params e.g. "tanggal=gte.2024-01-01&order=tanggal.desc"
+   */
+  public static async directFetch<T = any>(tableName: string, query?: string): Promise<T[] | null> {
+    const storeConfig = await db.stores.toCollection().first();
+    if (!storeConfig?.supabase_url || !storeConfig?.supabase_anon_key) return null;
+
+    const url = storeConfig.supabase_url.replace(/\/$/, '');
+    const key = storeConfig.supabase_anon_key;
+    const qs = query ? `?${query}` : '?select=*';
+
+    try {
+      const res = await fetch(`${url}/rest/v1/${tableName}${qs}`, {
+        headers: {
+          'apikey': key,
+          'Authorization': `Bearer ${key}`,
+          'Prefer': 'return=representation'
+        }
+      });
+      if (!res.ok) return null;
+      return await res.json() as T[];
+    } catch (err) {
+      console.error(`directFetch error for ${tableName}:`, err);
+      return null;
+    }
+  }
+
   // General check and sync trigger
   public static async syncAll(): Promise<{ success: boolean; syncedCount: number }> {
     if (this.isSyncing) return { success: false, syncedCount: 0 };
