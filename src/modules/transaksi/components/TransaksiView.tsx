@@ -353,12 +353,14 @@ export const TransaksiView: React.FC = () => {
       
       // Instantly push the transaction to Supabase to trigger realtime events immediately
       if (txWritten) {
-          SyncService.directPush('transactions', 'INSERT', actualTxId, txWritten).then(async ok => {
-              if (ok) {
+          SyncService.directPush('transactions', 'INSERT', actualTxId, txWritten).then(async (res: any) => {
+              if (res.success) {
                  await db.transactions.update(actualTxId, { sync_status: 'SYNCED' });
                  for (const itm of itemsWritten) {
                     SyncService.directPush('transaction_items', 'INSERT', itm.id!, itm).catch(console.error);
                  }
+              } else {
+                 alert('⚠️ Transaksi berhasil di lokal, tetapi GAGAL terkirim ke Server/Dashboard Admin!\nError: ' + res.error + '\n\nApakah Anda sudah menjalankan file SQL 005_drop_foreign_keys.sql di Supabase?');
               }
           }).catch(console.error);
       }

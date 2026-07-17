@@ -101,11 +101,11 @@ export class SyncService {
     action: 'INSERT' | 'UPDATE' | 'DELETE',
     recordId: number,
     payload?: any
-  ): Promise<boolean> {
-    if (!navigator.onLine) return false;
+  ): Promise<{ success: boolean, error?: string }> {
+    if (!navigator.onLine) return { success: false, error: 'Offline' };
 
     const cfg = await this.getConfig();
-    if (!cfg) return false;
+    if (!cfg) return { success: false, error: 'No config' };
 
     try {
       if (action === 'DELETE') {
@@ -113,7 +113,8 @@ export class SyncService {
           method: 'DELETE',
           headers: { 'apikey': cfg.key, 'Authorization': `Bearer ${cfg.key}` }
         });
-        return res.ok;
+        if (!res.ok) return { success: false, error: await res.text() };
+        return { success: true };
       } else {
         // Strip local-only fields before sending
         const clean = this.cleanPayload(tableName, payload);
@@ -130,12 +131,13 @@ export class SyncService {
         if (!res.ok) {
           const err = await res.text();
           console.error(`[directPush] ${tableName} failed:`, err);
+          return { success: false, error: err };
         }
-        return res.ok || res.status === 201;
+        return { success: true };
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(`[directPush] error for ${tableName}:`, err);
-      return false;
+      return { success: false, error: err.message };
     }
   }
 
