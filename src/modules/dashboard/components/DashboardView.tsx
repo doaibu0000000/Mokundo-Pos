@@ -81,9 +81,9 @@ export const DashboardView: React.FC = () => {
             // Put to IndexedDB
             await db.transactions.bulkPut(serverTx);
             
-            // If the count increased or there were new things, update the UI
-            // We just call loadDashboardData again to guarantee UI sync
-            loadDashboardData();
+            // If the count increased or there were new things, update the UI globally
+            // This will trigger loadDashboardData() in this component and loadHomeStats() in layout-mobile
+            window.dispatchEvent(new CustomEvent('masterdata-updated'));
          }
       }).catch(console.error);
     }, 15000);

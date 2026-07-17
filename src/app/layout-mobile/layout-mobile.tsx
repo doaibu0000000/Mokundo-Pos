@@ -37,17 +37,24 @@ export const MobileLayout: React.FC = () => {
 
   useEffect(() => {
     loadHomeStats();
+
+    const handleRealtimeUpdate = () => {
+      loadHomeStats();
+    };
+    window.addEventListener('masterdata-updated', handleRealtimeUpdate);
+
+    return () => {
+      window.removeEventListener('masterdata-updated', handleRealtimeUpdate);
+    };
   }, [activeTab]);
 
   const loadHomeStats = async () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const todayStr = today.toISOString();
+    const todayTime = today.getTime();
 
-    const todayTx = await db.transactions
-      .where('tanggal')
-      .aboveOrEqual(todayStr)
-      .toArray();
+    const allTx = await db.transactions.toArray();
+    const todayTx = allTx.filter(tx => new Date(tx.tanggal).getTime() >= todayTime);
 
     let sum = 0;
     let count = 0;
