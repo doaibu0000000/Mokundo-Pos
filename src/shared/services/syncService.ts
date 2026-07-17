@@ -80,6 +80,23 @@ export class SyncService {
         }
       }
 
+      // 4. Sync Master Data Queue
+      const syncQueue = await db.sync_queue.orderBy('timestamp').toArray();
+      for (const item of syncQueue) {
+        let success = false;
+        if (item.action === 'DELETE') {
+          success = await this.deleteRecord(url, key, item.table_name, item.record_id);
+        } else {
+          const payload = JSON.parse(item.payload);
+          success = await this.syncRecord(url, key, item.table_name, payload);
+        }
+
+        if (success) {
+          await db.sync_queue.delete(item.id!);
+          totalSynced++;
+        }
+      }
+
       return { success: true, syncedCount: totalSynced };
     } catch (error) {
       console.error('Data synchronization failed:', error);
@@ -170,6 +187,23 @@ export class SyncService {
       return response.ok || response.status === 201;
     } catch (e) {
       console.error(`Network error syncing ${tableName}:`, e);
+      return false;
+    }
+  }
+
+  // Delete single record from Supabase via REST API
+  private static async deleteRecord(url: string, anonKey: string, tableName: string, id: number): Promise<boolean> {
+    try {
+      const response = await fetch(`${url}/rest/v1/${tableName}?id=eq.${id}`, {
+        method: 'DELETE',
+        headers: {
+          'apikey': anonKey,
+          'Authorization': `Bearer ${anonKey}`
+        }
+      });
+      return response.ok;
+    } catch (e) {
+      console.error(`Network error deleting from ${tableName}:`, e);
       return false;
     }
   }

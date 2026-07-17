@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Plus, Edit2, Trash2, Download, Upload, Search, ChevronDown, Check } from 'lucide-react';
 import { db, type Product, type Category } from '../../../shared/services/db';
+import { SyncService } from '../../../shared/services/syncService';
 import { NeumorphicCard, NeumorphicButton, NeumorphicInput, NeumorphicModal } from '../../../shared/components';
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -256,8 +257,22 @@ export const ProdukView: React.FC = () => {
           });
         }
         await db.products.update(editingProduct.id!, payload as any);
+        await db.sync_queue.add({
+          table_name: 'products',
+          record_id: editingProduct.id!,
+          action: 'UPDATE',
+          payload: JSON.stringify({ id: editingProduct.id, ...payload }),
+          timestamp: new Date().toISOString()
+        });
       } else {
         const newId = await db.products.add(payload);
+        await db.sync_queue.add({
+          table_name: 'products',
+          record_id: newId as number,
+          action: 'INSERT',
+          payload: JSON.stringify({ id: newId, ...payload }),
+          timestamp: new Date().toISOString()
+        });
         // Write initial stock log
         await db.stock_logs.add({
           produk_id: newId as number,
@@ -270,6 +285,7 @@ export const ProdukView: React.FC = () => {
       }
       setIsProductModalOpen(false);
       loadData();
+      SyncService.syncAll().catch(console.error);
     } catch (err: any) {
       setProdError(err.message || 'Gagal menyimpan produk. Periksa duplikasi Barcode.');
     }
@@ -318,7 +334,15 @@ export const ProdukView: React.FC = () => {
       message: 'Apakah Anda yakin ingin menghapus produk ini?',
       onConfirm: async () => {
         await db.products.delete(id);
+        await db.sync_queue.add({
+          table_name: 'products',
+          record_id: id,
+          action: 'DELETE',
+          payload: '{}',
+          timestamp: new Date().toISOString()
+        });
         loadData();
+        SyncService.syncAll().catch(console.error);
       }
     });
   };
@@ -361,11 +385,26 @@ export const ProdukView: React.FC = () => {
     try {
       if (editingCategory) {
         await db.categories.update(editingCategory.id!, payload);
+        await db.sync_queue.add({
+          table_name: 'categories',
+          record_id: editingCategory.id!,
+          action: 'UPDATE',
+          payload: JSON.stringify({ id: editingCategory.id, ...payload }),
+          timestamp: new Date().toISOString()
+        });
       } else {
-        await db.categories.add(payload);
+        const newId = await db.categories.add(payload);
+        await db.sync_queue.add({
+          table_name: 'categories',
+          record_id: newId as number,
+          action: 'INSERT',
+          payload: JSON.stringify({ id: newId, ...payload }),
+          timestamp: new Date().toISOString()
+        });
       }
       setIsCategoryModalOpen(false);
       loadData();
+      SyncService.syncAll().catch(console.error);
     } catch (err: any) {
       setCatError('Gagal menyimpan kategori');
     }
@@ -377,7 +416,15 @@ export const ProdukView: React.FC = () => {
       message: 'Apakah Anda yakin ingin menghapus kategori ini? Semua produk di dalamnya tidak akan terhapus namun kehilangan kategori.',
       onConfirm: async () => {
         await db.categories.delete(id);
+        await db.sync_queue.add({
+          table_name: 'categories',
+          record_id: id,
+          action: 'DELETE',
+          payload: '{}',
+          timestamp: new Date().toISOString()
+        });
         loadData();
+        SyncService.syncAll().catch(console.error);
       }
     });
   };
@@ -445,14 +492,29 @@ export const ProdukView: React.FC = () => {
 
           if (existing) {
             await db.products.update(existing.id!, payload);
+            await db.sync_queue.add({
+              table_name: 'products',
+              record_id: existing.id!,
+              action: 'UPDATE',
+              payload: JSON.stringify({ id: existing.id, ...payload }),
+              timestamp: new Date().toISOString()
+            });
           } else {
-            await db.products.add(payload);
+            const newId = await db.products.add(payload);
+            await db.sync_queue.add({
+              table_name: 'products',
+              record_id: newId as number,
+              action: 'INSERT',
+              payload: JSON.stringify({ id: newId, ...payload }),
+              timestamp: new Date().toISOString()
+            });
           }
           addedCount++;
         }
 
         alert(`Berhasil mengimpor/memperbarui ${addedCount} produk.`);
         loadData();
+        SyncService.syncAll().catch(console.error);
       } catch (err) {
         alert('Gagal memproses file CSV. Pastikan format kolom sesuai.');
       }
