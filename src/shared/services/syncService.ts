@@ -1,7 +1,10 @@
 import { db } from './db';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 export class SyncService {
   private static isSyncing = false;
+  private static supabase: SupabaseClient | null = null;
+  private static realtimeChannel: any = null;
 
   // Listen to network changes and sync
   public static init() {
@@ -15,6 +18,54 @@ export class SyncService {
         .catch(err => console.error('Pull master data error on network return:', err));
     });
   }
+
+  // Subscribe to Supabase Realtime for instant Kasir updates
+  public static async subscribeToRealtime() {
+    if (this.realtimeChannel) return; // already subscribed
+
+    const storeConfig = await db.stores.toCollection().first();
+    if (!storeConfig || !storeConfig.sync_enabled || !storeConfig.supabase_url || !storeConfig.supabase_anon_key) {
+      return;
+    }
+
+    const url = storeConfig.supabase_url.replace(/\/$/, '');
+    const key = storeConfig.supabase_anon_key;
+
+    if (!this.supabase) {
+      this.supabase = createClient(url, key);
+    }
+
+    console.log('Connecting to Supabase Realtime...');
+    
+    this.realtimeChannel = this.supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // listen to INSERT, UPDATE, DELETE
+          schema: 'public',
+        },
+        async (payload) => {
+          console.log('Realtime update received!', payload);
+          // Whenever ANY change happens on the server, we just pull everything
+          // or we could do it specifically. For safety and simplicity:
+          // trigger pullMasterData.
+          
+          // To prevent pulling our own changes that we just pushed:
+          // we wait a tiny bit to let local sync finish if it was us.
+          setTimeout(async () => {
+             const ok = await this.pullMasterData();
+             if (ok) window.dispatchEvent(new CustomEvent('masterdata-updated'));
+          }, 1000);
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('Successfully subscribed to Supabase Realtime!');
+        }
+      });
+  }
+
 
   // General check and sync trigger
   public static async syncAll(): Promise<{ success: boolean; syncedCount: number }> {

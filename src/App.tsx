@@ -38,6 +38,9 @@ function App() {
       }).then((ok) => {
         if (ok) window.dispatchEvent(new CustomEvent('masterdata-updated'));
       }).catch(err => console.error('Initial sync failed:', err));
+      
+      // Start listening to instant realtime updates
+      SyncService.subscribeToRealtime().catch(err => console.error('Realtime subscription failed:', err));
     }
 
     // Auto-poll every 30 seconds to keep all browsers in sync
