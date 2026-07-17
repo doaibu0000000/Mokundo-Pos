@@ -43,17 +43,8 @@ function App() {
       SyncService.subscribeToRealtime().catch(err => console.error('Realtime subscription failed:', err));
     }
 
-    // Auto-poll every 30 seconds to keep all browsers in sync
-    const interval = setInterval(async () => {
-      if (navigator.onLine) {
-        // Push any local queue first, then pull
-        await SyncService.syncAll().catch(() => {});
-        const ok = await SyncService.pullMasterData().catch(() => false);
-        if (ok) window.dispatchEvent(new CustomEvent('masterdata-updated'));
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
+    // Removed 30-second polling interval - Supabase Realtime handles instant updates
+    // without causing any flickering or full data reloads
   }, []);
 
   return (

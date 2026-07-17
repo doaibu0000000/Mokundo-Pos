@@ -42,24 +42,41 @@ export class SyncService {
       .on(
         'postgres_changes',
         {
-          event: '*', // listen to INSERT, UPDATE, DELETE
+          event: '*',
           schema: 'public',
         },
-        async (payload) => {
-          console.log('Realtime update received!', payload);
-          // Whenever ANY change happens on the server, we just pull everything
-          // or we could do it specifically. For safety and simplicity:
-          // trigger pullMasterData.
-          
-          // To prevent pulling our own changes that we just pushed:
-          // we wait a tiny bit to let local sync finish if it was us.
-          setTimeout(async () => {
-             const ok = await this.pullMasterData();
-             if (ok) window.dispatchEvent(new CustomEvent('masterdata-updated'));
-          }, 1000);
+        async (payload: any) => {
+          const { table, eventType, new: newRecord, old: oldRecord } = payload;
+
+          // Apply targeted update to local IndexedDB - no full reload needed
+          try {
+            if (table === 'products') {
+              if (eventType === 'DELETE') {
+                await db.products.delete(oldRecord.id);
+              } else if (newRecord?.id) {
+                const normalized = {
+                  ...newRecord,
+                  varian: Array.isArray(newRecord.varian)
+                    ? newRecord.varian
+                    : (typeof newRecord.varian === 'string' ? JSON.parse(newRecord.varian) : ['Normal'])
+                };
+                await db.products.put(normalized);
+              }
+            } else if (table === 'categories') {
+              if (eventType === 'DELETE') {
+                await db.categories.delete(oldRecord.id);
+              } else if (newRecord?.id) {
+                await db.categories.put(newRecord);
+              }
+            }
+            // Notify views to re-read from IndexedDB silently
+            window.dispatchEvent(new CustomEvent('masterdata-updated'));
+          } catch (err) {
+            console.error('Realtime update error:', err);
+          }
         }
       )
-      .subscribe((status) => {
+      .subscribe((status: string) => {
         if (status === 'SUBSCRIBED') {
           console.log('Successfully subscribed to Supabase Realtime!');
         }

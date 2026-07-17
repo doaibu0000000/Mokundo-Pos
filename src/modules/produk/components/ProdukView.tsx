@@ -135,9 +135,28 @@ export const ProdukView: React.FC = () => {
     loadData();
   }, [productSearch]);
 
-  // Auto-refresh when master data is pulled from Supabase
+  // Auto-refresh when master data is pulled from Supabase (silent, no loading spinner)
   useEffect(() => {
-    const handleMasterDataUpdated = () => loadData();
+    const handleMasterDataUpdated = () => {
+      // Read fresh data from IndexedDB silently (no spinner = no flicker)
+      db.categories.orderBy('urutan').toArray().then(cats => {
+        setCategories(cats);
+        sessionStorage.setItem('mokundo_cached_categories', JSON.stringify(cats));
+      });
+      db.products.toArray().then(prods => {
+        let filteredProds = prods;
+        if (productSearch) {
+          const lower = productSearch.toLowerCase();
+          filteredProds = prods.filter(p =>
+            p.nama.toLowerCase().includes(lower) ||
+            p.sku.toLowerCase().includes(lower)
+          );
+        } else {
+          sessionStorage.setItem('mokundo_cached_products', JSON.stringify(prods));
+        }
+        setProducts(filteredProds);
+      });
+    };
     window.addEventListener('masterdata-updated', handleMasterDataUpdated);
     return () => window.removeEventListener('masterdata-updated', handleMasterDataUpdated);
   }, [productSearch]);
@@ -170,6 +189,8 @@ export const ProdukView: React.FC = () => {
       setIsLoadingData(false);
     }
   };
+
+
 
   // Open product form for edit/new
   const openProductForm = (p: Product | null = null) => {
