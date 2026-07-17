@@ -138,11 +138,9 @@ export class SyncService {
 
       // Fetch Categories - fully replace local data so deletes propagate
       const categories = await fetchData('categories');
-      if (Array.isArray(categories)) {
+      if (Array.isArray(categories) && categories.length > 0) {
         await db.categories.clear();
-        if (categories.length > 0) {
-          await db.categories.bulkAdd(categories);
-        }
+        await db.categories.bulkAdd(categories);
       }
 
       // Fetch Products - fully replace local data so deletes propagate
