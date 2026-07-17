@@ -146,7 +146,18 @@ export const TransaksiView: React.FC = () => {
       loadProducts();
     };
     window.addEventListener('masterdata-updated', handleMasterDataUpdated);
-    return () => window.removeEventListener('masterdata-updated', handleMasterDataUpdated);
+
+    // Fallback: Poll Supabase products every 10 seconds in case Realtime doesn't fire
+    const interval = setInterval(() => {
+      SyncService.pullMasterData().then(ok => {
+        if (ok) window.dispatchEvent(new CustomEvent('masterdata-updated'));
+      });
+    }, 10000);
+
+    return () => {
+      window.removeEventListener('masterdata-updated', handleMasterDataUpdated);
+      clearInterval(interval);
+    };
   }, [selectedCategory, searchQuery]);
 
   // Wake Lock API Activation
