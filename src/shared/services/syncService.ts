@@ -8,7 +8,11 @@ export class SyncService {
     window.addEventListener('online', () => {
       console.log('Device is online, triggering sync...');
       this.syncAll().catch(err => console.error('Sync error on network return:', err));
-      this.pullMasterData().catch(err => console.error('Pull master data error on network return:', err));
+      this.pullMasterData()
+        .then((ok) => {
+          if (ok) window.dispatchEvent(new CustomEvent('masterdata-updated'));
+        })
+        .catch(err => console.error('Pull master data error on network return:', err));
     });
   }
 
@@ -128,31 +132,44 @@ export class SyncService {
             'Authorization': `Bearer ${key}`
           }
         });
-        if (!response.ok) throw new Error(`Failed to fetch ${tableName}`);
+        if (!response.ok) throw new Error(`Failed to fetch ${tableName}: ${response.status}`);
         return await response.json();
       };
 
-      // Fetch and update Categories
+      // Fetch Categories - fully replace local data so deletes propagate
       const categories = await fetchData('categories');
-      if (categories && categories.length > 0) {
-        await db.categories.bulkPut(categories);
+      if (Array.isArray(categories)) {
+        await db.categories.clear();
+        if (categories.length > 0) {
+          await db.categories.bulkAdd(categories);
+        }
       }
 
-      // Fetch and update Products
+      // Fetch Products - fully replace local data so deletes propagate
       const products = await fetchData('products');
-      if (products && products.length > 0) {
-        await db.products.bulkPut(products);
+      if (Array.isArray(products)) {
+        await db.products.clear();
+        if (products.length > 0) {
+          // Ensure varian field is always a JS array (Supabase may return JSON string)
+          const normalized = products.map((p: any) => ({
+            ...p,
+            varian: Array.isArray(p.varian)
+              ? p.varian
+              : (typeof p.varian === 'string' ? JSON.parse(p.varian) : ['Normal'])
+          }));
+          await db.products.bulkAdd(normalized);
+        }
       }
 
       // Fetch and update Users
       const users = await fetchData('users');
-      if (users && users.length > 0) {
+      if (Array.isArray(users) && users.length > 0) {
         await db.users.bulkPut(users);
       }
       
       // Fetch and update Store settings (if any exist on server)
       const stores = await fetchData('stores');
-      if (stores && stores.length > 0) {
+      if (Array.isArray(stores) && stores.length > 0) {
         // Only update local store if the server has data
         const serverStore = stores[0];
         await db.stores.update(storeConfig.id!, {

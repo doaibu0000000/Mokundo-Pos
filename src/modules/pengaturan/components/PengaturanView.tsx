@@ -269,6 +269,7 @@ export const PengaturanView: React.FC = () => {
       const success = await SyncService.pullMasterData();
       if (success) {
         setSyncSuccess('Berhasil menarik data master terbaru dari server!');
+        window.dispatchEvent(new CustomEvent('masterdata-updated'));
       } else {
         setSyncError('Gagal menarik data. Pastikan internet aktif dan konfigurasi benar.');
       }
