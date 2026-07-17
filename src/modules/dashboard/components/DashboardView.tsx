@@ -57,15 +57,35 @@ export const DashboardView: React.FC = () => {
 
   // Listen for realtime Supabase updates to reload dashboard instantly
   useEffect(() => {
+    // 1. Initial load
+    loadDashboardData();
+
+    // 2. Listen to masterdata-updated event
     const handleRealtimeUpdate = () => {
       loadDashboardData();
     };
     window.addEventListener('masterdata-updated', handleRealtimeUpdate);
     
-    // Fallback polling: Fetch from REST API every 15s to guarantee data if Realtime disconnects
+    // 3. Fallback polling: Fetch from REST API every 15s to guarantee data if Realtime disconnects
     const interval = setInterval(() => {
-      // Refresh by calling loadDashboardData which now also syncs from server
-      loadDashboardData();
+      const filterDate = new Date();
+      filterDate.setDate(filterDate.getDate() - filterDays);
+      filterDate.setHours(0, 0, 0, 0);
+      const startFilterStr = filterDate.toISOString();
+
+      SyncService.directFetch<Transaction>(
+        'transactions',
+        `tanggal=gte.${encodeURIComponent(startFilterStr)}`
+      ).then(async serverTx => {
+         if (serverTx && serverTx.length > 0) {
+            // Put to IndexedDB
+            await db.transactions.bulkPut(serverTx);
+            
+            // If the count increased or there were new things, update the UI
+            // We just call loadDashboardData again to guarantee UI sync
+            loadDashboardData();
+         }
+      }).catch(console.error);
     }, 15000);
 
     return () => {
@@ -86,20 +106,11 @@ export const DashboardView: React.FC = () => {
       filterDate.setHours(0, 0, 0, 0);
       const startFilterStr = filterDate.toISOString();
 
+      // Only fetch from local DB
       const allTx = await db.transactions
         .where('tanggal')
         .aboveOrEqual(startFilterStr)
         .toArray();
-
-      // Fire a background fetch to ensure local DB gets updated from server if Realtime failed
-      SyncService.directFetch<Transaction>(
-        'transactions',
-        `tanggal=gte.${encodeURIComponent(startFilterStr)}`
-      ).then(serverTx => {
-         if (serverTx && serverTx.length > 0) {
-            db.transactions.bulkPut(serverTx).catch(console.error);
-         }
-      }).catch(console.error);
 
       // 2. Fetch Transaction Items from local DB
       const allItems = await db.transaction_items.toArray(); 
