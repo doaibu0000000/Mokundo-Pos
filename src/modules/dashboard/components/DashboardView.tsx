@@ -61,7 +61,16 @@ export const DashboardView: React.FC = () => {
       loadDashboardData();
     };
     window.addEventListener('masterdata-updated', handleRealtimeUpdate);
-    return () => window.removeEventListener('masterdata-updated', handleRealtimeUpdate);
+    
+    // Fallback polling: Refresh data every 15 seconds in case Supabase Realtime is not enabled on the tables
+    const interval = setInterval(() => {
+      loadDashboardData();
+    }, 15000);
+
+    return () => {
+      window.removeEventListener('masterdata-updated', handleRealtimeUpdate);
+      clearInterval(interval);
+    };
   }, [filterDays]); // Depend on filterDays so it uses current filter
 
   const loadDashboardData = async () => {

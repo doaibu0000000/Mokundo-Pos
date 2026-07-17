@@ -130,6 +130,11 @@ export class SyncService {
         if (tableName === 'transactions') {
           delete cleanPayload.items;
         }
+        
+        // Inject store_id for tables that require it
+        if (['categories', 'products', 'shifts', 'transactions', 'stock_logs'].includes(tableName)) {
+           cleanPayload.store_id = storeConfig.id;
+        }
 
         const res = await fetch(`${url}/rest/v1/${tableName}`, {
           method: 'POST',
