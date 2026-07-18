@@ -37,18 +37,19 @@ export const LoginView: React.FC = () => {
             const baseUrl = storeConfig.supabase_url.replace(/\/$/, '');
             const key = storeConfig.supabase_anon_key;
             const res = await fetch(
-              `${baseUrl}/rest/v1/users?username=eq.${encodeURIComponent(trimmedUser.toLowerCase())}&select=id,username,password_hash`,
+              `${baseUrl}/rest/v1/users?username=eq.${encodeURIComponent(trimmedUser.toLowerCase())}&select=*`,
               { headers: { 'apikey': key, 'Authorization': `Bearer ${key}` } }
             );
             if (res.ok) {
               const remoteUsers = await res.json();
               if (Array.isArray(remoteUsers) && remoteUsers.length > 0) {
                 const remoteUser = remoteUsers[0];
-                // Hanya update password_hash jika Supabase mengembalikannya
                 if (remoteUser.password_hash) {
                   const localUser = await db.users.where('username').equalsIgnoreCase(trimmedUser).first();
                   if (localUser?.id) {
-                    await db.users.update(localUser.id, { password_hash: remoteUser.password_hash });
+                    await db.users.update(localUser.id, { ...remoteUser });
+                  } else {
+                    await db.users.put(remoteUser);
                   }
                 }
               }
