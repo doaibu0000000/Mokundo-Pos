@@ -1026,9 +1026,6 @@ export const PengaturanView: React.FC = () => {
           {renderHeader('Sinkronisasi Cloud', 'Backup data ke Supabase')}
           
           <NeumorphicCard>
-            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
-              Simpan data offline Anda secara aman di server database cloud pribadi Anda (Gratis).
-            </p>
 
             <div 
               className="nm-inset"
