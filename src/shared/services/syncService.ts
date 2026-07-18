@@ -1,5 +1,6 @@
 import { db } from './db';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { APP_CONFIG } from '../config';
 
 export class SyncService {
   private static isSyncing = false;
@@ -19,16 +20,25 @@ export class SyncService {
     });
   }
 
-  // Get configured Supabase URL and key
-  private static async getConfig() {
+  // Get configured Supabase URL and key (with fallback to hardcoded config)
+  public static async getSupabaseConfig() {
     const storeConfig = await db.stores.toCollection().first();
-    if (!storeConfig?.sync_enabled || !storeConfig?.supabase_url || !storeConfig?.supabase_anon_key) {
+    const url = storeConfig?.supabase_url || APP_CONFIG.SUPABASE_URL;
+    const key = storeConfig?.supabase_anon_key || APP_CONFIG.SUPABASE_ANON_KEY;
+    
+    // Anggap aktif jika URL dan Key ada (baik dari lokal maupun hardcoded)
+    if (!url || !key) {
       return null;
     }
     return {
-      url: storeConfig.supabase_url.replace(/\/$/, ''),
-      key: storeConfig.supabase_anon_key,
+      url: url.replace(/\/$/, ''),
+      key: key,
     };
+  }
+
+  // Alias for backward compatibility internally
+  private static async getConfig() {
+    return this.getSupabaseConfig();
   }
 
   // Subscribe to Supabase Realtime for instant cross-device updates

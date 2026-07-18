@@ -245,10 +245,10 @@ export const PengaturanView: React.FC = () => {
       //    agar kasir yang dibuat di device lain masuk ke list lokal
       if (navigator.onLine) {
         try {
-          const storeConfig = await db.stores.toCollection().first();
-          if (storeConfig?.supabase_url && storeConfig?.supabase_anon_key) {
-            const baseUrl = storeConfig.supabase_url.replace(/\/$/, '');
-            const key = storeConfig.supabase_anon_key;
+          const { SyncService } = await import('../../../shared/services/syncService');
+          const supabaseConfig = await SyncService.getSupabaseConfig();
+          if (supabaseConfig) {
+            const { url: baseUrl, key } = supabaseConfig;
             const res = await fetch(
               `${baseUrl}/rest/v1/users?select=*`,
               { headers: { 'apikey': key, 'Authorization': `Bearer ${key}` } }
