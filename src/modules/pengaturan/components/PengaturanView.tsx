@@ -83,6 +83,12 @@ export const PengaturanView: React.FC = () => {
     '112mm': '112 mm (Laporan / EDC Besar)'
   };
   const [qrBarcode, setQrBarcode] = useState(store?.qr_barcode || '');
+  const [qrLinkType, setQrLinkType] = useState<'whatsapp' | 'url'>('whatsapp');
+  const [qrWhatsappPhone, setQrWhatsappPhone] = useState('');
+  const [qrWhatsappMessage, setQrWhatsappMessage] = useState('');
+  const [qrCustomUrl, setQrCustomUrl] = useState('');
+  const [qrPreviewDataUrl, setQrPreviewDataUrl] = useState('');
+  
   const [qrPromoText, setQrPromoText] = useState(store?.qr_promo_text || 'Mau pesan lagi tanpa antre atau\ntertarik punya bisnis kopi sendiri?');
   const [qrScanText, setQrScanText] = useState(store?.qr_scan_text || 'Pindai saya!');
   const [receiptThankYou, setReceiptThankYou] = useState(store?.receipt_thankyou_text || 'Thank you for your order!');
@@ -142,13 +148,58 @@ export const PengaturanView: React.FC = () => {
       setSupabaseKey(store.supabase_anon_key || '');
       setSyncEnabled(store.sync_enabled === 1);
       setUkuranKertas(store.ukuran_kertas_struk || '58mm');
-      setQrBarcode(store.qr_barcode || '');
+      
+      const barcodeStr = store.qr_barcode || '';
+      setQrBarcode(barcodeStr);
+      if (barcodeStr.startsWith('https://wa.me/')) {
+        setQrLinkType('whatsapp');
+        try {
+          const urlObj = new URL(barcodeStr);
+          const pathname = urlObj.pathname.replace('/', '');
+          setQrWhatsappPhone(pathname);
+          const msg = urlObj.searchParams.get('text') || '';
+          setQrWhatsappMessage(msg);
+        } catch {
+          // Ignore parse error
+        }
+      } else {
+        setQrLinkType('url');
+        setQrCustomUrl(barcodeStr);
+      }
+
       setQrPromoText(store.qr_promo_text || 'Mau pesan lagi tanpa antre atau\ntertarik punya bisnis kopi sendiri?');
       setQrScanText(store.qr_scan_text || 'Pindai saya!');
       setReceiptThankYou(store.receipt_thankyou_text || 'Thank you for your order!');
       setReceiptFooterBrand(store.receipt_footer_brand || '— Surantaka Coffee —');
     }
   }, [store]);
+
+  // Sync builder states to qrBarcode
+  useEffect(() => {
+    if (qrLinkType === 'whatsapp') {
+      const cleanNum = qrWhatsappPhone.replace(/\D/g, '');
+      if (cleanNum) {
+        setQrBarcode(`https://wa.me/${cleanNum}?text=${encodeURIComponent(qrWhatsappMessage)}`);
+      } else {
+        setQrBarcode('');
+      }
+    } else {
+      setQrBarcode(qrCustomUrl);
+    }
+  }, [qrLinkType, qrWhatsappPhone, qrWhatsappMessage, qrCustomUrl]);
+
+  // Generate QR preview
+  useEffect(() => {
+    if (!qrBarcode) {
+      setQrPreviewDataUrl('');
+      return;
+    }
+    import('qrcode').then(qrcode => {
+      qrcode.default.toDataURL(qrBarcode, { margin: 1, width: 250 }, (err, url) => {
+        if (!err) setQrPreviewDataUrl(url);
+      });
+    }).catch(console.error);
+  }, [qrBarcode]);
 
   const handlePairBluetooth = async () => {
     setBluetoothError('');
@@ -813,23 +864,114 @@ export const PengaturanView: React.FC = () => {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>BARCODE</label>
-                <textarea
-                  value={qrBarcode}
-                  onChange={(e) => setQrBarcode(e.target.value)}
-                  placeholder="Masukkan Link URL (misal: wa.me/628... atau namatoko.com)"
-                  rows={2}
-                  className="nm-input"
-                  style={{
-                    padding: '12px 12px 16px 12px',
-                    lineHeight: '1.5',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: '13px',
-                    fontFamily: 'monospace',
-                    border: 'var(--border-width-hc) solid var(--border-high-contrast)',
-                    resize: 'vertical'
-                  }}
-                />
+                <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>QR CODE NOTA</label>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                  {/* Left Side: Builder */}
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>JENIS TAUTAN</label>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <NeumorphicButton
+                          variant={qrLinkType === 'whatsapp' ? 'primary' : 'flat'}
+                          onClick={() => setQrLinkType('whatsapp')}
+                          style={{ flex: 1, padding: '8px', fontSize: '12px', display: 'flex', gap: '6px', justifyContent: 'center' }}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                          WhatsApp
+                        </NeumorphicButton>
+                        <NeumorphicButton
+                          variant={qrLinkType === 'url' ? 'primary' : 'flat'}
+                          onClick={() => setQrLinkType('url')}
+                          style={{ flex: 1, padding: '8px', fontSize: '12px', display: 'flex', gap: '6px', justifyContent: 'center' }}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                          Custom URL
+                        </NeumorphicButton>
+                      </div>
+                    </div>
+
+                    {qrLinkType === 'whatsapp' ? (
+                      <>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <label style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>NOMOR WHATSAPP</label>
+                          <input
+                            type="text"
+                            value={qrWhatsappPhone}
+                            onChange={(e) => setQrWhatsappPhone(e.target.value)}
+                            placeholder="081234567890"
+                            className="nm-input"
+                            style={{
+                              padding: '10px',
+                              borderRadius: 'var(--radius-md)',
+                              fontSize: '13px',
+                              border: 'var(--border-width-hc) solid var(--border-high-contrast)'
+                            }}
+                          />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <label style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>PESAN OTOMATIS</label>
+                          <textarea
+                            value={qrWhatsappMessage}
+                            onChange={(e) => setQrWhatsappMessage(e.target.value)}
+                            placeholder="Halo kak, boleh saya tau tentang produk ini?"
+                            rows={3}
+                            className="nm-input"
+                            style={{
+                              padding: '10px',
+                              lineHeight: '1.4',
+                              borderRadius: 'var(--radius-md)',
+                              fontSize: '13px',
+                              border: 'var(--border-width-hc) solid var(--border-high-contrast)',
+                              resize: 'vertical'
+                            }}
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>LINK URL</label>
+                        <textarea
+                          value={qrCustomUrl}
+                          onChange={(e) => setQrCustomUrl(e.target.value)}
+                          placeholder="Masukkan Link URL (misal: namatoko.com)"
+                          rows={2}
+                          className="nm-input"
+                          style={{
+                            padding: '10px',
+                            lineHeight: '1.4',
+                            borderRadius: 'var(--radius-md)',
+                            fontSize: '13px',
+                            fontFamily: 'monospace',
+                            border: 'var(--border-width-hc) solid var(--border-high-contrast)',
+                            resize: 'vertical'
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Right Side: Preview */}
+                  <div style={{ width: '120px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', textAlign: 'center' }}>PRATINJAU QR</label>
+                    <div className="nm-inset" style={{ 
+                      width: '100%', 
+                      aspectRatio: '1/1', 
+                      borderRadius: 'var(--radius-md)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '8px',
+                      backgroundColor: 'var(--bg-primary)'
+                    }}>
+                      {qrPreviewDataUrl ? (
+                        <img src={qrPreviewDataUrl} alt="QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      ) : (
+                        <span style={{ fontSize: '10px', color: 'var(--text-tertiary)', textAlign: 'center' }}>QR Code belum dibuat</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
