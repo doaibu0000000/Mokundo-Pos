@@ -103,7 +103,7 @@ export const PengaturanView: React.FC = () => {
   const [securitySuccess, setSecuritySuccess] = useState('');
 
   // Kasir Password Reset States (Admin only)
-  const [kasirList, setKasirList] = useState<{ id: number; nama_lengkap: string; username: string }[]>([]);
+
   const [selectedKasirId, setSelectedKasirId] = useState<number | ''>('');
   const [kasirNewPassword, setKasirNewPassword] = useState('');
   const [kasirConfirmPassword, setKasirConfirmPassword] = useState('');
@@ -298,7 +298,6 @@ export const PengaturanView: React.FC = () => {
       const kasirs = allUsers
         .filter(u => u.role === 'Kasir')
         .map(u => ({ id: u.id!, nama_lengkap: u.nama_lengkap, username: u.username }));
-      setKasirList(kasirs);
       // Auto-select kasir pertama jika belum ada yang dipilih
       if (kasirs.length > 0 && !selectedKasirId) {
         setSelectedKasirId(kasirs[0].id);
@@ -354,7 +353,7 @@ export const PengaturanView: React.FC = () => {
       const storedUserRaw = localStorage.getItem('mokundo_user');
       if (storedUserRaw) {
         const storedUser = JSON.parse(storedUserRaw);
-        if (storedUser.id === selectedKasirId) {
+        if (storedUser.id === targetKasirId) {
           localStorage.removeItem('mokundo_user');
           localStorage.removeItem('mokundo_cart');
           localStorage.removeItem('mokundo_platform');
@@ -362,7 +361,7 @@ export const PengaturanView: React.FC = () => {
         }
       }
 
-      setKasirPwSuccess(`Kata sandi ${kasir?.nama_lengkap ?? 'kasir'} berhasil direset! Kasir wajib login ulang dengan sandi baru.`);
+      setKasirPwSuccess('Kata sandi kasir berhasil direset! Kasir wajib login ulang dengan sandi baru.');
       setSelectedKasirId('');
       setKasirNewPassword('');
       setKasirConfirmPassword('');
