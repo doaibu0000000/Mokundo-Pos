@@ -67,7 +67,7 @@ const LayoutSelector: React.FC = () => {
           </p>
           <NeumorphicButton 
             variant="primary" 
-            fullWidth 
+            style={{ width: '100%' }}
             onClick={handleModalClose}
           >
             Login Ulang
