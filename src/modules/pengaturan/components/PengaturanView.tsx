@@ -893,25 +893,52 @@ export const PengaturanView: React.FC = () => {
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px', lineHeight: '1.4' }}>
               Hubungkan printer thermal Bluetooth Anda. Jika sudah terhubung, struk dapat dicetak langsung tanpa popup konfirmasi browser.
             </p>
-            {connectedBluetooth ? (
-              <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--accent-green)' }}>
-                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Status: <strong style={{ color: 'var(--accent-green)' }}>Terhubung</strong></div>
-                <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{connectedBluetooth}</div>
+
+            {/* Bluetooth NOT supported — show friendly fallback */}
+            {!(navigator as any).bluetooth ? (
+              <div style={{ marginBottom: '16px', padding: '12px 14px', backgroundColor: 'rgba(255,193,7,0.1)', borderRadius: '10px', border: '1px solid rgba(255,193,7,0.4)' }}>
+                <div style={{ fontWeight: 700, fontSize: '13px', color: '#f59e0b', marginBottom: '4px' }}>⚠️ Browser Tidak Mendukung Web Bluetooth</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                  Browser ini (<strong>{navigator.userAgent.includes('Firefox') ? 'Firefox' : navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome') ? 'Safari' : 'Browser Anda'}</strong>) tidak mendukung Bluetooth. Gunakan fitur <strong>"Cetak via Browser"</strong> di bawah sebagai alternatif, atau gunakan <strong>Google Chrome</strong> untuk koneksi Bluetooth printer.
+                </div>
               </div>
-            ) : null}
-            {bluetoothError && (
-              <div style={{ marginBottom: '16px', color: 'var(--accent-red)', fontSize: '12px', fontWeight: 600 }}>
-                {bluetoothError}
-              </div>
+            ) : (
+              <>
+                {connectedBluetooth ? (
+                  <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--accent-green)' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Status: <strong style={{ color: 'var(--accent-green)' }}>Terhubung</strong></div>
+                    <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{connectedBluetooth}</div>
+                  </div>
+                ) : null}
+                {bluetoothError && (
+                  <div style={{ marginBottom: '16px', color: 'var(--accent-red)', fontSize: '12px', fontWeight: 600 }}>
+                    {bluetoothError}
+                  </div>
+                )}
+                <NeumorphicButton
+                  onClick={handlePairBluetooth}
+                  style={{ width: '100%', opacity: isBluetoothConnecting ? 0.7 : 1, marginBottom: '10px' }}
+                  disabled={isBluetoothConnecting}
+                >
+                  {isBluetoothConnecting ? 'Sedang Menyandingkan...' : (connectedBluetooth ? 'Hubungkan Ulang Bluetooth' : 'Pair / Hubungkan Bluetooth Printer')}
+                </NeumorphicButton>
+              </>
             )}
-            <NeumorphicButton 
-              onClick={handlePairBluetooth} 
-              style={{ width: '100%', opacity: isBluetoothConnecting ? 0.7 : 1 }}
-              disabled={isBluetoothConnecting}
-            >
-              {isBluetoothConnecting ? 'Sedang Menyandingkan...' : (connectedBluetooth ? 'Hubungkan Ulang Bluetooth' : 'Pair / Hubungkan Bluetooth Printer')}
-            </NeumorphicButton>
+
+            {/* Universal print fallback — works on ALL browsers */}
+            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '14px', marginTop: '4px' }}>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
+                🖨️ <strong>Alternatif Universal:</strong> Cetak langsung dari browser (bekerja di semua perangkat &amp; browser)
+              </div>
+              <NeumorphicButton
+                style={{ width: '100%' }}
+                onClick={() => window.print()}
+              >
+                Cetak via Dialog Browser
+              </NeumorphicButton>
+            </div>
           </NeumorphicCard>
+
         </div>
       )}
 
