@@ -282,11 +282,26 @@ export const PengaturanView: React.FC = () => {
       const newHash = await hashPassword(kasirNewPassword);
       await db.users.update(selectedKasirId as number, { password_hash: newHash });
       const kasir = kasirList.find(k => k.id === selectedKasirId);
-      setKasirPwSuccess(`Kata sandi ${kasir?.nama_lengkap ?? 'kasir'} berhasil direset!`);
+
+      // Paksa logout kasir jika sedang login di browser yang sama
+      const storedUserRaw = localStorage.getItem('mokundo_user');
+      if (storedUserRaw) {
+        const storedUser = JSON.parse(storedUserRaw);
+        if (storedUser.id === selectedKasirId) {
+          localStorage.removeItem('mokundo_user');
+          localStorage.removeItem('mokundo_cart');
+          localStorage.removeItem('mokundo_platform');
+          localStorage.removeItem('mokundo_activeTab');
+        }
+      }
+
+      setKasirPwSuccess(`Kata sandi ${kasir?.nama_lengkap ?? 'kasir'} berhasil direset! Kasir wajib login ulang dengan sandi baru.`);
       setSelectedKasirId('');
       setKasirNewPassword('');
       setKasirConfirmPassword('');
-      setTimeout(() => setKasirPwSuccess(''), 3000);
+      // Re-load kasir agar auto-select tersedia kembali
+      await loadKasirList();
+      setTimeout(() => setKasirPwSuccess(''), 4000);
     } catch (e) {
       setKasirPwError('Gagal mereset kata sandi kasir');
     }
