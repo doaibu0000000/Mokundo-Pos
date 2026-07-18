@@ -48,7 +48,6 @@ const LayoutSelector: React.FC = () => {
       <NeumorphicModal
         isOpen={showLogoutModal}
         onClose={handleModalClose}
-        title="Sesi Berakhir"
         hideCloseButton={true}
       >
         <div style={{ textAlign: 'center', padding: '0.5rem 1rem' }}>
