@@ -90,6 +90,27 @@ export class SyncService {
             } else if (newRecord?.id) {
               await db.transaction_items.put(newRecord);
             }
+          } else if (table === 'users') {
+            if (eventType === 'UPDATE' && newRecord?.id) {
+              const localUser = await db.users.get(newRecord.id);
+              await db.users.put(newRecord);
+              
+              // Cek jika password berubah untuk user yang sedang aktif (login) di browser ini
+              if (localUser && localUser.password_hash !== newRecord.password_hash) {
+                const storedUserRaw = localStorage.getItem('mokundo_user');
+                if (storedUserRaw) {
+                  const storedUser = JSON.parse(storedUserRaw);
+                  if (storedUser.id === newRecord.id) {
+                    localStorage.removeItem('mokundo_user');
+                    localStorage.removeItem('mokundo_cart');
+                    localStorage.removeItem('mokundo_platform');
+                    localStorage.removeItem('mokundo_activeTab');
+                    alert('Kata sandi Anda telah diubah oleh Admin. Sesi berakhir, silakan login ulang.');
+                    window.location.reload();
+                  }
+                }
+              }
+            }
           }
           // Fire event so all open views refresh instantly
           window.dispatchEvent(new CustomEvent('masterdata-updated'));
