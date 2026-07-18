@@ -830,12 +830,18 @@ export const PengaturanView: React.FC = () => {
 
       {activeScreen === 'keamanan' && (
         <div style={{ maxWidth: '480px', display: 'flex', flexDirection: 'column', gap: '12px', animation: 'fadeIn 0.2s ease-in-out' }}>
-          {renderHeader('Keamanan Sandi', 'Ganti kata sandi admin')}
+          {renderHeader('Keamanan Sandi', '')}
           
           <NeumorphicCard>
-            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
-              Amankan akses kasir Anda dengan mengganti kredensial default <code>admin</code> atau <code>kasir</code>.
-            </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #f7971e, #ffd200)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Key size={16} color="#fff" />
+                </div>
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: '14px' }}>Reset Kata Sandi Admin</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Atur ulang password akun admin</div>
+                </div>
+              </div>
 
             <form onSubmit={handleChangePassword} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <NeumorphicInput
