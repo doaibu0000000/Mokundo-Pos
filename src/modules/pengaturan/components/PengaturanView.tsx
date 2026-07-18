@@ -638,6 +638,8 @@ export const PengaturanView: React.FC = () => {
             </div>
           </NeumorphicCard>
 
+
+          {user?.role === 'Admin' && (
           <NeumorphicCard 
             className="nm-button"
             onClick={() => navigateTo('reset')}
@@ -649,6 +651,7 @@ export const PengaturanView: React.FC = () => {
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Hapus semua data, kembali ke awal</div>
             </div>
           </NeumorphicCard>
+          )}
 
           <NeumorphicCard style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px' }}>
             <h3 style={{ fontSize: '15px', fontWeight: 800 }}>Akses & Tampilan</h3>
@@ -1318,7 +1321,7 @@ export const PengaturanView: React.FC = () => {
         `}</style>
       </NeumorphicModal>
 
-      {activeScreen === 'reset' && (
+      {activeScreen === 'reset' && user?.role === 'Admin' && (
         <div style={{ maxWidth: '480px', display: 'flex', flexDirection: 'column', gap: '12px', animation: 'fadeIn 0.2s ease-in-out' }}>
           {renderHeader('Reset Data Aplikasi', 'Hapus semua data & kembali ke awal')}
 
