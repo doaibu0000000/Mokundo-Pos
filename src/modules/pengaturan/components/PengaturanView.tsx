@@ -956,7 +956,7 @@ export const PengaturanView: React.FC = () => {
                             type="text"
                             value={qrWhatsappPhone}
                             onChange={(e) => setQrWhatsappPhone(e.target.value)}
-                            placeholder="081234567890"
+                            placeholder="083865945442"
                             className="nm-input"
                             style={{
                               padding: '10px',
