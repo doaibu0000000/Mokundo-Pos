@@ -63,7 +63,7 @@ export const LoginView: React.FC = () => {
       // 2. Ambil user dari lokal (sudah diupdate jika pull berhasil)
       const user = await db.users.where('username').equalsIgnoreCase(trimmedUser).first();
       if (!user) {
-        setError('Username atau password salah');
+        setError('Username salah');
         setLoading(false);
         return;
       }
@@ -71,7 +71,7 @@ export const LoginView: React.FC = () => {
       // 3. Hash input password dan cocokkan
       const inputHash = await hashPassword(trimmedPass);
       if (user.password_hash !== inputHash) {
-        setError('Username atau password salah');
+        setError('Password salah');
         setLoading(false);
         return;
       }
