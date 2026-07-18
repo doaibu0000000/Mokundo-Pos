@@ -105,8 +105,7 @@ export class SyncService {
                     localStorage.removeItem('mokundo_cart');
                     localStorage.removeItem('mokundo_platform');
                     localStorage.removeItem('mokundo_activeTab');
-                    alert('Kata sandi Anda telah diubah oleh Admin. Sesi berakhir, silakan login ulang.');
-                    window.location.reload();
+                    window.dispatchEvent(new CustomEvent('show-force-logout-modal'));
                   }
                 }
               }
@@ -129,8 +128,7 @@ export class SyncService {
             localStorage.removeItem('mokundo_cart');
             localStorage.removeItem('mokundo_platform');
             localStorage.removeItem('mokundo_activeTab');
-            alert('Kata sandi Anda telah diubah oleh Admin. Sesi berakhir, silakan login ulang.');
-            window.location.reload();
+            window.dispatchEvent(new CustomEvent('show-force-logout-modal'));
           }
         }
       })
