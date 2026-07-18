@@ -102,6 +102,14 @@ export const PengaturanView: React.FC = () => {
   const [securityError, setSecurityError] = useState('');
   const [securitySuccess, setSecuritySuccess] = useState('');
 
+  // Kasir Password Reset States (Admin only)
+  const [kasirList, setKasirList] = useState<{ id: number; nama_lengkap: string; username: string }[]>([]);
+  const [selectedKasirId, setSelectedKasirId] = useState<number | ''>('');
+  const [kasirNewPassword, setKasirNewPassword] = useState('');
+  const [kasirConfirmPassword, setKasirConfirmPassword] = useState('');
+  const [kasirPwError, setKasirPwError] = useState('');
+  const [kasirPwSuccess, setKasirPwSuccess] = useState('');
+
   // Supabase Sync States
   const [supabaseUrl, setSupabaseUrl] = useState(store?.supabase_url || '');
   const [supabaseKey, setSupabaseKey] = useState(store?.supabase_anon_key || '');
@@ -227,6 +235,56 @@ export const PengaturanView: React.FC = () => {
       setConfirmPassword('');
     } catch (e) {
       setSecurityError('Gagal memperbarui kata sandi');
+    }
+  };
+
+  // Load kasir list when admin opens keamanan screen
+  const loadKasirList = async () => {
+    try {
+      const allUsers = await db.users.toArray();
+      const kasirs = allUsers
+        .filter(u => u.role === 'Kasir')
+        .map(u => ({ id: u.id!, nama_lengkap: u.nama_lengkap, username: u.username }));
+      setKasirList(kasirs);
+    } catch (e) {
+      console.error('Gagal memuat daftar kasir', e);
+    }
+  };
+
+  // Reset password kasir by admin
+  const handleResetKasirPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setKasirPwError('');
+    setKasirPwSuccess('');
+
+    if (!selectedKasirId) {
+      setKasirPwError('Pilih kasir terlebih dahulu');
+      return;
+    }
+    if (!kasirNewPassword || !kasirConfirmPassword) {
+      setKasirPwError('Semua field wajib diisi');
+      return;
+    }
+    if (kasirNewPassword.length < 5) {
+      setKasirPwError('Kata sandi minimal 5 karakter');
+      return;
+    }
+    if (kasirNewPassword !== kasirConfirmPassword) {
+      setKasirPwError('Konfirmasi kata sandi tidak cocok');
+      return;
+    }
+
+    try {
+      const newHash = await hashPassword(kasirNewPassword);
+      await db.users.update(selectedKasirId as number, { password_hash: newHash });
+      const kasir = kasirList.find(k => k.id === selectedKasirId);
+      setKasirPwSuccess(`Kata sandi ${kasir?.nama_lengkap ?? 'kasir'} berhasil direset!`);
+      setSelectedKasirId('');
+      setKasirNewPassword('');
+      setKasirConfirmPassword('');
+      setTimeout(() => setKasirPwSuccess(''), 3000);
+    } catch (e) {
+      setKasirPwError('Gagal mereset kata sandi kasir');
     }
   };
 
@@ -821,6 +879,83 @@ export const PengaturanView: React.FC = () => {
               </NeumorphicButton>
             </form>
           </NeumorphicCard>
+
+          {/* Ganti Sandi Kasir — hanya untuk Admin */}
+          {user?.role !== 'Kasir' && (
+            <NeumorphicCard>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #667eea, #764ba2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Key size={16} color="#fff" />
+                </div>
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: '14px' }}>Reset Kata Sandi Kasir</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Atur ulang password akun kasir</div>
+                </div>
+              </div>
+
+              <form onSubmit={handleResetKasirPassword} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {/* Dropdown pilih kasir */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>Pilih Kasir</label>
+                  <div
+                    className="nm-inset"
+                    style={{ borderRadius: 'var(--radius-sm)', padding: '2px 4px' }}
+                  >
+                    <select
+                      value={selectedKasirId}
+                      onChange={e => setSelectedKasirId(e.target.value ? Number(e.target.value) : '')}
+                      onFocus={loadKasirList}
+                      onClick={loadKasirList}
+                      style={{
+                        width: '100%',
+                        background: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        fontSize: '14px',
+                        color: 'var(--text-primary)',
+                        padding: '10px 8px',
+                        cursor: 'pointer',
+                        appearance: 'auto'
+                      }}
+                    >
+                      <option value="">-- Pilih akun kasir --</option>
+                      {kasirList.map(k => (
+                        <option key={k.id} value={k.id}>{k.nama_lengkap} (@{k.username})</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <NeumorphicInput
+                  label="Kata Sandi Baru"
+                  type="password"
+                  placeholder="Min 5 karakter"
+                  value={kasirNewPassword}
+                  onChange={e => setKasirNewPassword(e.target.value)}
+                  required
+                />
+                <NeumorphicInput
+                  label="Konfirmasi Kata Sandi Baru"
+                  type="password"
+                  placeholder="Ulangi kata sandi baru"
+                  value={kasirConfirmPassword}
+                  onChange={e => setKasirConfirmPassword(e.target.value)}
+                  required
+                />
+
+                {kasirPwError && (
+                  <div style={{ color: 'var(--accent-red)', fontSize: '12px', fontWeight: 600 }}>⚠️ {kasirPwError}</div>
+                )}
+                {kasirPwSuccess && (
+                  <div style={{ color: 'var(--accent-green)', fontSize: '12px', fontWeight: 600 }}>✓ {kasirPwSuccess}</div>
+                )}
+
+                <NeumorphicButton type="submit" style={{ marginTop: '4px', background: 'linear-gradient(135deg, #667eea, #764ba2)', color: '#fff' }}>
+                  Reset Kata Sandi Kasir
+                </NeumorphicButton>
+              </form>
+            </NeumorphicCard>
+          )}
         </div>
       )}
 
