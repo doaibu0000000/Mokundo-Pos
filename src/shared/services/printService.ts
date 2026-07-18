@@ -356,14 +356,14 @@ export class PrintService {
     }).join('');
 
     let qrCodeImg = '';
-    if (store.qr_barcode) {
-      try {
-        const QRCode = (await import('qrcode')).default;
-        const qrBase64 = await QRCode.toDataURL(store.qr_barcode, { margin: 0, width: 150 });
-        qrCodeImg = `<img src="${qrBase64}" style="width: 100%; height: 100%; object-fit: contain;" alt="QR Code" />`;
-      } catch (err) {
-        console.error("Failed to generate QR Code", err);
-      }
+    // Generate QR code - use stored barcode or build from whatsapp default
+    const qrUrl = store.qr_barcode || 'https://wa.me/6283865945442?text=Halo%20Admin%2C%20saya%20ingin%20bertanya%20mengenai%20pembelian%20produk%20dan%20peluang%20kemitraan.%20Boleh%20dibantu%3F';
+    try {
+      const QRCode = (await import('qrcode')).default;
+      const qrBase64 = await QRCode.toDataURL(qrUrl, { margin: 0, width: 150 });
+      qrCodeImg = `<img src="${qrBase64}" style="width: 100%; height: 100%; object-fit: contain;" alt="QR Code" />`;
+    } catch (err) {
+      console.error("Failed to generate QR Code", err);
     }
 
     const paperSize = store.ukuran_kertas_struk || '58mm';
@@ -632,20 +632,18 @@ export class PrintService {
 
   <hr class="divider">
 
-  ${qrCodeImg ? `
   <div class="promo">
-    ${store.qr_promo_text ? store.qr_promo_text.replace(/\n/g, '<br>') : 'Mau pesan lagi tanpa antre atau<br>tertarik punya bisnis kopi sendiri?'}
+    ${(store.qr_promo_text || 'Mau pesan lagi tanpa antre atau\ntertarik punya bisnis kopi sendiri?').replace(/\n/g, '<br>')}
     <div style="margin-top: 4px;">${store.qr_scan_text || 'Pindai saya!'}</div>
   </div>
-  <div class="qr-box">${qrCodeImg}</div>
-  ` : ''}
+  ${qrCodeImg ? `<div class="qr-box">${qrCodeImg}</div>` : ''}
 
-  <div class="thankyou">${store.receipt_thankyou_text ? store.receipt_thankyou_text.replace(/\n/g, '<br>') : 'Thank you for your order!'}</div>
+  <div class="thankyou">${(store.receipt_thankyou_text || 'Thank you for your order!').replace(/\n/g, '<br>')}</div>
 
   <hr class="divider">
 
   <div class="footer-msg">
-    ${store.receipt_footer ? store.receipt_footer.replace(/\\n/g, '<br>') : 'Mengunjungi kami kembali adalah<br>kebahagiaan terbesar kami!'}
+    ${(store.receipt_footer || 'Mengunjungi kami kembali adalah\nkebahagiaan terbesar kami!').replace(/\n/g, '<br>')}
     <div class="brand">${store.receipt_footer_brand || `— ${store.nama || 'Surantaka Coffee'} —`}</div>
   </div>
 </div>
