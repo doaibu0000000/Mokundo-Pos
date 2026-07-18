@@ -233,7 +233,7 @@ export const PengaturanView: React.FC = () => {
     }
 
     try {
-      await db.stores.update(store!.id!, {
+      const payload = {
         nama: storeNama,
         alamat: storeAlamat,
         PPN: 0,
@@ -246,7 +246,14 @@ export const PengaturanView: React.FC = () => {
         qr_scan_text: qrScanText,
         receipt_thankyou_text: receiptThankYou,
         receipt_footer_brand: receiptFooterBrand
-      });
+      };
+
+      await db.stores.update(store!.id!, payload);
+      
+      // Immediately push to Supabase so it syncs to other devices
+      const { SyncService } = await import('../../../shared/services/syncService');
+      await SyncService.directPush('stores', 'UPDATE', store!.id!, { ...store, ...payload });
+
       if (profilTab === 'setting') {
         setStoreSuccess('Pengaturan kertas thermal berhasil diperbarui!');
       } else {

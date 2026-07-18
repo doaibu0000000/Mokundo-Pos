@@ -90,6 +90,12 @@ export class SyncService {
             } else if (newRecord?.id) {
               await db.transaction_items.put(newRecord);
             }
+          } else if (table === 'stores') {
+            if (eventType === 'DELETE') {
+              await db.stores.delete(oldRecord.id);
+            } else if (newRecord?.id) {
+              await db.stores.put(newRecord);
+            }
           } else if (table === 'users') {
             if (eventType === 'UPDATE' && newRecord?.id) {
               const localUser = await db.users.get(newRecord.id);
@@ -371,6 +377,12 @@ export class SyncService {
       const users = await fetchTable('users');
       if (Array.isArray(users) && users.length > 0) {
         await db.users.bulkPut(users);
+      }
+
+      // Fetch stores (store configuration)
+      const stores = await fetchTable('stores');
+      if (Array.isArray(stores) && stores.length > 0) {
+        await db.stores.bulkPut(stores);
       }
 
       return true;
