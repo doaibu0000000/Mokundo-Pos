@@ -249,8 +249,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       );
 
       if (existingIdx > -1) {
+        const currentQty = prevCart[existingIdx].qty;
+        // Jangan tambah jika sudah mencapai batas stok
+        if (product.stok !== undefined && currentQty >= product.stok) {
+          return prevCart;
+        }
         const updated = [...prevCart];
-        updated[existingIdx].qty += 1;
+        updated[existingIdx] = { ...updated[existingIdx], qty: currentQty + 1 };
         // Merge notes if needed or append
         if (notes && !updated[existingIdx].notes.includes(notes)) {
           updated[existingIdx].notes = updated[existingIdx].notes 
@@ -258,6 +263,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             : notes;
         }
         return updated;
+      }
+
+      // Jangan tambah jika stok 0
+      if (product.stok !== undefined && product.stok <= 0) {
+        return prevCart;
       }
 
       return [...prevCart, { product, qty: 1, selectedVarian: varian, notes }];
@@ -271,8 +281,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       );
       if (idx === -1) return prevCart;
 
+      const item = prevCart[idx];
+      const newQty = item.qty + change;
+
+      // Batasi kuantitas maksimal sesuai stok
+      if (change > 0 && item.product.stok !== undefined && newQty > item.product.stok) {
+        return prevCart;
+      }
+
       const updated = [...prevCart];
-      updated[idx].qty += change;
+      updated[idx] = { ...updated[idx], qty: newQty };
 
       if (updated[idx].qty <= 0) {
         updated.splice(idx, 1);
