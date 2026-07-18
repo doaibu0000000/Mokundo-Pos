@@ -229,10 +229,29 @@ export const PengaturanView: React.FC = () => {
       const newHash = await hashPassword(newPassword);
       await db.users.update(user!.id!, { password_hash: newHash });
 
-      setSecuritySuccess('Kata sandi berhasil diubah! Jangan gunakan sandi default kembali.');
+      // Push password baru ke Supabase agar sinkron ke semua device
+      if (navigator.onLine) {
+        const updatedUser = await db.users.get(user!.id!);
+        if (updatedUser) {
+          const { SyncService } = await import('../../../shared/services/syncService');
+          await SyncService.directPush('users', 'UPDATE', updatedUser.id!, updatedUser);
+        }
+      }
+
+      // Paksa logout admin agar harus login ulang dengan sandi baru
+      localStorage.removeItem('mokundo_user');
+      localStorage.removeItem('mokundo_cart');
+      localStorage.removeItem('mokundo_platform');
+      localStorage.removeItem('mokundo_activeTab');
+
+      setSecuritySuccess('Kata sandi berhasil diubah! Anda wajib login ulang dengan sandi baru.');
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      setTimeout(() => {
+        setSecuritySuccess('');
+        window.location.reload(); // Reload agar otomatis diarahkan ke halaman login
+      }, 3000);
     } catch (e) {
       setSecurityError('Gagal memperbarui kata sandi');
     }
