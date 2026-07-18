@@ -88,6 +88,7 @@ export const PengaturanView: React.FC = () => {
   const [receiptThankYou, setReceiptThankYou] = useState(store?.receipt_thankyou_text || 'Thank you for your order!');
   const [receiptFooterBrand, setReceiptFooterBrand] = useState(store?.receipt_footer_brand || '— Surantaka Coffee —');
   const [storeSuccess, setStoreSuccess] = useState('');
+  const [storeError, setStoreError] = useState('');
   
   // Bluetooth Print State
   const [connectedBluetooth, setConnectedBluetooth] = useState<string | null>(null);
@@ -1321,6 +1322,55 @@ export const PengaturanView: React.FC = () => {
         `}</style>
       </NeumorphicModal>
 
+      <NeumorphicModal
+        isOpen={!!storeError}
+        onClose={() => setStoreError('')}
+        hideCloseButton={true}
+        width="340px"
+      >
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          padding: '24px 16px 8px 16px',
+        }}>
+          <div style={{
+            width: '80px', height: '80px',
+            borderRadius: '50%',
+            border: '4px solid rgba(220, 53, 69, 0.2)',
+            position: 'relative',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginBottom: '24px'
+          }}>
+            <svg width="80" height="80" style={{ position: 'absolute', top: '-4px', left: '-4px' }}>
+              <circle cx="40" cy="40" r="38" fill="none" stroke="#dc3545" strokeWidth="4" 
+                style={{
+                  strokeDasharray: 240,
+                  strokeDashoffset: 240,
+                  animation: 'drawCircle 0.5s ease-in-out forwards',
+                  transform: 'rotate(-45deg)',
+                  transformOrigin: '50% 50%'
+                }} />
+            </svg>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#dc3545" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ zIndex: 10, animation: 'drawCheck 0.4s 0.3s ease-out forwards' }}>
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </div>
+          
+          <h2 style={{ margin: '0 0 12px 0', fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)' }}>
+            Gagal!
+          </h2>
+          <p style={{ margin: '0 0 24px 0', fontWeight: 500, fontSize: '14px', color: 'var(--text-secondary)', textAlign: 'center' }}>
+            {storeError}
+          </p>
+          
+          <NeumorphicButton variant="primary" onClick={() => setStoreError('')} style={{ width: '100%' }}>
+            Tutup
+          </NeumorphicButton>
+        </div>
+      </NeumorphicModal>
+
       {activeScreen === 'reset' && user?.role === 'Admin' && (
         <div style={{ maxWidth: '480px', display: 'flex', flexDirection: 'column', gap: '12px', animation: 'fadeIn 0.2s ease-in-out' }}>
           {renderHeader('Reset Data Aplikasi', 'Hapus semua data & kembali ke awal')}
@@ -1399,10 +1449,12 @@ export const PengaturanView: React.FC = () => {
                     localStorage.removeItem('mokundo_cart');
                     localStorage.removeItem('mokundo_activeTab');
                     
-                    alert('✅ Reset berhasil! Aplikasi akan dimuat ulang.');
-                    window.location.reload();
+                    setStoreSuccess('Reset berhasil! Aplikasi memuat ulang...');
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 2000);
                   } catch (e) {
-                    alert('Gagal mereset data. Coba lagi.');
+                    setStoreError('Gagal mereset data. Coba lagi.');
                     setIsResetting(false);
                   }
                 }}
