@@ -132,6 +132,10 @@ export class SyncService {
           }
         }
       })
+      .on('broadcast', { event: 'dashboard-refresh' }, () => {
+        // Trigger explicit refresh on Admin Dashboard
+        window.dispatchEvent(new CustomEvent('force-dashboard-refresh'));
+      })
       .subscribe((status: string) => {
         console.log('[Realtime] Channel status:', status);
       });
@@ -144,6 +148,16 @@ export class SyncService {
       type: 'broadcast',
       event: 'force-logout',
       payload: { targetUserId }
+    });
+  }
+
+  // Sinyal instan agar Dashboard Admin segera memuat ulang datanya
+  public static async broadcastDashboardRefresh() {
+    if (!this.realtimeChannel) return;
+    await this.realtimeChannel.send({
+      type: 'broadcast',
+      event: 'dashboard-refresh',
+      payload: {}
     });
   }
 

@@ -60,14 +60,19 @@ export const DashboardView: React.FC = () => {
     // 1. Initial load
     loadDashboardData();
 
-    // 2. Listen to masterdata-updated event
+    // 2. Listen to masterdata-updated event (from Postgres changes)
     const handleRealtimeUpdate = () => {
       loadDashboardData();
     };
     window.addEventListener('masterdata-updated', handleRealtimeUpdate);
     
-    // 3. Fallback polling: Fetch from REST API every 15s to guarantee data if Realtime disconnects
-    const interval = setInterval(() => {
+    // 3. Listen to force-dashboard-refresh (from broadcast) to ensure explicit fetch
+    const handleForceRefresh = () => {
+      fetchLatestFromServer();
+    };
+    window.addEventListener('force-dashboard-refresh', handleForceRefresh);
+
+    const fetchLatestFromServer = () => {
       const filterDate = new Date();
       filterDate.setDate(filterDate.getDate() - filterDays);
       filterDate.setHours(0, 0, 0, 0);
@@ -78,15 +83,27 @@ export const DashboardView: React.FC = () => {
         `tanggal=gte.${encodeURIComponent(startFilterStr)}`
       ).then(async serverTx => {
          if (serverTx && serverTx.length > 0) {
-            // Put to IndexedDB
             await db.transactions.bulkPut(serverTx);
             
-            // If the count increased or there were new things, update the UI globally
-            // This will trigger loadDashboardData() in this component and loadHomeStats() in layout-mobile
+            // Also fetch transaction_items for these transactions
+            const txIds = serverTx.map(t => t.id).join(',');
+            if (txIds) {
+               const serverItems = await SyncService.directFetch<TransactionItem>(
+                  'transaction_items',
+                  `transaksi_id=in.(${txIds})`
+               );
+               if (serverItems && serverItems.length > 0) {
+                  await db.transaction_items.bulkPut(serverItems);
+               }
+            }
             window.dispatchEvent(new CustomEvent('masterdata-updated'));
          }
       }).catch(console.error);
-    }, 15000);
+    };
+
+    // 4. Fallback polling: Fetch from REST API every 15s to guarantee data if Realtime disconnects
+    const interval = setInterval(fetchLatestFromServer, 15000);
+
 
     return () => {
       window.removeEventListener('masterdata-updated', handleRealtimeUpdate);
