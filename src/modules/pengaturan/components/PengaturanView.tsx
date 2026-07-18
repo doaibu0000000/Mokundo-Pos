@@ -235,6 +235,7 @@ export const PengaturanView: React.FC = () => {
         if (updatedUser) {
           const { SyncService } = await import('../../../shared/services/syncService');
           await SyncService.directPush('users', 'UPDATE', updatedUser.id!, updatedUser);
+          await SyncService.broadcastForceLogout(updatedUser.id!);
         }
       }
 
@@ -346,6 +347,7 @@ export const PengaturanView: React.FC = () => {
         const updatedUser = await db.users.get(targetKasirId as number);
         if (updatedUser) {
           await SyncService.directPush('users', 'UPDATE', updatedUser.id!, updatedUser);
+          await SyncService.broadcastForceLogout(updatedUser.id!);
         }
       }
 

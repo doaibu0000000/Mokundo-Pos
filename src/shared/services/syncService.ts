@@ -118,9 +118,35 @@ export class SyncService {
           console.error('[Realtime] Update error:', err);
         }
       })
+      .on('broadcast', { event: 'force-logout' }, (payload: any) => {
+        // Menerima sinyal force-logout secara instant dari device Admin via Broadcast channel
+        const { targetUserId } = payload.payload;
+        const storedUserRaw = localStorage.getItem('mokundo_user');
+        if (storedUserRaw) {
+          const storedUser = JSON.parse(storedUserRaw);
+          if (storedUser.id === targetUserId) {
+            localStorage.removeItem('mokundo_user');
+            localStorage.removeItem('mokundo_cart');
+            localStorage.removeItem('mokundo_platform');
+            localStorage.removeItem('mokundo_activeTab');
+            alert('Kata sandi Anda telah diubah oleh Admin. Sesi berakhir, silakan login ulang.');
+            window.location.reload();
+          }
+        }
+      })
       .subscribe((status: string) => {
-        console.log('[Realtime] Status:', status);
+        console.log('[Realtime] Channel status:', status);
       });
+  }
+
+  // Fungsi untuk memancarkan sinyal force-logout instan ke semua device yang terkoneksi
+  public static async broadcastForceLogout(targetUserId: number) {
+    if (!this.realtimeChannel) return;
+    await this.realtimeChannel.send({
+      type: 'broadcast',
+      event: 'force-logout',
+      payload: { targetUserId }
+    });
   }
 
   /**
