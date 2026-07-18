@@ -28,25 +28,38 @@ export const LoginView: React.FC = () => {
     setError('');
 
     try {
-      // 1. Jika online, tarik data user terbaru dari Supabase dulu
-      //    agar perubahan password dari device lain (admin) langsung berlaku
+      // 1. Jika online dan Supabase dikonfigurasi, tarik password_hash terbaru
+      //    Ini memastikan perubahan password oleh admin berlaku di semua device
       if (navigator.onLine) {
         try {
-          const { SyncService } = await import('../../../shared/services/syncService');
-          const remoteUsers = await SyncService.directFetch<any>(
-            'users',
-            `username=eq.${encodeURIComponent(trimmedUser.toLowerCase())}&select=*`
-          );
-          if (remoteUsers && remoteUsers.length > 0) {
-            const { db: localDb } = await import('../../../shared/services/db');
-            await localDb.users.put(remoteUsers[0]);
+          const storeConfig = await db.stores.toCollection().first();
+          if (storeConfig?.supabase_url && storeConfig?.supabase_anon_key) {
+            const baseUrl = storeConfig.supabase_url.replace(/\/$/, '');
+            const key = storeConfig.supabase_anon_key;
+            const res = await fetch(
+              `${baseUrl}/rest/v1/users?username=eq.${encodeURIComponent(trimmedUser.toLowerCase())}&select=id,username,password_hash`,
+              { headers: { 'apikey': key, 'Authorization': `Bearer ${key}` } }
+            );
+            if (res.ok) {
+              const remoteUsers = await res.json();
+              if (Array.isArray(remoteUsers) && remoteUsers.length > 0) {
+                const remoteUser = remoteUsers[0];
+                // Hanya update password_hash jika Supabase mengembalikannya
+                if (remoteUser.password_hash) {
+                  const localUser = await db.users.where('username').equalsIgnoreCase(trimmedUser).first();
+                  if (localUser?.id) {
+                    await db.users.update(localUser.id, { password_hash: remoteUser.password_hash });
+                  }
+                }
+              }
+            }
           }
         } catch (_) {
-          // Jika gagal pull, tetap lanjut dengan data lokal
+          // Gagal pull dari Supabase, lanjut dengan data lokal
         }
       }
 
-      // 2. Fetch user by username dari lokal (sudah diupdate jika online)
+      // 2. Ambil user dari lokal (sudah diupdate jika pull berhasil)
       const user = await db.users.where('username').equalsIgnoreCase(trimmedUser).first();
       if (!user) {
         setError('Username atau password salah');
@@ -54,7 +67,7 @@ export const LoginView: React.FC = () => {
         return;
       }
 
-      // 3. Hash input password and match
+      // 3. Hash input password dan cocokkan
       const inputHash = await hashPassword(trimmedPass);
       if (user.password_hash !== inputHash) {
         setError('Username atau password salah');
@@ -62,7 +75,7 @@ export const LoginView: React.FC = () => {
         return;
       }
 
-      // 4. Authenticate session
+      // 4. Autentikasi berhasil
       loginUser(user);
     } catch (err) {
       console.error('Login error:', err);
