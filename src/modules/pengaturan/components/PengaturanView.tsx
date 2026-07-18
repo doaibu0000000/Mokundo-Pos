@@ -628,17 +628,19 @@ export const PengaturanView: React.FC = () => {
             </NeumorphicCard>
           )}
 
-          <NeumorphicCard 
-            className="nm-button"
-            onClick={() => navigateTo('profil')}
-            style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
-          >
-            <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-blue)' }}><ReceiptText size={20} /></div>
-            <div style={{ flex: 1, textAlign: 'left' }}>
-              <div style={{ fontWeight: 800, fontSize: '15px' }}>Tampilan Struk</div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Ubah nama dan alamat pada struk</div>
-            </div>
-          </NeumorphicCard>
+          {user?.role !== 'Kasir' && (
+            <NeumorphicCard 
+              className="nm-button"
+              onClick={() => navigateTo('profil')}
+              style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
+            >
+              <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-blue)' }}><ReceiptText size={20} /></div>
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <div style={{ fontWeight: 800, fontSize: '15px' }}>Tampilan Struk</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Ubah nama dan alamat pada struk</div>
+              </div>
+            </NeumorphicCard>
+          )}
 
           <NeumorphicCard 
             className="nm-button"
