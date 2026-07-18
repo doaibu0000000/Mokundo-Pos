@@ -246,6 +246,10 @@ export const PengaturanView: React.FC = () => {
         .filter(u => u.role === 'Kasir')
         .map(u => ({ id: u.id!, nama_lengkap: u.nama_lengkap, username: u.username }));
       setKasirList(kasirs);
+      // Auto-select kasir pertama jika belum ada yang dipilih
+      if (kasirs.length > 0 && !selectedKasirId) {
+        setSelectedKasirId(kasirs[0].id);
+      }
     } catch (e) {
       console.error('Gagal memuat daftar kasir', e);
     }
@@ -257,10 +261,6 @@ export const PengaturanView: React.FC = () => {
     setKasirPwError('');
     setKasirPwSuccess('');
 
-    if (!selectedKasirId) {
-      setKasirPwError('Pilih kasir terlebih dahulu');
-      return;
-    }
     if (!kasirNewPassword || !kasirConfirmPassword) {
       setKasirPwError('Semua field wajib diisi');
       return;
@@ -271,6 +271,10 @@ export const PengaturanView: React.FC = () => {
     }
     if (kasirNewPassword !== kasirConfirmPassword) {
       setKasirPwError('Konfirmasi kata sandi tidak cocok');
+      return;
+    }
+    if (!selectedKasirId) {
+      setKasirPwError('Tidak ada akun kasir ditemukan');
       return;
     }
 
@@ -514,7 +518,7 @@ export const PengaturanView: React.FC = () => {
           {user?.role !== 'Kasir' && (
             <NeumorphicCard 
               className="nm-button"
-              onClick={() => navigateTo('keamanan')}
+              onClick={() => { navigateTo('keamanan'); loadKasirList(); }}
               style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
             >
               <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-orange)' }}><Key size={20} /></div>
@@ -834,7 +838,7 @@ export const PengaturanView: React.FC = () => {
           
           <NeumorphicCard>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #f7971e, #ffd200)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #667eea, #764ba2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Key size={16} color="#fff" />
                 </div>
                 <div>
@@ -900,37 +904,6 @@ export const PengaturanView: React.FC = () => {
               </div>
 
               <form onSubmit={handleResetKasirPassword} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                {/* Dropdown pilih kasir */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>Pilih Kasir</label>
-                  <div
-                    className="nm-inset"
-                    style={{ borderRadius: 'var(--radius-sm)', padding: '2px 4px' }}
-                  >
-                    <select
-                      value={selectedKasirId}
-                      onChange={e => setSelectedKasirId(e.target.value ? Number(e.target.value) : '')}
-                      onFocus={loadKasirList}
-                      onClick={loadKasirList}
-                      style={{
-                        width: '100%',
-                        background: 'transparent',
-                        border: 'none',
-                        outline: 'none',
-                        fontSize: '14px',
-                        color: 'var(--text-primary)',
-                        padding: '10px 8px',
-                        cursor: 'pointer',
-                        appearance: 'auto'
-                      }}
-                    >
-                      <option value="">-- Pilih akun kasir --</option>
-                      {kasirList.map(k => (
-                        <option key={k.id} value={k.id}>{k.nama_lengkap} (@{k.username})</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
 
                 <NeumorphicInput
                   label="Kata Sandi Baru"
