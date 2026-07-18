@@ -241,6 +241,40 @@ export const PengaturanView: React.FC = () => {
   // Load kasir list when admin opens keamanan screen
   const loadKasirList = async () => {
     try {
+      // 1. Jika online, tarik data user terbaru dari Supabase dulu
+      //    agar kasir yang dibuat di device lain masuk ke list lokal
+      if (navigator.onLine) {
+        try {
+          const storeConfig = await db.stores.toCollection().first();
+          if (storeConfig?.supabase_url && storeConfig?.supabase_anon_key) {
+            const baseUrl = storeConfig.supabase_url.replace(/\/$/, '');
+            const key = storeConfig.supabase_anon_key;
+            const res = await fetch(
+              `${baseUrl}/rest/v1/users?select=*`,
+              { headers: { 'apikey': key, 'Authorization': `Bearer ${key}` } }
+            );
+            if (res.ok) {
+              const remoteUsers = await res.json();
+              if (Array.isArray(remoteUsers) && remoteUsers.length > 0) {
+                for (const ru of remoteUsers) {
+                  const localUser = await db.users.get(ru.id);
+                  if (localUser) {
+                    await db.users.update(ru.id, {
+                      ...ru,
+                      password_hash: ru.password_hash || localUser.password_hash
+                    });
+                  } else {
+                    await db.users.put(ru);
+                  }
+                }
+              }
+            }
+          }
+        } catch (_) {
+          // Gagal pull dari Supabase, lanjut dengan data lokal
+        }
+      }
+
       const allUsers = await db.users.toArray();
       const kasirs = allUsers
         .filter(u => u.role === 'Kasir')
