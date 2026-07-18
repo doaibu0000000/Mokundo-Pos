@@ -283,6 +283,14 @@ export const PengaturanView: React.FC = () => {
       await db.users.update(selectedKasirId as number, { password_hash: newHash });
       const kasir = kasirList.find(k => k.id === selectedKasirId);
 
+      // Push password baru ke Supabase agar sinkron ke semua device
+      if (navigator.onLine) {
+        const updatedUser = await db.users.get(selectedKasirId as number);
+        if (updatedUser) {
+          await SyncService.directPush('users', 'UPDATE', updatedUser.id!, updatedUser);
+        }
+      }
+
       // Paksa logout kasir jika sedang login di browser yang sama
       const storedUserRaw = localStorage.getItem('mokundo_user');
       if (storedUserRaw) {

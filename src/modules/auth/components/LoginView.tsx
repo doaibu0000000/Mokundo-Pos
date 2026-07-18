@@ -28,7 +28,25 @@ export const LoginView: React.FC = () => {
     setError('');
 
     try {
-      // 1. Fetch user by username
+      // 1. Jika online, tarik data user terbaru dari Supabase dulu
+      //    agar perubahan password dari device lain (admin) langsung berlaku
+      if (navigator.onLine) {
+        try {
+          const { SyncService } = await import('../../../shared/services/syncService');
+          const remoteUsers = await SyncService.directFetch<any>(
+            'users',
+            `username=eq.${encodeURIComponent(trimmedUser.toLowerCase())}&select=*`
+          );
+          if (remoteUsers && remoteUsers.length > 0) {
+            const { db: localDb } = await import('../../../shared/services/db');
+            await localDb.users.put(remoteUsers[0]);
+          }
+        } catch (_) {
+          // Jika gagal pull, tetap lanjut dengan data lokal
+        }
+      }
+
+      // 2. Fetch user by username dari lokal (sudah diupdate jika online)
       const user = await db.users.where('username').equalsIgnoreCase(trimmedUser).first();
       if (!user) {
         setError('Username atau password salah');
@@ -36,7 +54,7 @@ export const LoginView: React.FC = () => {
         return;
       }
 
-      // 2. Hash input password and match
+      // 3. Hash input password and match
       const inputHash = await hashPassword(trimmedPass);
       if (user.password_hash !== inputHash) {
         setError('Username atau password salah');
@@ -44,7 +62,7 @@ export const LoginView: React.FC = () => {
         return;
       }
 
-      // 3. Authenticate session
+      // 4. Authenticate session
       loginUser(user);
     } catch (err) {
       console.error('Login error:', err);
