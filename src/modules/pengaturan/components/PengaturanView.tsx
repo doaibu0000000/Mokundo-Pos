@@ -1384,13 +1384,21 @@ export const PengaturanView: React.FC = () => {
                 onClick={async () => {
                   setIsResetting(true);
                   try {
+                    // Wipe local indexedDB
                     await db.transactions.clear();
                     await db.transaction_items.clear();
                     await db.products.clear();
                     await db.categories.clear();
                     await db.shifts.clear();
+                    
+                    // Wipe remote Supabase DB
+                    if (navigator.onLine) {
+                      await SyncService.wipeSupabaseData();
+                    }
+
                     localStorage.removeItem('mokundo_cart');
                     localStorage.removeItem('mokundo_activeTab');
+                    
                     alert('✅ Reset berhasil! Aplikasi akan dimuat ulang.');
                     window.location.reload();
                   } catch (e) {

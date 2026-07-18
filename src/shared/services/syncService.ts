@@ -366,6 +366,29 @@ export class SyncService {
     }
   }
 
+  // Wipe all transactional and master data from Supabase
+  public static async wipeSupabaseData(): Promise<void> {
+    const cfg = await this.getConfig();
+    if (!cfg) return;
+
+    try {
+      if (!this.supabase) {
+        this.supabase = createClient(cfg.url, cfg.key);
+      }
+      console.log('[SyncService] Wiping Supabase data...');
+      
+      await this.supabase.from('transaction_items').delete().neq('id', -1);
+      await this.supabase.from('transactions').delete().neq('id', -1);
+      await this.supabase.from('products').delete().neq('id', -1);
+      await this.supabase.from('categories').delete().neq('id', -1);
+      await this.supabase.from('shifts').delete().neq('id', -1);
+      
+      console.log('[SyncService] Supabase data wiped successfully');
+    } catch (e) {
+      console.error('[SyncService] Failed to wipe Supabase:', e);
+    }
+  }
+
   // --- Private Helpers ---
 
   private static cleanPayload(_tableName: string, payload: any): any {
