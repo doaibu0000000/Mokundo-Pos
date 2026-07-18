@@ -84,8 +84,8 @@ export const PengaturanView: React.FC = () => {
   };
   const [qrBarcode, setQrBarcode] = useState(store?.qr_barcode || '');
   const [qrLinkType, setQrLinkType] = useState<'whatsapp' | 'url'>('whatsapp');
-  const [qrWhatsappPhone, setQrWhatsappPhone] = useState('');
-  const [qrWhatsappMessage, setQrWhatsappMessage] = useState('');
+  const [qrWhatsappPhone, setQrWhatsappPhone] = useState('083865945442');
+  const [qrWhatsappMessage, setQrWhatsappMessage] = useState('Halo Admin, saya ingin bertanya mengenai pembelian produk dan peluang kemitraan. Boleh dibantu?');
   const [qrCustomUrl, setQrCustomUrl] = useState('');
   const [qrPreviewDataUrl, setQrPreviewDataUrl] = useState('');
   
@@ -150,8 +150,8 @@ export const PengaturanView: React.FC = () => {
       setUkuranKertas(store.ukuran_kertas_struk || '58mm');
       
       const barcodeStr = store.qr_barcode || '';
-      setQrBarcode(barcodeStr);
       if (barcodeStr.startsWith('https://wa.me/')) {
+        setQrBarcode(barcodeStr);
         setQrLinkType('whatsapp');
         try {
           const urlObj = new URL(barcodeStr);
@@ -162,7 +162,12 @@ export const PengaturanView: React.FC = () => {
         } catch {
           // Ignore parse error
         }
+      } else if (barcodeStr === '') {
+        setQrLinkType('whatsapp');
+        setQrWhatsappPhone('083865945442');
+        setQrWhatsappMessage('Halo Admin, saya ingin bertanya mengenai pembelian produk dan peluang kemitraan. Boleh dibantu?');
       } else {
+        setQrBarcode(barcodeStr);
         setQrLinkType('url');
         setQrCustomUrl(barcodeStr);
       }
