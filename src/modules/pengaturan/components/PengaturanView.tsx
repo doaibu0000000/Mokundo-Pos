@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Settings, Key, Cloud, FolderLock, Power, AlertTriangle, Sun, Moon, Printer, ReceiptText, Download } from 'lucide-react';
+import { Settings, Key, Cloud, FolderLock, Power, AlertTriangle, Sun, Moon, Printer, ReceiptText, Download, Trash2 } from 'lucide-react';
 import { useApp } from '../../../store/AppContext';
 import { db, hashPassword } from '../../../shared/services/db';
 import { SyncService } from '../../../shared/services/syncService';
@@ -29,9 +29,11 @@ export const PengaturanView: React.FC = () => {
     toggleDarkMode
   } = useApp();
 
-  const [activeScreen, setActiveScreen] = useState<'menu' | 'profil' | 'printer' | 'keamanan' | 'sync' | 'shift'>('menu');
+  const [activeScreen, setActiveScreen] = useState<'menu' | 'profil' | 'printer' | 'keamanan' | 'sync' | 'shift' | 'reset'>('menu');
+  const [resetTyped, setResetTyped] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
 
-  const navigateTo = (screen: 'menu' | 'profil' | 'printer' | 'keamanan' | 'sync' | 'shift') => {
+  const navigateTo = (screen: 'menu' | 'profil' | 'printer' | 'keamanan' | 'sync' | 'shift' | 'reset') => {
     if (screen !== 'menu' && activeScreen === 'menu') {
       window.history.pushState({ screen }, '');
     }
@@ -633,6 +635,18 @@ export const PengaturanView: React.FC = () => {
             <div style={{ flex: 1, textAlign: 'left' }}>
               <div style={{ fontWeight: 800, fontSize: '15px' }}>Rekonsiliasi Shift</div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Tutup shift & hitung laci</div>
+            </div>
+          </NeumorphicCard>
+
+          <NeumorphicCard 
+            className="nm-button"
+            onClick={() => navigateTo('reset')}
+            style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', cursor: 'pointer' }}
+          >
+            <div className="nm-inset" style={{ padding: '8px', borderRadius: '50%', color: 'var(--accent-red)' }}><Trash2 size={20} /></div>
+            <div style={{ flex: 1, textAlign: 'left' }}>
+              <div style={{ fontWeight: 800, fontSize: '15px', color: 'var(--accent-red)' }}>Reset Data Aplikasi</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Hapus semua data, kembali ke awal</div>
             </div>
           </NeumorphicCard>
 
@@ -1303,6 +1317,91 @@ export const PengaturanView: React.FC = () => {
           }
         `}</style>
       </NeumorphicModal>
+
+      {activeScreen === 'reset' && (
+        <div style={{ maxWidth: '480px', display: 'flex', flexDirection: 'column', gap: '12px', animation: 'fadeIn 0.2s ease-in-out' }}>
+          {renderHeader('Reset Data Aplikasi', 'Hapus semua data & kembali ke awal')}
+
+          <NeumorphicCard>
+            <div style={{ textAlign: 'center', padding: '8px 0 16px' }}>
+              <div style={{
+                width: '64px', height: '64px', margin: '0 auto 16px',
+                borderRadius: '50%', backgroundColor: 'rgba(239,68,68,0.1)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: '2px solid rgba(239,68,68,0.3)'
+              }}>
+                <Trash2 size={28} color="var(--accent-red)" />
+              </div>
+              <h3 style={{ fontWeight: 800, fontSize: '16px', color: 'var(--accent-red)', marginBottom: '8px' }}>Peringatan: Tindakan Tidak Dapat Dibatalkan!</h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                Semua data berikut akan <strong>dihapus permanen</strong>:
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+              {[
+                '🛍️ Semua data Transaksi & Item',
+                '📦 Semua data Produk & Kategori',
+                '📅 Semua data Shift',
+                '📋 Semua data Laporan',
+              ].map((item, i) => (
+                <div key={i} className="nm-inset" style={{ padding: '10px 14px', borderRadius: '8px', fontSize: '13px', fontWeight: 600 }}>
+                  {item}
+                </div>
+              ))}
+            </div>
+
+            <div style={{ padding: '12px 14px', borderRadius: '10px', backgroundColor: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', marginBottom: '20px' }}>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: 0 }}>
+                ✅ Data yang <strong>tetap dipertahankan</strong>: Nama Toko, Akun Login (Admin & Kasir), dan Pengaturan Cloud.
+              </p>
+            </div>
+
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '10px', fontWeight: 600 }}>
+              Ketik <strong style={{ color: 'var(--accent-red)' }}>RESET</strong> untuk konfirmasi:
+            </p>
+            <NeumorphicInput
+              label=""
+              placeholder="Ketik RESET di sini"
+              value={resetTyped}
+              onChange={(e) => setResetTyped(e.target.value)}
+            />
+
+            <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+              <NeumorphicButton
+                style={{ flex: 1 }}
+                onClick={() => { navigateTo('menu'); setResetTyped(''); }}
+              >
+                Batal
+              </NeumorphicButton>
+              <NeumorphicButton
+                variant="danger"
+                style={{ flex: 1, opacity: resetTyped === 'RESET' && !isResetting ? 1 : 0.4 }}
+                disabled={resetTyped !== 'RESET' || isResetting}
+                onClick={async () => {
+                  setIsResetting(true);
+                  try {
+                    await db.transactions.clear();
+                    await db.transaction_items.clear();
+                    await db.products.clear();
+                    await db.categories.clear();
+                    await db.shifts.clear();
+                    localStorage.removeItem('mokundo_cart');
+                    localStorage.removeItem('mokundo_activeTab');
+                    alert('✅ Reset berhasil! Aplikasi akan dimuat ulang.');
+                    window.location.reload();
+                  } catch (e) {
+                    alert('Gagal mereset data. Coba lagi.');
+                    setIsResetting(false);
+                  }
+                }}
+              >
+                {isResetting ? 'Mereset...' : '🗑️ Reset Sekarang'}
+              </NeumorphicButton>
+            </div>
+          </NeumorphicCard>
+        </div>
+      )}
 
     </div>
   );
