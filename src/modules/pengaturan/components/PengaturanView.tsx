@@ -326,19 +326,25 @@ export const PengaturanView: React.FC = () => {
       setKasirPwError('Konfirmasi kata sandi tidak cocok');
       return;
     }
-    if (!selectedKasirId) {
-      setKasirPwError('Tidak ada akun kasir ditemukan');
-      return;
+    let targetKasirId = selectedKasirId;
+    if (!targetKasirId) {
+      // Fallback: Cari kasir pertama di database lokal jika state belum terisi
+      const firstKasir = await db.users.filter(u => u.role === 'Kasir').first();
+      if (firstKasir && firstKasir.id) {
+        targetKasirId = firstKasir.id;
+      } else {
+        setKasirPwError('Tidak ada akun kasir ditemukan di database');
+        return;
+      }
     }
 
     try {
       const newHash = await hashPassword(kasirNewPassword);
-      await db.users.update(selectedKasirId as number, { password_hash: newHash });
-      const kasir = kasirList.find(k => k.id === selectedKasirId);
-
+      await db.users.update(targetKasirId as number, { password_hash: newHash });
+      
       // Push password baru ke Supabase agar sinkron ke semua device
       if (navigator.onLine) {
-        const updatedUser = await db.users.get(selectedKasirId as number);
+        const updatedUser = await db.users.get(targetKasirId as number);
         if (updatedUser) {
           await SyncService.directPush('users', 'UPDATE', updatedUser.id!, updatedUser);
         }
