@@ -359,6 +359,8 @@ export const TransaksiView: React.FC = () => {
                  for (const itm of itemsWritten) {
                     SyncService.directPush('transaction_items', 'INSERT', itm.id!, itm).catch(console.error);
                  }
+                 // Instantly notify Admin dashboard to refresh
+                 SyncService.broadcastDashboardRefresh().catch(console.error);
               } else {
                  alert('⚠️ Transaksi berhasil di lokal, tetapi GAGAL terkirim ke Server/Dashboard Admin!\nError: ' + res.error + '\n\nApakah Anda sudah menjalankan file SQL 005_drop_foreign_keys.sql di Supabase?');
               }
