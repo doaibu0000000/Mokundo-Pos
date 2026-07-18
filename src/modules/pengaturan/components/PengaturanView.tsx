@@ -864,10 +864,39 @@ export const PengaturanView: React.FC = () => {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <style>{`
+                  .qr-builder-container {
+                    display: flex;
+                    gap: 16px;
+                    align-items: flex-start;
+                  }
+                  .qr-preview-desktop {
+                    display: flex;
+                    width: 120px;
+                    flex-shrink: 0;
+                    flex-direction: column;
+                    gap: 6px;
+                  }
+                  .qr-preview-mobile {
+                    display: none;
+                    width: 120px;
+                    flex-direction: column;
+                    gap: 6px;
+                    margin: 0 auto;
+                  }
+                  @media (max-width: 600px) {
+                    .qr-preview-desktop {
+                      display: none;
+                    }
+                    .qr-preview-mobile {
+                      display: flex;
+                    }
+                  }
+                `}</style>
                 <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>QR CODE NOTA</label>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                <div className="qr-builder-container">
                   {/* Left Side: Builder */}
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       <label style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>JENIS TAUTAN</label>
@@ -888,6 +917,27 @@ export const PengaturanView: React.FC = () => {
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                           Custom URL
                         </NeumorphicButton>
+                      </div>
+                    </div>
+
+                    {/* PRATINJAU QR (MOBILE ONLY) */}
+                    <div className="qr-preview-mobile">
+                      <label style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', textAlign: 'center' }}>PRATINJAU QR</label>
+                      <div className="nm-inset" style={{ 
+                        width: '100%', 
+                        aspectRatio: '1/1', 
+                        borderRadius: 'var(--radius-md)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '8px',
+                        backgroundColor: 'var(--bg-primary)'
+                      }}>
+                        {qrPreviewDataUrl ? (
+                          <img src={qrPreviewDataUrl} alt="QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                        ) : (
+                          <span style={{ fontSize: '10px', color: 'var(--text-tertiary)', textAlign: 'center' }}>QR Code belum dibuat</span>
+                        )}
                       </div>
                     </div>
 
@@ -951,8 +1001,8 @@ export const PengaturanView: React.FC = () => {
                     )}
                   </div>
                   
-                  {/* Right Side: Preview */}
-                  <div style={{ width: '120px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {/* Right Side: Preview (DESKTOP ONLY) */}
+                  <div className="qr-preview-desktop">
                     <label style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', textAlign: 'center' }}>PRATINJAU QR</label>
                     <div className="nm-inset" style={{ 
                       width: '100%', 
