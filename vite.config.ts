@@ -13,6 +13,7 @@ export default defineConfig({
       injectRegister: 'auto',
       includeAssets: ['favicon.png', 'pwa-192x192.png', 'pwa-512x512.png', 'pwa-512x512-maskable.png', 'splash-icon.png'],
       workbox: {
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB limit for caching large logos
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
