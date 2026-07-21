@@ -11,7 +11,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      includeAssets: ['mokundo.jpg'],
+      includeAssets: ['mokundo.jpg', 'splash-icon.jpg'],
       workbox: {
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB limit for caching large logos
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
@@ -64,7 +64,7 @@ export default defineConfig({
             purpose: 'maskable'
           },
           {
-            src: 'mokundo.jpg',
+            src: 'splash-icon.jpg',
             sizes: '512x512',
             type: 'image/jpeg',
             purpose: 'any'
