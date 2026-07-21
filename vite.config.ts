@@ -11,7 +11,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      includeAssets: ['mokundo.jpg', 'splash-icon.jpg', 'pwa-192x192.png', 'pwa-512x512.png', 'pwa-512x512-maskable.png'],
+      includeAssets: ['mokundo.jpg', 'splash-icon.png', 'pwa-192x192.png', 'pwa-512x512.png', 'pwa-512x512-maskable.png'],
       workbox: {
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB limit for caching large logos
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
@@ -55,7 +55,7 @@ export default defineConfig({
             src: 'pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png',
-            purpose: 'maskable'
+            purpose: 'any maskable'
           },
           {
             src: 'pwa-512x512-maskable.png',
@@ -64,9 +64,9 @@ export default defineConfig({
             purpose: 'maskable'
           },
           {
-            src: 'splash-icon.jpg',
+            src: 'splash-icon.png',
             sizes: '512x512',
-            type: 'image/jpeg',
+            type: 'image/png',
             purpose: 'any'
           }
         ]
