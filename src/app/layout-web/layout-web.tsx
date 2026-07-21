@@ -83,7 +83,7 @@ export const WebLayout: React.FC = () => {
               padding: '4px'
             }}
           >
-            <img src="/Mokundo-Pos/brand-icon.png" alt="Logo" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+            <img src="/Mokundo-Pos/mokundo.jpg" alt="Logo" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
           </div>
           <div>
             <h2 style={{ fontSize: '15px', fontWeight: 900, lineHeight: 1.1 }}>Mokundo POS</h2>

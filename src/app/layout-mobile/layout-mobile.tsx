@@ -125,7 +125,7 @@ export const MobileLayout: React.FC = () => {
                 padding: '4px'
               }}
             >
-              <img src="/Mokundo-Pos/brand-icon.png" alt="Profile" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+              <img src="/Mokundo-Pos/mokundo.jpg" alt="Profile" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
             </div>
             <div>
               <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Selamat datang,</div>

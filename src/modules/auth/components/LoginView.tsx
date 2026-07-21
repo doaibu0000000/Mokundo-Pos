@@ -128,7 +128,7 @@ export const LoginView: React.FC = () => {
               padding: '8px'
             }}
           >
-            <img src="/Mokundo-Pos/brand-icon.png" alt="Mokundo Logo" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+            <img src="/Mokundo-Pos/mokundo.jpg" alt="Mokundo Logo" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
           </div>
 
           {/* Titles */}
