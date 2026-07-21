@@ -42,8 +42,8 @@ export default defineConfig({
         name: 'Mokundo',
         short_name: 'Mokundo',
         description: 'Sistem Kasir (POS) Offline-First untuk UMKM',
-        theme_color: '#0B204D',
-        background_color: '#0B204D',
+        theme_color: '#284D55',
+        background_color: '#284D55',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/Mokundo-Pos/',
@@ -62,6 +62,12 @@ export default defineConfig({
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
+          },
+          {
+            src: 'splash-icon.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any'
           }
         ]
       }
